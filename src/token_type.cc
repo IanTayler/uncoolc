@@ -24,15 +24,27 @@ std::string token_type_str(TokenType t) {
     return "L_SQ_BRACKET";
   case TokenType::R_SQ_BRACKET:
     return "R_SQ_BRACKET";
+  case TokenType::COLON:
+    return "COLON";
   case TokenType::SEMICOLON:
     return "SEMICOLON";
   case TokenType::SIMPLE_OP:
     return "SIMPLE_OP";
-  // Complex operators
-  case TokenType::MINUS_OP_CLASS:
-    return "INEQ_OP";
+  // Complex operators and token classes
+  case TokenType::L_PAREN_CLASS:
+    return "__L_PAREN_CLASS";
+  case TokenType::MINOR_OP_CLASS:
+    return "__MINOR_OP_CLASS";
   case TokenType::EQ_OP_CLASS:
-    return "EQ_OP";
+    return "__EQ_OP_CLASS";
+  case TokenType::ASTERISK_CLASS:
+    return "__ASTERISK_CLASS";
+  case TokenType::DASH_CLASS:
+    return "__DASH_CLASS";
+  case TokenType::ASSIGN:
+    return "ASSIGN";
+  case TokenType::ARROW:
+    return "ARROW";
   // IDs
   case TokenType::OBJECT_NAME:
     return "OBJECT_NAME";
@@ -80,7 +92,7 @@ std::string token_type_str(TokenType t) {
   case TokenType::INVALID:
     return "INVALID";
   default:
-    return "__UNKNOWN_TOKEN_STR__";
+    return "__UNKNOWN_TOKEN__";
   }
 }
 
@@ -90,7 +102,6 @@ std::string token_type_str(TokenType t) {
  *                    *
  *********************/
 
-// TODO(IT): name here weird
 TokenType token_type_from_start(char start) {
   switch (start) {
   case '\0':
@@ -109,9 +120,13 @@ TokenType token_type_from_start(char start) {
   case '"':
     return TokenType::STRING;
   case '(':
-    return TokenType::L_PAREN;
+    return TokenType::L_PAREN_CLASS;
   case ')':
     return TokenType::R_PAREN;
+  case '*':
+    return TokenType::ASTERISK_CLASS;
+  case '-':
+    return TokenType::DASH_CLASS;
   case '{':
     return TokenType::L_BRACKET;
   case '}':
@@ -120,15 +135,15 @@ TokenType token_type_from_start(char start) {
     return TokenType::L_SQ_BRACKET;
   case ']':
     return TokenType::R_SQ_BRACKET;
+  case ':':
+    return TokenType::COLON;
   case ';':
     return TokenType::SEMICOLON;
   case '=':
     return TokenType::EQ_OP_CLASS;
   case '<':
-    return TokenType::MINUS_OP_CLASS;
+    return TokenType::MINOR_OP_CLASS;
   case '+':
-  case '-':
-  case '*':
   case '/':
   case '~':
     return TokenType::SIMPLE_OP;

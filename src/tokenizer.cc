@@ -114,13 +114,17 @@ private:
         return Token(TokenType::KW_END);
 
       break;
-    case 4: // else, esac, then
+    case 4: // else, esac, then, loop and pool
       if (c0 == 'e' && c1 == 'l' && c2 == 's' && c3 == 'e')
         return Token(TokenType::KW_ELSE);
       if (c0 == 'e' && c1 == 's' && c2 == 'a' && c3 == 'c')
         return Token(TokenType::KW_ESAC);
       if (c0 == 't' && c1 == 'h' && c2 == 'e' && c3 == 'n')
         return Token(TokenType::KW_THEN);
+      if (c0 == 'l' && c1 == 'o' && c2 == 'o' && c3 == 'p')
+        return Token(TokenType::KW_LOOP);
+      if (c0 == 'p' && c1 == 'o' && c2 == 'o' && c3 == 'l')
+        return Token(TokenType::KW_POOL);
       break;
     case 5: // while, class
       if (c0 == 'w' && c1 == 'h' && c2 == 'i' && c3 == 'l' && c4 == 'e')
@@ -161,6 +165,68 @@ private:
     return Token(t);
   }
 
+  Token get_parenthesis(TokenType t) {
+    if (t == TokenType::R_PAREN) {
+      return Token(t);
+    }
+    // Consume initial parenthesis
+    consume();
+    char c = current();
+    if (c == '*') {
+      consume();
+      return Token(TokenType::OPEN_COMMENT);
+    }
+    return Token(TokenType::L_PAREN);
+  }
+
+  Token get_dash(TokenType t) {
+    // Consume initial -
+    consume();
+    char c = current();
+    if (c == '-') {
+      consume();
+      return Token(TokenType::LINE_COMMENT);
+    }
+    return Token(TokenType::SIMPLE_OP, "-");
+  }
+
+  Token get_asterisk(TokenType t) {
+    // Consume initial *
+    consume();
+    char c = current();
+    if (c == ')') {
+      consume();
+      return Token(TokenType::CLOSE_COMMENT);
+    }
+    return Token(TokenType::SIMPLE_OP, "*");
+  }
+
+  Token get_minor_op(TokenType t) {
+    // Consume initial <
+    consume();
+    char c = current();
+    if (c == '-') {
+      consume();
+      return Token(TokenType::ASSIGN);
+    }
+    if (c == '=') {
+      consume();
+      return Token(TokenType::SIMPLE_OP, "<=");
+    }
+    return Token(TokenType::SIMPLE_OP, "<");
+  }
+
+  Token get_eq_op(TokenType t) {
+    // Consume initial =
+    consume();
+    char c = current();
+    if (c == '>') {
+      consume();
+      return Token(TokenType::ARROW);
+    }
+    return Token(TokenType::SIMPLE_OP, "=");
+  }
+
   Token get_space(TokenType t) {
     unsigned int start_pos = pos_;
     char c = current();
@@ -197,6 +263,17 @@ private:
     switch (t) {
     case TOKENTYPE_SYMBOLS_FIRST ... TOKENTYPE_SYMBOLS_LAST:
       return get_symbol(t);
+    case TokenType::L_PAREN_CLASS:
+    case TokenType::R_PAREN:
+      return get_parenthesis(t);
+    case TokenType::DASH_CLASS:
+      return get_dash(t);
+    case TokenType::ASTERISK_CLASS:
+      return get_asterisk(t);
+    case TokenType::MINOR_OP_CLASS:
+      return get_minor_op(t);
+    case TokenType::EQ_OP_CLASS:
+      return get_eq_op(t);
     case TokenType::OBJECT_NAME:
     case TokenType::TYPE_NAME:
       return get_name(t);

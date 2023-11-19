@@ -11,16 +11,19 @@ enum class TokenType {
   R_BRACKET,
   L_SQ_BRACKET,
   R_SQ_BRACKET,
+  COLON,
   SEMICOLON,
   // Parentheses or comment tokens
   L_PAREN_CLASS,
   L_PAREN,
   OPEN_COMMENT,
-  R_PAREN_CLASS,
   R_PAREN,
+  ASTERISK_CLASS, // *) (CLOSE_COMMENT) and * (SIMPLE_OP)
   CLOSE_COMMENT,
+  DASH_CLASS, // -- (LINE_COMMENT) and - (SIMPLE_OP)
+  LINE_COMMENT,
   // Operators
-  MINUS_OP_CLASS, // <- (ASSIGN), < and <= (SIMPLE_OPs)
+  MINOR_OP_CLASS, // <- (ASSIGN), < and <= (SIMPLE_OPs)
   ASSIGN,
   EQ_OP_CLASS,   // = (SIMPLE_OP) and => (ARROW)
   ARROW,
