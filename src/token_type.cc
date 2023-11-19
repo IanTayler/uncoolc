@@ -24,6 +24,8 @@ std::string token_type_str(TokenType t) {
     return "L_SQ_BRACKET";
   case TokenType::R_SQ_BRACKET:
     return "R_SQ_BRACKET";
+  case TokenType::DOT:
+    return "DOT";
   case TokenType::COLON:
     return "COLON";
   case TokenType::SEMICOLON:
@@ -135,6 +137,8 @@ TokenType token_type_from_start(char start) {
     return TokenType::L_SQ_BRACKET;
   case ']':
     return TokenType::R_SQ_BRACKET;
+  case '.':
+    return TokenType::DOT;
   case ':':
     return TokenType::COLON;
   case ';':

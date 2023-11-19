@@ -1,5 +1,7 @@
 #include "tokenizer.h"
 
+#include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -64,35 +66,70 @@ void TokenStream::add(Token token) { stream_.push_back(token); }
 class Tokenizer {
 private:
   unsigned int pos_;
-  const std::string &s_;
+  std::istream *input;
+  // TODO(IT) only keep a lookahead buffer instead of the entire string
+  // Keeping the full string to make it simple for now.
+  std::string s_;
 
-  char current() { return s_[pos_]; }
+  /// Load input characters to string. Returns False if there are no more
+  /// characters to read
+  bool load(unsigned int ahead) {
+    const int read_size = 16;
+    while (pos_ + ahead >= s_.length()) {
+      char buf[read_size];
+
+      input->read(buf, read_size);
+      int read_bytes = input->gcount();
+
+      if (read_bytes > 0)
+        s_.append(buf, read_bytes);
+      else // Got to the end, should add an end character
+        return false;
+    }
+    return true;
+  }
+  char current() {
+    if (!load(0))
+      return '\0';
+    return s_[pos_];
+  }
 
   char consume() {
+    if (!load(0))
+      return '\0';
     char c = s_[pos_++];
     return c;
   }
 
-  char lookahead() { return s_[pos_ + 1]; }
+  char lookahead() {
+    if (!load(0))
+      return '\0';
+    return s_[pos_ + 1];
+  }
+  char lookahead(unsigned int i) {
+    if (!load(i))
+      return '\0';
+    return s_[pos_ + i];
+  }
 
   bool is_alphanum(char c) {
     return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
-            (c >= '0' && c <= '9'));
+            (c >= '0' && c <= '9') || c == '_');
   }
 
   std::optional<Token> match_keyword(unsigned int start_pos,
                                      unsigned int end_pos) {
     int len = end_pos - start_pos;
     char c0, c1, c2, c3, c4;
-    c0 = s_[start_pos];
+    c0 = lookahead();
     if (len > 1)
-      c1 = s_[start_pos + 1];
+      c1 = lookahead(1);
     if (len > 2)
-      c2 = s_[start_pos + 2];
+      c2 = lookahead(2);
     if (len > 3)
-      c3 = s_[start_pos + 3];
+      c3 = lookahead(3);
     if (len > 4)
-      c4 = s_[start_pos + 4];
+      c4 = lookahead(4);
 
     switch (len) {
     case 2: // if, in, fi
@@ -134,9 +171,9 @@ private:
       break;
     case 8: // inherits
       char c5, c6, c7;
-      c5 = s_[start_pos + 5];
-      c6 = s_[start_pos + 6];
-      c7 = s_[start_pos + 7];
+      c5 = lookahead(5);
+      c6 = lookahead(6);
+      c7 = lookahead(7);
       if (c0 == 'i' && c1 == 'n' && c2 == 'h' && c3 == 'e' && c4 == 'r' &&
           c5 == 'i' && c6 == 't' && c7 == 's')
         return Token(TokenType::KW_INHERITS);
@@ -166,16 +203,19 @@ private:
   }
 
   Token get_parenthesis(TokenType t) {
+    // Consume initial parenthesis
+    consume();
+
     if (t == TokenType::R_PAREN) {
       return Token(t);
     }
-    // Consume initial parenthesis
-    consume();
+
     char c = current();
     if (c == '*') {
       consume();
       return Token(TokenType::OPEN_COMMENT);
     }
+
     return Token(TokenType::L_PAREN);
   }
 
@@ -259,7 +299,7 @@ private:
     return Token(t, s_.substr(start_pos, end_pos - start_pos));
   }
 
-  Token get_category(TokenType t) {
+  Token get_in_category(TokenType t) {
     switch (t) {
     case TOKENTYPE_SYMBOLS_FIRST ... TOKENTYPE_SYMBOLS_LAST:
       return get_symbol(t);
@@ -291,17 +331,17 @@ private:
   }
 
 public:
-  explicit Tokenizer(const std::string &s) : pos_(0), s_(s) {}
+  explicit Tokenizer(std::istream *inp) : pos_(0), input(inp) {}
 
   Token get() {
     TokenType t = token_type_from_start(current());
-    Token token = get_category(t);
+    Token token = get_in_category(t);
     return token;
   }
 };
 
 /// Main exported function in the tokenizer. Return a stream of tokens.
-TokenStream tokenize(std::string input) {
+TokenStream tokenize(std::istream *input) {
   TokenStream tokens = TokenStream();
   Tokenizer tokenizer = Tokenizer(input);
   Token last_token;

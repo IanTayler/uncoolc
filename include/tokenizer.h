@@ -11,6 +11,7 @@ enum class TokenType {
   R_BRACKET,
   L_SQ_BRACKET,
   R_SQ_BRACKET,
+  DOT,
   COLON,
   SEMICOLON,
   // Parentheses or comment tokens
@@ -25,7 +26,7 @@ enum class TokenType {
   // Operators
   MINOR_OP_CLASS, // <- (ASSIGN), < and <= (SIMPLE_OPs)
   ASSIGN,
-  EQ_OP_CLASS,   // = (SIMPLE_OP) and => (ARROW)
+  EQ_OP_CLASS, // = (SIMPLE_OP) and => (ARROW)
   ARROW,
   SIMPLE_OP,
   // IDs
@@ -90,6 +91,6 @@ public:
   void add(Token);
 };
 
-TokenStream tokenize(std::string input);
+TokenStream tokenize(std::istream *input);
 
 #endif
