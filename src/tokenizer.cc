@@ -101,11 +101,13 @@ private:
     return c;
   }
 
-  char lookahead() {
-    if (!load(0))
-      return '\0';
-    return s_[pos_ + 1];
+  void advance(unsigned int ahead) {
+    load(ahead);
+    pos_ += ahead;
   }
+
+  char lookahead() { return lookahead(0); }
+
   char lookahead(unsigned int i) {
     if (!load(i))
       return '\0';
@@ -181,19 +183,26 @@ private:
     }
     return std::nullopt;
   }
+
   Token get_name(TokenType t) {
     unsigned int start_pos = pos_;
+
+    unsigned int ahead = 0;
     char c = current();
     while (is_alphanum(c)) {
-      consume();
-      c = current();
+      ahead++;
+      c = lookahead(ahead);
     }
-    unsigned int end_pos = pos_;
-    std::string substr = s_.substr(start_pos, end_pos - start_pos);
+    unsigned int end_pos = pos_ + ahead;
+
     std::optional<Token> kw_token = match_keyword(start_pos, end_pos);
+    advance(ahead);
+
     if (kw_token)
       return kw_token.value();
+
     // Didn't match a keyword
+    std::string substr = s_.substr(start_pos, end_pos - start_pos);
     return Token(t, substr);
   }
 
