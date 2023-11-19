@@ -1,4 +1,4 @@
-#include "./tokenizer.h"
+#include "tokenizer.h"
 
 #include <string>
 #include <vector>
@@ -8,6 +8,7 @@
  *       Token        *
  *                    *
  *********************/
+
 /// Full token initializer.
 Token::Token(TokenType t, std::optional<std::string> r) : type_(t), rep_(r) {}
 
@@ -54,52 +55,18 @@ void TokenStream::add(Token token) { stream_.push_back(token); }
 
 /**********************
  *                    *
- *      TokenType     *
- *                    *
- *********************/
-// TODO(IT): name here weird
-TokenType from_start(char start) {
-  switch (start) {
-    case '\0':
-      return TokenType::END;
-    case '\n':
-      return TokenType::END;
-    case 'a' ... 'z':
-      return TokenType::NAME;
-    case 'A' ... 'Z':
-      return TokenType::NAME;
-    case '0' ... '9':
-      return TokenType::NUMBER;
-    case ' ':
-      return TokenType::SPACE;
-    case '"':
-      return TokenType::STRING;
-    case '(':
-      return TokenType::L_PAREN;
-    case ')':
-      return TokenType::R_PAREN;
-    case '=':
-      return TokenType::ASSIGN;
-    default:
-      return TokenType::INVALID;
-  }
-}
-
-/**********************
- *                    *
- *      Functions     *
+ *      Tokenizer     *
  *                    *
  *********************/
 class Tokenizer {
- private:
+private:
   unsigned int pos_;
-  std::string s_;
+  const std::string &s_;
 
   char current() { return s_[pos_]; }
 
   char consume() {
-    char c = s_[pos_];
-    pos_++;
+    char c = s_[pos_++];
     return c;
   }
 
@@ -110,12 +77,69 @@ class Tokenizer {
             (c >= '0' && c <= '9'));
   }
 
+  std::optional<Token> match_keyword(unsigned int start_pos,
+                                     unsigned int end_pos) {
+    int len = end_pos - start_pos;
+    char c0, c1, c2, c3, c4;
+    c0 = s_[start_pos];
+    if (len > 1)
+      c1 = s_[start_pos + 1];
+    if (len > 2)
+      c2 = s_[start_pos + 2];
+    if (len > 3)
+      c3 = s_[start_pos + 3];
+    if (len > 4)
+      c4 = s_[start_pos + 4];
+
+    switch (len) {
+    case 2:
+      if (c0 == 'i' && c1 == 'f')
+        return Token(TokenType::KW_IF, "if");
+
+      if (c0 == 'f' && c1 == 'i')
+        return Token(TokenType::KW_FI, std::nullopt);
+
+      break;
+    case 3:
+      if (c0 == 'f' && c1 == 'o' && c2 == 'r')
+        return Token(TokenType::KW_FOR, std::nullopt);
+
+      if (c0 == 'e' && c1 == 'n' && c2 == 'd')
+        return Token(TokenType::KW_END, std::nullopt);
+
+      break;
+    case 4:
+      if (c0 == 'e') {
+        if (c1 == 'l' && c2 == 's' && c3 == 'e')
+          return Token(TokenType::KW_ELSE, std::nullopt);
+        if (c1 == 's' && c2 == 'a' && c3 == 'c')
+          return Token(TokenType::KW_ESAC, std::nullopt);
+      } else if (c0 == 't') {
+        if (c1 == 'h' && c2 == 'e' && c3 == 'n')
+          return Token(TokenType::KW_THEN, std::nullopt);
+      }
+      break;
+    case 5:
+      if (c0 == 'w' && c1 == 'h' && c2 == 'i' && c3 == 'l' && c4 == 'e')
+        return Token(TokenType::KW_WHILE, std::nullopt);
+      break;
+    }
+    return std::nullopt;
+  }
   Token get_name(TokenType t) {
     unsigned int start_pos = pos_;
-    for (char c = consume(); is_alphanum(c); c = consume()) {
+    char c = current();
+    while (is_alphanum(c)) {
+      consume();
+      c = current();
     }
     unsigned int end_pos = pos_;
-    return Token(t, s_.substr(start_pos, end_pos - start_pos));
+    std::string substr = s_.substr(start_pos, end_pos - start_pos);
+    std::optional<Token> kw_token = match_keyword(start_pos, end_pos);
+    if (kw_token)
+      return kw_token.value();
+    // Didn't match a keyword
+    return Token(t, substr);
   }
 
   Token get_symbol(TokenType t) {
@@ -126,7 +150,7 @@ class Tokenizer {
   Token get_space(TokenType t) {
     unsigned int start_pos = pos_;
     char c = current();
-    while (from_start(c) == t) {
+    while (token_type_from_start(c) == t) {
       consume();
       c = current();
     }
@@ -137,8 +161,7 @@ class Tokenizer {
   Token get_number(TokenType t) {
     unsigned int start_pos = pos_;
     char c = current();
-    // TODO(IT) support floating point and separators
-    while (from_start(c) == t) {
+    while (token_type_from_start(c) == t) {
       consume();
       c = current();
     }
@@ -148,7 +171,7 @@ class Tokenizer {
 
   Token get_string(TokenType t) {
     unsigned int start_pos = pos_;
-    char c = consume();  // Consume the starting quotes.
+    char c = consume(); // Consume the starting quotes.
     for (c = consume(); (c != '\00' && c != '"'); c = consume()) {
     }
     // TODO(IT) handle broken string here
@@ -158,28 +181,29 @@ class Tokenizer {
 
   Token get_category(TokenType t) {
     switch (t) {
-      case TokenType::L_PAREN... TokenType::R_PAREN:
-        return get_symbol(t);
-      case TokenType::NAME:
-        return get_name(t);
-      case TokenType::NUMBER:
-        return get_number(t);
-      case TokenType::SPACE:
-        return get_space(t);
-      case TokenType::STRING:
-        return get_string(t);
-      case TokenType::END:
-        return Token::end();
-      default:
-        return get_symbol(t);
+    case TOKENTYPE_SYMBOLS_FIRST ... TOKENTYPE_SYMBOLS_LAST:
+      return get_symbol(t);
+    case TokenType::OBJECT_NAME:
+    case TokenType::TYPE_NAME:
+      return get_name(t);
+    case TokenType::NUMBER:
+      return get_number(t);
+    case TokenType::SPACE:
+      return get_space(t);
+    case TokenType::STRING:
+      return get_string(t);
+    case TokenType::END:
+      return Token::end();
+    default:
+      return get_symbol(t);
     }
   }
 
- public:
-  explicit Tokenizer(std::string s) : pos_(0), s_(s) {}
+public:
+  explicit Tokenizer(const std::string &s) : pos_(0), s_(s) {}
 
   Token get() {
-    TokenType t = from_start(current());
+    TokenType t = token_type_from_start(current());
     Token token = get_category(t);
     return token;
   }

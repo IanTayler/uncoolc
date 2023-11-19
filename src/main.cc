@@ -10,7 +10,7 @@ int main() {
   Token token;
   while (token.type() != TokenType::END) {
     token = tokens.next();
-    std::cout << "TOKEN: " << static_cast<int>(token.type()) << " "
-              << token.rep() << std::endl;
+    std::cout << "TOKEN: " << token_type_str(token.type()) << " " << token.rep()
+              << std::endl;
   }
 }
