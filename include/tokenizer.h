@@ -67,14 +67,18 @@ class Token {
 private:
   TokenType type_;
   std::optional<std::string> rep_;
+  unsigned int line_;
 
 public:
   Token();
   Token(TokenType);
   Token(TokenType, std::optional<std::string>);
+  Token(TokenType, std::optional<std::string>, unsigned int);
   static Token end();
   TokenType type();
   std::string rep();
+  unsigned int line();
+  void set_line(unsigned int);
 };
 
 class TokenStream {

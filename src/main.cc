@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   Token token;
   while (token.type() != TokenType::END) {
     token = tokens.next();
-    std::cout << "TOKEN: " << token_type_str(token.type()) << " " << token.rep()
+    std::cout << token.line() << ": "  << token_type_str(token.type()) << " " << token.rep()
               << std::endl;
   }
 }

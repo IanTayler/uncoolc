@@ -12,13 +12,17 @@
  *********************/
 
 /// Full token initializer.
-Token::Token(TokenType t, std::optional<std::string> r) : type_(t), rep_(r) {}
+Token::Token(TokenType t, std::optional<std::string> r, unsigned int l)
+    : type_(t), rep_(r), line_(l) {}
+
+/// Token initializer without line number
+Token::Token(TokenType t, std::optional<std::string> r) : Token(t, r, 0) {}
 
 /// Initializer for constant tokens.
-Token::Token(TokenType t) : type_(t), rep_(std::nullopt) {}
+Token::Token(TokenType t) : Token(t, std::nullopt) {}
 
 /// Default token initializer.
-Token::Token() : type_(TokenType::INVALID), rep_(std::nullopt) {}
+Token::Token() : Token(TokenType::INVALID) {}
 
 /// Special token marking an end of stream
 Token Token::end() { return Token(TokenType::END, std::nullopt); }
@@ -28,6 +32,12 @@ TokenType Token::type() { return type_; }
 
 /// Return a representation. Empty string if no representation.
 std::string Token::rep() { return rep_.value_or(""); }
+
+/// Return the token's line number.
+unsigned int Token::line() { return line_; }
+
+/// Set the token's line number.
+void Token::set_line(unsigned int l) { line_ = l; }
 
 /**********************
  *                    *
@@ -66,6 +76,7 @@ void TokenStream::add(Token token) { stream_.push_back(token); }
 class Tokenizer {
 private:
   unsigned int pos_;
+  unsigned int line_;
   std::istream *input;
   // TODO(IT) only keep a lookahead buffer instead of the entire string
   // Keeping the full string to make it simple for now.
@@ -340,11 +351,14 @@ private:
   }
 
 public:
-  explicit Tokenizer(std::istream *inp) : pos_(0), input(inp) {}
+  explicit Tokenizer(std::istream *inp) : pos_(0), input(inp), line_(0) {}
 
   Token get() {
     TokenType t = token_type_from_start(current());
     Token token = get_in_category(t);
+    token.set_line(line_);
+    if (token.type() == TokenType::NEW_LINE)
+      line_++;
     return token;
   }
 };
