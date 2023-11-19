@@ -43,6 +43,8 @@ enum class TokenType {
   KW_END,
   KW_LOOP,
   KW_POOL,
+  KW_CLASS,
+  KW_INHERITS,
   // Misc
   SPACE,
   NEW_LINE,

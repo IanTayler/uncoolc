@@ -66,6 +66,10 @@ std::string token_type_str(TokenType t) {
     return "KW_LOOP";
   case TokenType::KW_POOL:
     return "KW_POOL";
+  case TokenType::KW_CLASS:
+    return "KW_CLASS";
+  case TokenType::KW_INHERITS:
+    return "KW_INHERITS";
   // Misc
   case TokenType::SPACE:
     return "SPACE";
