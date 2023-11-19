@@ -52,8 +52,8 @@ std::string token_type_str(TokenType t) {
     return "KW_THEN";
   case TokenType::KW_ELSE:
     return "KW_ELSE";
-  case TokenType::KW_FOR:
-    return "KW_FOR";
+  case TokenType::KW_LET:
+    return "KW_LET";
   case TokenType::KW_WHILE:
     return "KW_WHILE";
   case TokenType::KW_CASE:

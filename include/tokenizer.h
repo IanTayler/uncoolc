@@ -36,11 +36,12 @@ enum class TokenType {
   KW_FI,
   KW_THEN,
   KW_ELSE,
-  KW_FOR, // TODO(IT) not really a thing
+  KW_LET,
+  KW_IN,
   KW_WHILE,
   KW_CASE,
   KW_ESAC,
-  KW_END,
+  KW_END, // TODO: probably doesn't really exist?
   KW_LOOP,
   KW_POOL,
   KW_CLASS,
@@ -65,6 +66,7 @@ private:
 
 public:
   Token();
+  Token(TokenType);
   Token(TokenType, std::optional<std::string>);
   static Token end();
   TokenType type();

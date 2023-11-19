@@ -12,6 +12,9 @@
 /// Full token initializer.
 Token::Token(TokenType t, std::optional<std::string> r) : type_(t), rep_(r) {}
 
+/// Initializer for constant tokens.
+Token::Token(TokenType t) : type_(t), rep_(std::nullopt) {}
+
 /// Default token initializer.
 Token::Token() : type_(TokenType::INVALID), rep_(std::nullopt) {}
 
@@ -92,36 +95,47 @@ private:
       c4 = s_[start_pos + 4];
 
     switch (len) {
-    case 2:
+    case 2: // if, in, fi
       if (c0 == 'i' && c1 == 'f')
-        return Token(TokenType::KW_IF, "if");
+        return Token(TokenType::KW_IF);
+
+      if (c0 == 'i' && c1 == 'n')
+        return Token(TokenType::KW_IN);
 
       if (c0 == 'f' && c1 == 'i')
-        return Token(TokenType::KW_FI, std::nullopt);
+        return Token(TokenType::KW_FI);
 
       break;
-    case 3:
-      if (c0 == 'f' && c1 == 'o' && c2 == 'r')
-        return Token(TokenType::KW_FOR, std::nullopt);
+    case 3: // let, end
+      if (c0 == 'l' && c1 == 'e' && c2 == 't')
+        return Token(TokenType::KW_LET);
 
       if (c0 == 'e' && c1 == 'n' && c2 == 'd')
-        return Token(TokenType::KW_END, std::nullopt);
+        return Token(TokenType::KW_END);
 
       break;
-    case 4:
-      if (c0 == 'e') {
-        if (c1 == 'l' && c2 == 's' && c3 == 'e')
-          return Token(TokenType::KW_ELSE, std::nullopt);
-        if (c1 == 's' && c2 == 'a' && c3 == 'c')
-          return Token(TokenType::KW_ESAC, std::nullopt);
-      } else if (c0 == 't') {
-        if (c1 == 'h' && c2 == 'e' && c3 == 'n')
-          return Token(TokenType::KW_THEN, std::nullopt);
-      }
+    case 4: // else, esac, then
+      if (c0 == 'e' && c1 == 'l' && c2 == 's' && c3 == 'e')
+        return Token(TokenType::KW_ELSE);
+      if (c0 == 'e' && c1 == 's' && c2 == 'a' && c3 == 'c')
+        return Token(TokenType::KW_ESAC);
+      if (c0 == 't' && c1 == 'h' && c2 == 'e' && c3 == 'n')
+        return Token(TokenType::KW_THEN);
       break;
-    case 5:
+    case 5: // while, class
       if (c0 == 'w' && c1 == 'h' && c2 == 'i' && c3 == 'l' && c4 == 'e')
-        return Token(TokenType::KW_WHILE, std::nullopt);
+        return Token(TokenType::KW_WHILE);
+      if (c0 == 'c' && c1 == 'l' && c2 == 'a' && c3 == 's' && c4 == 's')
+        return Token(TokenType::KW_CLASS);
+      break;
+    case 8: // inherits
+      char c5, c6, c7;
+      c5 = s_[start_pos + 5];
+      c6 = s_[start_pos + 6];
+      c7 = s_[start_pos + 7];
+      if (c0 == 'i' && c1 == 'n' && c2 == 'h' && c3 == 'e' && c4 == 'r' &&
+          c5 == 'i' && c6 == 't' && c7 == 's')
+        return Token(TokenType::KW_INHERITS);
       break;
     }
     return std::nullopt;
@@ -144,7 +158,7 @@ private:
 
   Token get_symbol(TokenType t) {
     consume();
-    return Token(t, std::nullopt);
+    return Token(t);
   }
 
   Token get_space(TokenType t) {
