@@ -1,0 +1,13 @@
+class A inherits B {
+  a : Int <- 10;
+  f() : Int {
+    2
+  };
+};
+
+class Main {
+  a_obj <- new A;
+  main() : Object {
+    a_obj.f()
+  }
+};
