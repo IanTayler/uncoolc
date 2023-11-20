@@ -12,6 +12,7 @@ enum class TokenType {
   L_SQ_BRACKET,
   R_SQ_BRACKET,
   DOT,
+  COMMA,
   COLON,
   SEMICOLON,
   // Parentheses or comment tokens
