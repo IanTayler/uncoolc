@@ -13,25 +13,25 @@ std::string token_type_str(TokenType t) {
   switch (t) {
   // Symbols
   case TokenType::L_PAREN:
-    return "L_PAREN";
+    return "(";
   case TokenType::R_PAREN:
-    return "R_PAREN";
+    return ")";
   case TokenType::L_BRACKET:
-    return "L_BRACKET";
+    return "{";
   case TokenType::R_BRACKET:
-    return "R_BRACKET";
+    return "}";
   case TokenType::L_SQ_BRACKET:
-    return "L_SQ_BRACKET";
+    return "[";
   case TokenType::R_SQ_BRACKET:
-    return "R_SQ_BRACKET";
+    return "]";
   case TokenType::DOT:
-    return "DOT";
+    return ".";
   case TokenType::COMMA:
-    return "DOT";
+    return ",";
   case TokenType::COLON:
-    return "COLON";
+    return ":";
   case TokenType::SEMICOLON:
-    return "SEMICOLON";
+    return ";";
   case TokenType::SIMPLE_OP:
     return "SIMPLE_OP";
   // Complex operators and token classes
@@ -46,16 +46,16 @@ std::string token_type_str(TokenType t) {
   case TokenType::DASH_CLASS:
     return "__DASH_CLASS";
   case TokenType::ASSIGN:
-    return "ASSIGN";
+    return "<-";
   case TokenType::ARROW:
-    return "ARROW";
+    return "=>";
   // Comment related
   case TokenType::OPEN_COMMENT:
-    return "OPEN_COMMENT";
+    return "(*";
   case TokenType::CLOSE_COMMENT:
-    return "CLOSE_COMMENT";
+    return "*)";
   case TokenType::LINE_COMMENT:
-    return "LINE_COMMENT";
+    return "--";
   // IDs
   case TokenType::OBJECT_NAME:
     return "OBJECT_NAME";
@@ -74,31 +74,35 @@ std::string token_type_str(TokenType t) {
   case TokenType::KW_ISVOID:
     return "ISVOID";
   case TokenType::KW_IF:
-    return "KW_IF";
+    return "IF";
   case TokenType::KW_FI:
-    return "KW_FI";
+    return "FI";
   case TokenType::KW_IN:
-    return "KW_IN";
+    return "IN";
+  case TokenType::KW_OF:
+    return "OF";
   case TokenType::KW_THEN:
-    return "KW_THEN";
+    return "THEN";
   case TokenType::KW_ELSE:
-    return "KW_ELSE";
+    return "ELSE";
   case TokenType::KW_LET:
-    return "KW_LET";
+    return "LET";
+  case TokenType::KW_NEW:
+    return "NEW";
   case TokenType::KW_WHILE:
-    return "KW_WHILE";
+    return "WHILE";
   case TokenType::KW_CASE:
-    return "KW_CASE";
+    return "CASE";
   case TokenType::KW_ESAC:
-    return "KW_ESAC";
+    return "ESAC";
   case TokenType::KW_LOOP:
-    return "KW_LOOP";
+    return "LOOP";
   case TokenType::KW_POOL:
-    return "KW_POOL";
+    return "POOL";
   case TokenType::KW_CLASS:
-    return "KW_CLASS";
+    return "CLASS";
   case TokenType::KW_INHERITS:
-    return "KW_INHERITS";
+    return "INHERITS";
   // Misc
   case TokenType::SPACE:
     return "SPACE";
