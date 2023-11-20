@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "./tokenizer.h"
+#include "tokenizer.h"
 
 int main(int argc, char *argv[]) {
   std::istream *stream = &std::cin;
