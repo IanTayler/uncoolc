@@ -151,7 +151,7 @@ private:
       c4 = lookahead(4);
 
     switch (len) {
-    case 2: // if, in, fi
+    case 2: // if, in, fi, of
       if (c0 == 'i' && c1 == 'f')
         return Token(TokenType::KW_IF);
 
@@ -161,41 +161,59 @@ private:
       if (c0 == 'f' && c1 == 'i')
         return Token(TokenType::KW_FI);
 
+      if (c0 == 'o' && c1 == 'f')
+        return Token(TokenType::KW_OF);
+
       break;
     case 3: // let, end
       if (c0 == 'l' && c1 == 'e' && c2 == 't')
         return Token(TokenType::KW_LET);
 
-      if (c0 == 'e' && c1 == 'n' && c2 == 'd')
-        return Token(TokenType::KW_END);
+      if (c0 == 'n' && c1 == 'e' && c2 == 'w')
+        return Token(TokenType::KW_NEW);
 
       break;
-    case 4: // else, esac, then, loop and pool
+    case 4: // else, esac, then, true, loop and pool
       if (c0 == 'e' && c1 == 'l' && c2 == 's' && c3 == 'e')
         return Token(TokenType::KW_ELSE);
+
       if (c0 == 'e' && c1 == 's' && c2 == 'a' && c3 == 'c')
         return Token(TokenType::KW_ESAC);
+
       if (c0 == 't' && c1 == 'h' && c2 == 'e' && c3 == 'n')
         return Token(TokenType::KW_THEN);
+
+      if (c0 == 't' && c1 == 'r' && c2 == 'u' && c3 == 'e')
+        return Token(TokenType::KW_TRUE);
+
       if (c0 == 'l' && c1 == 'o' && c2 == 'o' && c3 == 'p')
         return Token(TokenType::KW_LOOP);
+
       if (c0 == 'p' && c1 == 'o' && c2 == 'o' && c3 == 'l')
         return Token(TokenType::KW_POOL);
+
       break;
-    case 5: // while, class
+    case 5: // while, class, false
       if (c0 == 'w' && c1 == 'h' && c2 == 'i' && c3 == 'l' && c4 == 'e')
         return Token(TokenType::KW_WHILE);
+
       if (c0 == 'c' && c1 == 'l' && c2 == 'a' && c3 == 's' && c4 == 's')
         return Token(TokenType::KW_CLASS);
+
+      if (c0 == 'f' && c1 == 'a' && c2 == 'l' && c3 == 's' && c4 == 'e')
+        return Token(TokenType::KW_FALSE);
+
       break;
     case 8: // inherits
       char c5, c6, c7;
       c5 = lookahead(5);
       c6 = lookahead(6);
       c7 = lookahead(7);
+
       if (c0 == 'i' && c1 == 'n' && c2 == 'h' && c3 == 'e' && c4 == 'r' &&
           c5 == 'i' && c6 == 't' && c7 == 's')
         return Token(TokenType::KW_INHERITS);
+
       break;
     }
     return std::nullopt;

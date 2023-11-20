@@ -67,6 +67,12 @@ std::string token_type_str(TokenType t) {
   case TokenType::STRING:
     return "STRING";
   // Keywords
+  case TokenType::KW_TRUE:
+    return "TRUE";
+  case TokenType::KW_FALSE:
+    return "FALSE";
+  case TokenType::KW_ISVOID:
+    return "ISVOID";
   case TokenType::KW_IF:
     return "KW_IF";
   case TokenType::KW_FI:
@@ -85,8 +91,6 @@ std::string token_type_str(TokenType t) {
     return "KW_CASE";
   case TokenType::KW_ESAC:
     return "KW_ESAC";
-  case TokenType::KW_END:
-    return "KW_END";
   case TokenType::KW_LOOP:
     return "KW_LOOP";
   case TokenType::KW_POOL:
