@@ -47,6 +47,13 @@ std::string token_type_str(TokenType t) {
     return "ASSIGN";
   case TokenType::ARROW:
     return "ARROW";
+  // Comment related
+  case TokenType::OPEN_COMMENT:
+    return "OPEN_COMMENT";
+  case TokenType::CLOSE_COMMENT:
+    return "CLOSE_COMMENT";
+  case TokenType::LINE_COMMENT:
+    return "LINE_COMMENT";
   // IDs
   case TokenType::OBJECT_NAME:
     return "OBJECT_NAME";
@@ -62,6 +69,8 @@ std::string token_type_str(TokenType t) {
     return "KW_IF";
   case TokenType::KW_FI:
     return "KW_FI";
+  case TokenType::KW_IN:
+    return "KW_IN";
   case TokenType::KW_THEN:
     return "KW_THEN";
   case TokenType::KW_ELSE:
