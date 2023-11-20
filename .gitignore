@@ -1,2 +1,5 @@
 build/
 .cache
+test/arith.cool
+test/graph.cool
+test/atoi.cool
