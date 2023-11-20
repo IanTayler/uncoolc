@@ -8,15 +8,22 @@
 
 int main(int argc, char *argv[]) {
   std::istream *stream = &std::cin;
+  bool show_all = false;
 
   // Not used if reading from stdin
   std::fstream f;
-  if (argc > 1) {
-    std::string stream_name{argv[1]};
-    if (stream_name != "-") {
-      f.open(stream_name, std::ios::in);
+  int arg_pos = 1;
+  while (arg_pos < argc) {
+    std::string arg{argv[arg_pos]};
+    if (arg == "-v" || arg == "--verbose")
+      show_all = true;
+
+    else if (arg != "-") {
+      f.open(arg, std::ios::in);
       stream = &f;
     }
+
+    arg_pos++;
   }
 
   TokenStream tokens = tokenize(stream);
@@ -37,9 +44,13 @@ int main(int argc, char *argv[]) {
 
   while (token.type() != TokenType::END) {
     token = tokens.next();
+    TokenType type = token.type();
+    if (!show_all && (type == TokenType::NEW_LINE || type == TokenType::SPACE ||
+                      type == TokenType::END))
+      continue;
     std::cout << std::setw(position_width)
               << std::format("{}:{}", token.line(), token.column()) << " | "
-              << std::setw(token_width) << token_type_str(token.type()) << " | "
+              << std::setw(token_width) << token_type_str(type) << " | "
               << token.rep() << std::endl;
   }
 }
