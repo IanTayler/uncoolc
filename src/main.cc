@@ -26,14 +26,14 @@ int main(int argc, char *argv[]) {
 
   std::cout << "POSITION "
             << "|"
-            << "    TOKEN TYPE "
+            << "   TOKEN TYPE  "
             << "|"
             << " STRING" << std::endl;
   std::cout << "---------"
             << "|"
             << "---------------"
             << "|"
-            << "-------" << std::endl;
+            << "---------" << std::endl;
 
   while (token.type() != TokenType::END) {
     token = tokens.next();
