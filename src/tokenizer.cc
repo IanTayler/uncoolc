@@ -12,11 +12,8 @@
  *********************/
 
 /// Full token initializer.
-Token::Token(TokenType t, std::optional<std::string> r, unsigned int l)
-    : type_(t), rep_(r), line_(l) {}
-
-/// Token initializer without line number
-Token::Token(TokenType t, std::optional<std::string> r) : Token(t, r, 0) {}
+Token::Token(TokenType t, std::optional<std::string> r)
+    : type_(t), rep_(r), line_(0), col_(0) {}
 
 /// Initializer for constant tokens.
 Token::Token(TokenType t) : Token(t, std::nullopt) {}
@@ -36,8 +33,14 @@ std::string Token::rep() { return rep_.value_or(""); }
 /// Return the token's line number.
 unsigned int Token::line() { return line_; }
 
+/// Return the token's column number.
+unsigned int Token::column() { return col_; }
+
 /// Set the token's line number.
-void Token::set_line(unsigned int l) { line_ = l; }
+void Token::set_position(unsigned int l, unsigned int c) {
+  line_ = l;
+  col_ = c;
+}
 
 /**********************
  *                    *
@@ -77,6 +80,7 @@ class Tokenizer {
 private:
   unsigned int pos_;
   unsigned int line_;
+  unsigned int col_;
   std::istream *input;
   // TODO(IT) only keep a lookahead buffer instead of the entire string
   // Keeping the full string to make it simple for now.
@@ -109,12 +113,14 @@ private:
     if (!load(0))
       return '\0';
     char c = s_[pos_++];
+    col_++;
     return c;
   }
 
   void advance(unsigned int ahead) {
     load(ahead);
     pos_ += ahead;
+    col_ += ahead;
   }
 
   char lookahead() { return lookahead(0); }
@@ -351,14 +357,19 @@ private:
   }
 
 public:
-  explicit Tokenizer(std::istream *inp) : pos_(0), input(inp), line_(0) {}
+  explicit Tokenizer(std::istream *inp)
+      : pos_(0), input(inp), line_(1), col_(1) {}
 
   Token get() {
+    unsigned int l = line_;
+    unsigned int c = col_;
     TokenType t = token_type_from_start(current());
     Token token = get_in_category(t);
-    token.set_line(line_);
-    if (token.type() == TokenType::NEW_LINE)
+    token.set_position(l, c);
+    if (token.type() == TokenType::NEW_LINE) {
       line_++;
+      col_ = 1;
+    }
     return token;
   }
 };
