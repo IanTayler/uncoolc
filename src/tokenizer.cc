@@ -1,5 +1,6 @@
-#include "token.h"
+#include "tokenizer.h"
 #include "symbol.h"
+#include "token.h"
 
 #include <iostream>
 #include <stdexcept>
