@@ -1,5 +1,5 @@
-#ifndef _TOKENIZER_H
-#define _TOKENIZER_H
+#ifndef _TOKEN_H
+#define _TOKEN_H
 
 #include "symbol.h"
 #include <optional>

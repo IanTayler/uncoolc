@@ -5,7 +5,7 @@
 #include <string>
 
 #include "symbol.h"
-#include "tokenizer.h"
+#include "token.h"
 
 int main(int argc, char *argv[]) {
   std::istream *stream = &std::cin;
