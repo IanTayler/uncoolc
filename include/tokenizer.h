@@ -1,6 +1,7 @@
 #ifndef _TOKENIZER_H
 #define _TOKENIZER_H
 
+#include "symbol.h"
 #include <optional>
 #include <string>
 #include <vector>
@@ -71,17 +72,17 @@ TokenType token_type_from_start(char start);
 class Token {
 private:
   TokenType type_;
-  std::optional<std::string> rep_;
+  Symbol symb_;
   unsigned int line_;
   unsigned int col_;
 
 public:
   Token();
   Token(TokenType);
-  Token(TokenType, std::optional<std::string>);
+  Token(TokenType, Symbol);
   static Token end();
   TokenType type();
-  std::string rep();
+  Symbol symbol();
   unsigned int line();
   unsigned int column();
   void set_position(unsigned int, unsigned int);
@@ -101,6 +102,6 @@ public:
   void add(Token);
 };
 
-TokenStream tokenize(std::istream *input);
+TokenStream tokenize(std::istream *, std::shared_ptr<SymbolTable>);
 
 #endif

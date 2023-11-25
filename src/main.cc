@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+#include "symbol.h"
 #include "tokenizer.h"
 
 int main(int argc, char *argv[]) {
@@ -26,7 +27,9 @@ int main(int argc, char *argv[]) {
     arg_pos++;
   }
 
-  TokenStream tokens = tokenize(stream);
+  std::shared_ptr<SymbolTable> symbols = std::make_shared<SymbolTable>();
+  TokenStream tokens = tokenize(stream, symbols);
+
   Token token;
 
   const int position_width = 8;
@@ -82,6 +85,6 @@ int main(int argc, char *argv[]) {
     std::cout << std::setw(position_width)
               << std::format("{}:{}", token.line(), token.column()) << " | "
               << std::setw(token_width) << token_type_str(type) << " | "
-              << token.rep() << std::endl;
+              << symbols->get_string(token.symbol()) << std::endl;
   }
 }

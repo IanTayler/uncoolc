@@ -1,4 +1,5 @@
 #include "tokenizer.h"
+#include "symbol.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -12,23 +13,22 @@
  *********************/
 
 /// Full token initializer.
-Token::Token(TokenType t, std::optional<std::string> r)
-    : type_(t), rep_(r), line_(0), col_(0) {}
+Token::Token(TokenType t, Symbol s) : type_(t), symb_(s), line_(0), col_(0) {}
 
 /// Initializer for constant tokens.
-Token::Token(TokenType t) : Token(t, std::nullopt) {}
+Token::Token(TokenType t) : Token(t, Symbol{}) {}
 
 /// Default token initializer.
 Token::Token() : Token(TokenType::INVALID) {}
 
 /// Special token marking an end of stream
-Token Token::end() { return Token(TokenType::END, std::nullopt); }
+Token Token::end() { return Token(TokenType::END); }
 
 /// Return token type.
 TokenType Token::type() { return type_; }
 
 /// Return a representation. Empty string if no representation.
-std::string Token::rep() { return rep_.value_or(""); }
+Symbol Token::symbol() { return symb_; }
 
 /// Return the token's line number.
 unsigned int Token::line() { return line_; }
@@ -78,12 +78,17 @@ void TokenStream::add(Token token) { stream_.push_back(token); }
  *********************/
 class Tokenizer {
 private:
+  // Internal state indicating where we are standing
   unsigned int pos_;
   unsigned int line_;
   unsigned int col_;
+
+  // Handlers to external resources we're composing here
   std::istream *input;
+  std::shared_ptr<SymbolTable> symbols;
+
+  // Buffer storing input text as we process it
   // TODO(IT) only keep a lookahead buffer instead of the entire string
-  // Keeping the full string to make it simple for now.
   std::string s_;
 
   /// Load input characters to string. Returns False if there are no more
@@ -110,10 +115,13 @@ private:
   }
 
   char consume() {
-    if (!load(0))
-      return '\0';
-    char c = s_[pos_++];
-    col_++;
+    char c = current();
+
+    if (c != '\0') {
+      pos_++;
+      col_++;
+    }
+
     return c;
   }
 
@@ -237,8 +245,8 @@ private:
       return kw_token.value();
 
     // Didn't match a keyword
-    std::string substr = s_.substr(start_pos, end_pos - start_pos);
-    return Token(t, substr);
+    int len = end_pos - start_pos;
+    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
   }
 
   Token get_symbol(TokenType t) {
@@ -271,7 +279,7 @@ private:
       consume();
       return Token(TokenType::LINE_COMMENT);
     }
-    return Token(TokenType::SIMPLE_OP, "-");
+    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("-"));
   }
 
   Token get_asterisk(TokenType t) {
@@ -282,7 +290,7 @@ private:
       consume();
       return Token(TokenType::CLOSE_COMMENT);
     }
-    return Token(TokenType::SIMPLE_OP, "*");
+    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("*"));
   }
 
   Token get_minor_op(TokenType t) {
@@ -295,9 +303,9 @@ private:
     }
     if (c == '=') {
       consume();
-      return Token(TokenType::SIMPLE_OP, "<=");
+      return Token(TokenType::SIMPLE_OP, symbols->symbol_from("<="));
     }
-    return Token(TokenType::SIMPLE_OP, "<");
+    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("<"));
   }
 
   Token get_eq_op(TokenType t) {
@@ -308,7 +316,7 @@ private:
       consume();
       return Token(TokenType::ARROW);
     }
-    return Token(TokenType::SIMPLE_OP, "=");
+    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("="));
   }
 
   Token get_space(TokenType t) {
@@ -319,7 +327,9 @@ private:
       c = current();
     }
     unsigned int end_pos = pos_;
-    return Token(t, s_.substr(start_pos, end_pos - start_pos));
+
+    int len = end_pos - start_pos;
+    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
   }
 
   Token get_number(TokenType t) {
@@ -330,7 +340,9 @@ private:
       c = current();
     }
     unsigned int end_pos = pos_;
-    return Token(t, s_.substr(start_pos, end_pos - start_pos));
+
+    int len = end_pos - start_pos;
+    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
   }
 
   Token get_string(TokenType t) {
@@ -339,8 +351,8 @@ private:
     for (c = consume(); (c != '\00' && c != '"'); c = consume()) {
     }
     // TODO(IT) handle broken string here
-    unsigned int end_pos = pos_;
-    return Token(t, s_.substr(start_pos, end_pos - start_pos));
+    unsigned int len = start_pos - pos_;
+    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
   }
 
   Token get_in_category(TokenType t) {
@@ -375,8 +387,8 @@ private:
   }
 
 public:
-  explicit Tokenizer(std::istream *inp)
-      : pos_(0), input(inp), line_(1), col_(1) {}
+  explicit Tokenizer(std::istream *inp, std::shared_ptr<SymbolTable> symbs)
+      : pos_(0), input(inp), symbols(symbs), line_(1), col_(1) {}
 
   Token get() {
     unsigned int l = line_;
@@ -393,9 +405,10 @@ public:
 };
 
 /// Main exported function in the tokenizer. Return a stream of tokens.
-TokenStream tokenize(std::istream *input) {
+TokenStream tokenize(std::istream *input,
+                     std::shared_ptr<SymbolTable> symbols) {
   TokenStream tokens = TokenStream();
-  Tokenizer tokenizer = Tokenizer(input);
+  Tokenizer tokenizer = Tokenizer(input, symbols);
   Token last_token;
   do {
     last_token = tokenizer.get();
