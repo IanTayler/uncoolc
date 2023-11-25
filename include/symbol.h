@@ -6,6 +6,7 @@
 #include <vector>
 
 const int _EMPTY_SYMBOL_ID = -1;
+
 class Symbol {
 public:
   int id;
