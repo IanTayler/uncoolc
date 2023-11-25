@@ -3,3 +3,4 @@ build/
 test/arith.cool
 test/graph.cool
 test/atoi.cool
+coolc-debug
