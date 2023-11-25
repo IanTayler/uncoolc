@@ -90,18 +90,33 @@ public:
 
 class TokenStream {
 private:
+  struct State {
+    unsigned int pos_;
+    int opened_comments;
+    bool line_comment;
+  };
+
   unsigned int pos_;
+  int opened_comments;
+  bool line_comment;
+
   std::vector<Token> stream_;
+
+  Token next_raw();
+  State get_state() const;
+  void restore_state(State);
 
 public:
   TokenStream();
   unsigned int position();
   Token at(unsigned int i);
   Token next();
+  Token next(bool skip_whitespace);
   Token lookahead();
+  Token lookahead(unsigned int k);
   void add(Token);
-};
 
-TokenStream tokenize(std::istream *, std::shared_ptr<SymbolTable>);
+  void reset_state();
+};
 
 #endif

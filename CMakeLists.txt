@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 add_executable(coolc 
   src/main.cc
   src/tokenizer.cc
-  src/token_type.cc
+  src/token.cc
   src/symbol.cc
 )
 target_include_directories(coolc

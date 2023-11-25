@@ -9,48 +9,12 @@
 
 /**********************
  *                    *
- *       Token        *
- *                    *
- *********************/
-
-/// Full token initializer.
-Token::Token(TokenType t, Symbol s) : type_(t), symb_(s), line_(0), col_(0) {}
-
-/// Initializer for constant tokens.
-Token::Token(TokenType t) : Token(t, Symbol{}) {}
-
-/// Default token initializer.
-Token::Token() : Token(TokenType::INVALID) {}
-
-/// Special token marking an end of stream
-Token Token::end() { return Token(TokenType::END); }
-
-/// Return token type.
-TokenType Token::type() { return type_; }
-
-/// Return a representation. Empty string if no representation.
-Symbol Token::symbol() { return symb_; }
-
-/// Return the token's line number.
-unsigned int Token::line() { return line_; }
-
-/// Return the token's column number.
-unsigned int Token::column() { return col_; }
-
-/// Set the token's line number.
-void Token::set_position(unsigned int l, unsigned int c) {
-  line_ = l;
-  col_ = c;
-}
-
-/**********************
- *                    *
  *     TokenStream    *
  *                    *
  *********************/
 
 /// Create new TokenStream with no Tokens.
-TokenStream::TokenStream() : pos_(0) { stream_ = std::vector<Token>(); }
+TokenStream::TokenStream() : pos_(0) {}
 
 /// Return position of the TokenStream pointer.
 unsigned int TokenStream::position() { return pos_; }
@@ -58,19 +22,99 @@ unsigned int TokenStream::position() { return pos_; }
 /// Return Token at specific integer position.
 Token TokenStream::at(unsigned int i) { return stream_.at(i); }
 
+/// Move forward in the TokenStream. Skipping whitespace by default.
+Token TokenStream::next() { return next(true); }
+
 /// Move forward in the TokenStream.
-Token TokenStream::next() {
+Token TokenStream::next(bool skip_whitespace) {
+  Token token;
+  TokenType type;
+
+  bool done;
+  do {
+    done = true;
+    token = next_raw();
+    type = token.type();
+
+    if (type == TokenType::END)
+      return token;
+    if (type == TokenType::OPEN_COMMENT)
+      opened_comments++;
+
+    if (opened_comments > 0) {
+      if (type == TokenType::CLOSE_COMMENT) {
+        opened_comments--;
+      }
+    } else if (type == TokenType::LINE_COMMENT) {
+      line_comment = true;
+    } else if (line_comment && type == TokenType::NEW_LINE) {
+      line_comment = false;
+    }
+
+    // Ignore tokens inside comments and whitespace
+    if (skip_whitespace) {
+      if (type == TokenType::NEW_LINE || type == TokenType::SPACE ||
+          type == TokenType::OPEN_COMMENT || type == TokenType::CLOSE_COMMENT ||
+          type == TokenType::LINE_COMMENT) {
+        done = false;
+      }
+
+      if (opened_comments > 0 || line_comment) {
+        done = false;
+      }
+    }
+  } while (!done);
+
+  return token;
+}
+
+/// Return a future Token in the stream without moving the pointer.
+Token TokenStream::lookahead(unsigned int k) {
+  State state = get_state();
+
+  Token token = at(pos_);
+  for (int i = 0; i < k; i++) {
+    token = next();
+  }
+
+  restore_state(state);
+  return token;
+}
+
+/// Return next Token in stream without moving the pointer.
+Token TokenStream::lookahead() { return lookahead(1); }
+
+/// Add a Token to the end of the stream.
+void TokenStream::add(Token token) { stream_.push_back(token); }
+
+Token TokenStream::next_raw() {
   if (pos_ < stream_.size()) {
     return stream_.at(pos_++);
   }
   return Token::end();
 }
 
-/// Return next Token in stream without moving the pointer.
-Token TokenStream::lookahead() { return stream_.at(pos_ + 1); }
+void TokenStream::reset_state() {
+  restore_state(State{
+      .pos_ = 0,
+      .opened_comments = 0,
+      .line_comment = false,
+  });
+}
 
-/// Add a Token to the end of the stream.
-void TokenStream::add(Token token) { stream_.push_back(token); }
+TokenStream::State TokenStream::get_state() const {
+  return State{
+      .pos_ = pos_,
+      .opened_comments = opened_comments,
+      .line_comment = line_comment,
+  };
+}
+
+void TokenStream::restore_state(TokenStream::State state) {
+  pos_ = state.pos_;
+  opened_comments = state.opened_comments;
+  line_comment = state.line_comment;
+}
 
 /**********************
  *                    *

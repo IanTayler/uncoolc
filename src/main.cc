@@ -8,12 +8,23 @@
 #include "token.h"
 #include "tokenizer.h"
 
+/**********************
+ *                    *
+ *      Helpers       *
+ *                    *
+ *********************/
+
 struct CliOptions {
   bool debug_output;
   std::filesystem::path debug_dir;
-
   bool verbose;
 };
+
+/**********************
+ *                    *
+ *    Tokenization    *
+ *                    *
+ *********************/
 
 std::optional<TokenStream> run_tokenizer(std::istream *input,
                                          std::shared_ptr<SymbolTable> symbols,
@@ -30,8 +41,6 @@ std::optional<TokenStream> run_tokenizer(std::istream *input,
   }
 
   if (output != nullptr) {
-    std::cout << "got here" << std::endl; // TODO remove
-    Token token;
 
     const int position_width = 8;
     const int token_width = 13;
@@ -48,54 +57,28 @@ std::optional<TokenStream> run_tokenizer(std::istream *input,
             << "|"
             << "---------" << std::endl;
 
-    int opened_comments = 0;
-    bool line_comment = false;
-
+    Token token;
     TokenType type = token.type();
     while (type != TokenType::END) {
-      token = tokens.next();
+      token = tokens.next(!options.verbose);
       type = token.type();
-
-      if (type == TokenType::OPEN_COMMENT)
-        opened_comments++;
-
-      // Ignore tokens inside comments and whitespace unless it's verbose mode
-      if (!options.verbose) {
-        if (opened_comments > 0 && type == TokenType::CLOSE_COMMENT) {
-          opened_comments--;
-        } else if (type == TokenType::LINE_COMMENT) {
-          line_comment = true;
-        }
-
-        if (line_comment && type == TokenType::NEW_LINE) {
-          line_comment = false;
-          continue;
-        }
-
-        if (type == TokenType::NEW_LINE || type == TokenType::SPACE ||
-            type == TokenType::END || type == TokenType::OPEN_COMMENT ||
-            type == TokenType::CLOSE_COMMENT ||
-            type == TokenType::LINE_COMMENT) {
-          continue;
-        }
-
-        if (opened_comments > 0 || line_comment) {
-          continue;
-        }
-      }
 
       *output << std::setw(position_width)
               << std::format("{}:{}", token.line(), token.column()) << " | "
               << std::setw(token_width) << token_type_str(type) << " | "
               << symbols->get_string(token.symbol()) << std::endl;
     }
-  }
-  if (output != nullptr) {
-    out_file.flush();
-    out_file.close();
+
+    tokens.reset_state();
   }
   return tokens;
 }
+
+/**********************
+ *                    *
+ *     Entrypoint     *
+ *                    *
+ *********************/
 
 int main(int argc, char *argv[]) {
   std::istream *stream = &std::cin;

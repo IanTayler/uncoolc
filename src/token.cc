@@ -176,3 +176,40 @@ TokenType token_type_from_start(char start) {
     return TokenType::INVALID;
   }
 }
+
+/**********************
+ *                    *
+ *       Token        *
+ *                    *
+ *********************/
+
+/// Full token initializer.
+Token::Token(TokenType t, Symbol s) : type_(t), symb_(s), line_(0), col_(0) {}
+
+/// Initializer for constant tokens.
+Token::Token(TokenType t) : Token(t, Symbol{}) {}
+
+/// Default token initializer.
+Token::Token() : Token(TokenType::INVALID) {}
+
+/// Special token marking an end of stream
+Token Token::end() { return Token(TokenType::END); }
+
+/// Return token type.
+TokenType Token::type() { return type_; }
+
+/// Return a representation. Empty string if no representation.
+Symbol Token::symbol() { return symb_; }
+
+/// Return the token's line number.
+unsigned int Token::line() { return line_; }
+
+/// Return the token's column number.
+unsigned int Token::column() { return col_; }
+
+/// Set the token's line number.
+void Token::set_position(unsigned int l, unsigned int c) {
+  line_ = l;
+  col_ = c;
+}
+
