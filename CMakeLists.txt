@@ -11,6 +11,7 @@ add_executable(coolc
   src/main.cc
   src/tokenizer.cc
   src/token_type.cc
+  src/symbol.cc
 )
 target_include_directories(coolc
   PUBLIC
