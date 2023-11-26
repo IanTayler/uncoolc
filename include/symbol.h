@@ -24,8 +24,19 @@ private:
   std::unordered_map<std::string, int> id_map;
 
 public:
-  Symbol symbol_from(std::string);
+  SymbolTable();
+  Symbol from(std::string);
   const std::string &get_string(Symbol) const;
+
+  Symbol true_const;
+  Symbol false_const;
+  Symbol self_var;
+  Symbol self_type;
+  Symbol object_type;
+  Symbol io_type;
+  Symbol bool_type;
+  Symbol int_type;
+  Symbol string_type;
 };
 
 #endif

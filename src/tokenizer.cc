@@ -291,7 +291,7 @@ private:
 
     // Didn't match a keyword
     int len = end_pos - start_pos;
-    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
+    return Token(t, symbols->from(s_.substr(start_pos, len)));
   }
 
   Token get_symbol(TokenType t) {
@@ -324,7 +324,7 @@ private:
       consume();
       return Token(TokenType::LINE_COMMENT);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("-"));
+    return Token(TokenType::SIMPLE_OP, symbols->from("-"));
   }
 
   Token get_asterisk(TokenType t) {
@@ -335,7 +335,7 @@ private:
       consume();
       return Token(TokenType::CLOSE_COMMENT);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("*"));
+    return Token(TokenType::SIMPLE_OP, symbols->from("*"));
   }
 
   Token get_minor_op(TokenType t) {
@@ -348,9 +348,9 @@ private:
     }
     if (c == '=') {
       consume();
-      return Token(TokenType::SIMPLE_OP, symbols->symbol_from("<="));
+      return Token(TokenType::SIMPLE_OP, symbols->from("<="));
     }
-    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("<"));
+    return Token(TokenType::SIMPLE_OP, symbols->from("<"));
   }
 
   Token get_eq_op(TokenType t) {
@@ -361,7 +361,7 @@ private:
       consume();
       return Token(TokenType::ARROW);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->symbol_from("="));
+    return Token(TokenType::SIMPLE_OP, symbols->from("="));
   }
 
   Token get_space(TokenType t) {
@@ -374,7 +374,7 @@ private:
     unsigned int end_pos = pos_;
 
     int len = end_pos - start_pos;
-    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
+    return Token(t, symbols->from(s_.substr(start_pos, len)));
   }
 
   Token get_number(TokenType t) {
@@ -387,7 +387,7 @@ private:
     unsigned int end_pos = pos_;
 
     int len = end_pos - start_pos;
-    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
+    return Token(t, symbols->from(s_.substr(start_pos, len)));
   }
 
   Token get_string(TokenType t) {
@@ -397,7 +397,7 @@ private:
     }
     // TODO(IT) handle broken string here
     unsigned int len = start_pos - pos_;
-    return Token(t, symbols->symbol_from(s_.substr(start_pos, len)));
+    return Token(t, symbols->from(s_.substr(start_pos, len)));
   }
 
   Token get_in_category(TokenType t) {
