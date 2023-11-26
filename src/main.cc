@@ -14,6 +14,8 @@
  *                    *
  *********************/
 
+const std::filesystem::path debug_dir_base = "./coolc-debug";
+
 struct CliOptions {
   bool debug_output;
   std::filesystem::path debug_dir;
@@ -26,9 +28,9 @@ struct CliOptions {
  *                    *
  *********************/
 
-std::optional<TokenStream> run_tokenizer(std::istream *input,
-                                         std::shared_ptr<SymbolTable> symbols,
-                                         const CliOptions &options) {
+TokenStream run_tokenizer(std::istream *input,
+                          std::shared_ptr<SymbolTable> symbols,
+                          const CliOptions &options) {
   TokenStream tokens = tokenize(input, symbols);
 
   std::ostream *output = nullptr;
@@ -84,10 +86,10 @@ int main(int argc, char *argv[]) {
   std::istream *stream = &std::cin;
   bool verbose = false;
   bool debug = true; // Default to debug mode while we develop
-  std::filesystem::path debug_dir = "./coolc-debug";
+  std::filesystem::path debug_dir = debug_dir_base;
 
   // Not used if reading from stdin
-  std::fstream f;
+  std::fstream input_file;
   int arg_pos = 1;
   while (arg_pos < argc) {
     std::string arg{argv[arg_pos]};
@@ -98,9 +100,9 @@ int main(int argc, char *argv[]) {
       debug = true;
 
     else if (arg != "-") {
-      f.open(arg, std::ios::in);
+      input_file.open(arg, std::ios::in);
       debug_dir /= arg;
-      stream = &f;
+      stream = &input_file;
     }
 
     arg_pos++;
@@ -111,5 +113,5 @@ int main(int argc, char *argv[]) {
   CliOptions options = {
       .debug_output = debug, .debug_dir = debug_dir, .verbose = verbose};
 
-  run_tokenizer(stream, symbols, options);
+  TokenStream tokens = run_tokenizer(stream, symbols, options);
 }
