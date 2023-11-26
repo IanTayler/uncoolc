@@ -295,8 +295,8 @@ private:
   }
 
   Token get_symbol(TokenType t) {
-    consume();
-    return Token(t);
+    char c = consume();
+    return Token(t, symbols->from(std::string(1, c)));
   }
 
   Token get_parenthesis(TokenType t) {

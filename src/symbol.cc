@@ -38,6 +38,7 @@ SymbolTable::SymbolTable() {
   self_type = from("SELF_TYPE");
   object_type = from("Object");
   io_type = from("IO");
+  bool_type = from("Bool");
   int_type = from("Int");
   string_type = from("String");
   add_op = from("+");
