@@ -13,6 +13,7 @@ add_executable(coolc
   src/token.cc
   src/symbol.cc
   src/ast.cc
+  src/error.cc
 )
 target_include_directories(coolc
   PUBLIC
