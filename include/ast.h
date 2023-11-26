@@ -104,8 +104,8 @@ private:
   Symbol value;
 
 public:
-  LiteralNode(Symbol v, Token st, Token end)
-      : value(v), ExpressionNode(st, end) {}
+  LiteralNode(Token t)
+      : value(t.symbol()), ExpressionNode(t, t) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
