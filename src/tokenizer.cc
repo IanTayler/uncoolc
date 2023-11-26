@@ -324,7 +324,7 @@ private:
       consume();
       return Token(TokenType::LINE_COMMENT);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->from("-"));
+    return Token(TokenType::SIMPLE_OP, symbols->sub_op);
   }
 
   Token get_asterisk(TokenType t) {
@@ -335,7 +335,7 @@ private:
       consume();
       return Token(TokenType::CLOSE_COMMENT);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->from("*"));
+    return Token(TokenType::SIMPLE_OP, symbols->mult_op);
   }
 
   Token get_minor_op(TokenType t) {
@@ -348,9 +348,9 @@ private:
     }
     if (c == '=') {
       consume();
-      return Token(TokenType::SIMPLE_OP, symbols->from("<="));
+      return Token(TokenType::SIMPLE_OP, symbols->leq_op);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->from("<"));
+    return Token(TokenType::SIMPLE_OP, symbols->lt_op);
   }
 
   Token get_eq_op(TokenType t) {
@@ -361,7 +361,7 @@ private:
       consume();
       return Token(TokenType::ARROW);
     }
-    return Token(TokenType::SIMPLE_OP, symbols->from("="));
+    return Token(TokenType::SIMPLE_OP, symbols->eq_op);
   }
 
   Token get_space(TokenType t) {

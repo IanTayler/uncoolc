@@ -40,6 +40,13 @@ SymbolTable::SymbolTable() {
   io_type = from("IO");
   int_type = from("Int");
   string_type = from("String");
+  add_op = from("+");
+  sub_op = from("-");
+  div_op = from("/");
+  mult_op = from("*");
+  leq_op = from("<=");
+  lt_op = from("<");
+  eq_op = from("=");
 }
 
 Symbol SymbolTable::from(std::string str) {

@@ -37,6 +37,13 @@ public:
   Symbol bool_type;
   Symbol int_type;
   Symbol string_type;
+  Symbol add_op;
+  Symbol sub_op;
+  Symbol div_op;
+  Symbol mult_op;
+  Symbol leq_op;
+  Symbol lt_op;
+  Symbol eq_op;
 };
 
 #endif
