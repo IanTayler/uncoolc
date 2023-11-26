@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+#include "ast.h"
+#include "parser.h"
 #include "symbol.h"
 #include "token.h"
 #include "tokenizer.h"
@@ -78,6 +80,25 @@ TokenStream run_tokenizer(std::istream *input,
 
 /**********************
  *                    *
+ *       Parsing      *
+ *                    *
+ *********************/
+
+std::unique_ptr<AstNode> run_parser(TokenStream &tokens,
+                                    std::shared_ptr<SymbolTable> symbols,
+                                    const CliOptions &options) {
+
+  std::unique_ptr<AstNode> node = Parser(tokens, symbols).parse();
+
+  AstPrinter printer;
+  if (options.debug_output)
+    node->print(printer, symbols);
+
+  return node;
+}
+
+/**********************
+ *                    *
  *     Entrypoint     *
  *                    *
  *********************/
@@ -114,4 +135,6 @@ int main(int argc, char *argv[]) {
       .debug_output = debug, .debug_dir = debug_dir, .verbose = verbose};
 
   TokenStream tokens = run_tokenizer(stream, symbols, options);
+
+  run_parser(tokens, symbols, options);
 }
