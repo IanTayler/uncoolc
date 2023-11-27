@@ -108,12 +108,15 @@ private:
 
 public:
   TokenStream();
+
   unsigned int position();
+
   Token at(unsigned int i);
   Token next();
   Token next(bool skip_whitespace);
   Token lookahead();
   Token lookahead(unsigned int k);
+
   void add(Token);
 
   void reset_state();
