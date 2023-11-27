@@ -8,7 +8,12 @@ private:
   TokenStream &tokens;
   std::shared_ptr<SymbolTable> symbols;
 
+  bool expect(TokenType);
+  bool expect(Token, TokenType);
+  void skip_until(TokenType type);
+
   std::unique_ptr<ModuleNode> parse_module();
+  std::unique_ptr<ClassNode> parse_class_header();
   std::unique_ptr<ClassNode> parse_class();
   std::unique_ptr<MethodNode> parse_method();
   std::unique_ptr<AttributeNode> parse_attribute();
@@ -18,7 +23,7 @@ public:
   Parser(TokenStream &ts, std::shared_ptr<SymbolTable> ss)
       : tokens(ts), symbols(ss) {}
 
-  std::unique_ptr<AstNode> parse();
+  std::unique_ptr<ModuleNode> parse();
 };
 
 #endif
