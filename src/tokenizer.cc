@@ -274,7 +274,7 @@ Token Tokenizer::get_string(TokenType t) {
   for (c = consume(); (c != '\00' && c != '"'); c = consume()) {
   }
   // TODO(IT) handle broken string here
-  unsigned int len = start_pos - pos_;
+  unsigned int len = pos_ - start_pos;
   return Token(t, symbols->from(s_.substr(start_pos, len)));
 }
 
