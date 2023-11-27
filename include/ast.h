@@ -76,15 +76,26 @@ public:
 
 class ParameterNode : public AstNode {
 public:
-  Symbol variable;
+  ParameterNode(Symbol o, Symbol dt, Token st)
+      : object_id(o), declared_type(dt), AstNode(st) {}
+
+  Symbol object_id;
   Symbol declared_type;
 };
 
 class MethodNode : public AstNode {
 public:
+  MethodNode(Symbol n, Symbol rt,
+             std::vector<std::unique_ptr<ParameterNode>> ps, ExpressionPtr b,
+             Token st)
+      : name(n), return_type(rt), parameters(std::move(ps)), body(std::move(b)),
+        AstNode(st) {}
+
   Symbol name;
   Symbol return_type;
+
   std::vector<std::unique_ptr<ParameterNode>> parameters;
+  ExpressionPtr body;
 };
 
 class ClassNode : public AstNode {

@@ -81,7 +81,7 @@ std::unique_ptr<ClassNode> Parser::parse_class() {
     case TokenType::COLON:
       class_->attributes.push_back(parse_attribute());
       break;
-    case TokenType::R_PAREN:
+    case TokenType::L_PAREN:
       class_->methods.push_back(parse_method());
       break;
     default:
@@ -97,8 +97,67 @@ std::unique_ptr<ClassNode> Parser::parse_class() {
   return class_;
 }
 
-// TODO(IT): implement
-std::unique_ptr<MethodNode> Parser::parse_method() { return nullptr; }
+/// Parse a method definition in a class
+std::unique_ptr<MethodNode> Parser::parse_method() {
+  Token method_name = tokens.next();
+
+  if (!expect(method_name, TokenType::OBJECT_NAME)) {
+    skip_until(TokenType::R_BRACKET);
+    skip_until(TokenType::SEMICOLON);
+    tokens.next();
+    return nullptr;
+  };
+
+  // (
+  expect(TokenType::L_PAREN);
+
+  std::vector<std::unique_ptr<ParameterNode>> parameters;
+  while (tokens.lookahead().type() != TokenType::R_PAREN) {
+    Token object_name = tokens.next();
+    // object
+    expect(object_name, TokenType::OBJECT_NAME);
+
+    // :
+    expect(TokenType::COLON);
+
+    // Type
+    Token type_name = tokens.next();
+    expect(type_name, TokenType::TYPE_NAME);
+
+    // ,
+    if (tokens.lookahead().type() == TokenType::COMMA) {
+      tokens.next();
+    }
+
+    parameters.push_back(std::make_unique<ParameterNode>(
+        object_name.symbol(), type_name.symbol(), object_name));
+  }
+
+  // )
+  expect(TokenType::R_PAREN);
+
+  // :
+  expect(TokenType::COLON);
+
+  // Return type
+  Token return_type = tokens.next();
+  expect(return_type, TokenType::TYPE_NAME);
+
+  // {
+  expect(TokenType::L_BRACKET);
+
+  // method body
+  ExpressionPtr expr = parse_expression();
+
+  // }
+  expect(TokenType::R_BRACKET);
+  // ;
+  expect(TokenType::SEMICOLON);
+
+  return std::make_unique<MethodNode>(
+      method_name.symbol(), return_type.symbol(), std::move(parameters),
+      std::move(expr), method_name);
+}
 
 /// Parse an attribute defintion
 std::unique_ptr<AttributeNode> Parser::parse_attribute() {
