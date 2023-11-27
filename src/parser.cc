@@ -58,8 +58,18 @@ std::unique_ptr<ClassNode> Parser::parse_class_header() {
     return nullptr;
   }
 
-  // TODO(IT) support for inheritance
   Symbol parent_class = symbols->object_type;
+
+  if (tokens.lookahead().type() == TokenType::KW_INHERITS) {
+    tokens.next();
+    Token parent_token = tokens.next();
+
+    if (expect(parent_token, TokenType::TYPE_NAME)) {
+      parent_class = parent_token.symbol();
+    } else {
+      skip_until(TokenType::L_BRACKET);
+    }
+  }
 
   if (!expect(TokenType::L_BRACKET)) {
     skip_until(TokenType::OBJECT_NAME);
