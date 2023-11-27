@@ -32,6 +32,7 @@ std::string token_type_str(TokenType t) {
     return ":";
   case TokenType::SEMICOLON:
     return ";";
+    return "~";
   case TokenType::SIMPLE_OP:
     return "SIMPLE_OP";
   // Complex operators and token classes
@@ -89,6 +90,8 @@ std::string token_type_str(TokenType t) {
     return "LET";
   case TokenType::KW_NEW:
     return "NEW";
+  case TokenType::KW_NOT:
+    return "NOT";
   case TokenType::KW_WHILE:
     return "WHILE";
   case TokenType::KW_CASE:
@@ -170,8 +173,9 @@ TokenType token_type_from_start(char start) {
     return TokenType::MINOR_OP_CLASS;
   case '+':
   case '/':
-  case '~':
     return TokenType::SIMPLE_OP;
+  case '~':
+    return TokenType::NEG_OP;
   default:
     return TokenType::INVALID;
   }

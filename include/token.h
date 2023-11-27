@@ -30,6 +30,7 @@ enum class TokenType {
   ASSIGN,
   EQ_OP_CLASS, // = (SIMPLE_OP) and => (ARROW)
   ARROW,
+  NEG_OP,
   SIMPLE_OP,
   // IDs
   OBJECT_NAME,
@@ -47,6 +48,7 @@ enum class TokenType {
   KW_ELSE,
   KW_LET,
   KW_NEW,
+  KW_NOT,
   KW_IN,
   KW_WHILE,
   KW_CASE,

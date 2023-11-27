@@ -102,6 +102,8 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
 
     if (c0 == 'n' && c1 == 'e' && c2 == 'w')
       return Token(TokenType::KW_NEW);
+    if (c0 == 'n' && c1 == 'o' && c2 == 't')
+      return Token(TokenType::KW_NOT);
 
     break;
   case 4: // else, esac, then, true, loop and pool
