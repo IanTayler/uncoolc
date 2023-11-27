@@ -28,6 +28,47 @@ void AstNode::print(AstPrinter printer, std::shared_ptr<SymbolTable>) {
   printer.print("__NODE_PRINT_UNDEFINED__");
 }
 
+void ModuleNode::print(AstPrinter printer,
+                       std::shared_ptr<SymbolTable> symbols) {
+  for (auto &class_ : classes) {
+    class_->print(printer, symbols);
+  }
+}
+
+void ClassNode::print(AstPrinter printer,
+                      std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("class {}", symbols->get_string(name)));
+
+  printer.enter();
+  {
+    for (auto &attr : attributes) {
+      attr->print(printer, symbols);
+    }
+
+    for (auto &method : methods) {
+      method->print(printer, symbols);
+    }
+  }
+  printer.exit();
+}
+
+void AttributeNode::print(AstPrinter printer,
+                          std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("attr {}", symbols->get_string(object_id)));
+
+  printer.enter();
+  {
+    printer.print(std::format("type {}", symbols->get_string(declared_type)));
+    if (initializer) {
+      printer.print("<-");
+      printer.enter();
+      (*initializer)->print(printer, symbols);
+      printer.exit();
+    }
+  }
+  printer.exit();
+}
+
 void ExpressionNode::print(AstPrinter printer,
                            std::shared_ptr<SymbolTable> symbols) {
   printer.print("__EXPRESSION_PRINT_UNDEFINED__");

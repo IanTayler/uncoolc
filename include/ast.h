@@ -70,6 +70,8 @@ public:
   Symbol object_id;
   Symbol declared_type;
   std::optional<ExpressionPtr> initializer;
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 class ParameterNode : public AstNode {
@@ -94,6 +96,8 @@ public:
 
   std::vector<std::unique_ptr<AttributeNode>> attributes;
   std::vector<std::unique_ptr<MethodNode>> methods;
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 class ModuleNode : public AstNode {
@@ -101,6 +105,8 @@ public:
   ModuleNode(Token st) : AstNode(st) {}
 
   std::vector<std::unique_ptr<ClassNode>> classes;
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 /***********************
