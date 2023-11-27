@@ -37,7 +37,8 @@ void ModuleNode::print(AstPrinter printer,
 
 void ClassNode::print(AstPrinter printer,
                       std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("class {}", symbols->get_string(name)));
+  printer.print(std::format("class {} inherits {}", symbols->get_string(name),
+                            symbols->get_string(superclass)));
 
   printer.enter();
   {
