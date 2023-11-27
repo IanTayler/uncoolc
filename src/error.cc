@@ -22,8 +22,8 @@ void _message(std::string message, LogLevel level, Token token) {
     break;
   }
 
-  std::cerr << level_name << ": " << token.line() << ":" << token.column()
-            << " " << message << std::endl;
+  std::cerr << token.line() << ":" << token.column() << " " << level_name
+            << ": " << message << std::endl;
 }
 
 void warning(std::string message, Token token) {
