@@ -84,11 +84,11 @@ TokenStream run_tokenizer(std::istream *input,
  *                    *
  *********************/
 
-std::unique_ptr<AstNode> run_parser(TokenStream &tokens,
-                                    std::shared_ptr<SymbolTable> symbols,
-                                    const CliOptions &options) {
+std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
+                                       std::shared_ptr<SymbolTable> symbols,
+                                       const CliOptions &options) {
 
-  std::unique_ptr<AstNode> node = Parser(tokens, symbols).parse();
+  std::unique_ptr<ModuleNode> node = Parser(tokens, symbols).parse();
 
   AstPrinter printer;
   if (options.debug_output)
@@ -136,5 +136,5 @@ int main(int argc, char *argv[]) {
 
   TokenStream tokens = run_tokenizer(stream, symbols, options);
 
-  run_parser(tokens, symbols, options);
+  std::unique_ptr<ModuleNode> ast = run_parser(tokens, symbols, options);
 }
