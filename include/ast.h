@@ -115,6 +115,8 @@ private:
 
 public:
   VariableNode(Token t) : name(t.symbol()), ExpressionNode(t, t) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 /***********************

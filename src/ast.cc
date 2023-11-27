@@ -38,6 +38,11 @@ void LiteralNode::print(AstPrinter printer,
   printer.print(std::format("Literal {}", symbols->get_string(value)));
 }
 
+void VariableNode::print(AstPrinter printer,
+                         std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("Variable {}", symbols->get_string(name)));
+}
+
 void BinaryOpNode::print(AstPrinter printer,
                          std::shared_ptr<SymbolTable> symbols) {
   std::string op_rep;
