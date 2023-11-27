@@ -91,6 +91,8 @@ public:
 class ModuleNode : AstNode {
 public:
   std::vector<std::unique_ptr<ClassNode>> classes;
+
+  ModuleNode();
 };
 
 /***********************
