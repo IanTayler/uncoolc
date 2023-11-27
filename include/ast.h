@@ -40,9 +40,8 @@ public:
 
 class AstNode {
 public:
-  AstNode(Token st, Token end) : start_token(st), end_token(end) {}
+  AstNode(Token st) : start_token(st) {}
   Token start_token;
-  Token end_token;
 
   virtual void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols);
   // TODO(IT): will need to add typecheck and generate_ir as virtual methods
@@ -50,7 +49,7 @@ public:
 
 class ExpressionNode : public AstNode {
 public:
-  ExpressionNode(Token st, Token end) : AstNode(st, end) {}
+  ExpressionNode(Token st) : AstNode(st) {}
   std::optional<Symbol> static_type;
 
   virtual void print(AstPrinter printer,
@@ -61,6 +60,13 @@ typedef std::unique_ptr<ExpressionNode> ExpressionPtr;
 
 class AttributeNode : public AstNode {
 public:
+  AttributeNode(Symbol v, Symbol ty, Token st)
+      : variable(v), declared_type(ty), AstNode(st) {}
+
+  AttributeNode(Symbol v, Symbol ty, ExpressionPtr ex, Token st)
+      : variable(v), declared_type(ty), initializer(std::move(ex)),
+        AstNode(st) {}
+
   Symbol variable;
   Symbol declared_type;
   std::optional<ExpressionPtr> initializer;
@@ -81,6 +87,8 @@ public:
 
 class ClassNode : public AstNode {
 public:
+  ClassNode(Symbol n, Symbol sc, Token st)
+      : name(n), superclass(sc), AstNode(st) {}
   Symbol name;
   Symbol superclass;
 
@@ -88,11 +96,11 @@ public:
   std::vector<std::unique_ptr<MethodNode>> methods;
 };
 
-class ModuleNode : AstNode {
+class ModuleNode : public AstNode {
 public:
-  std::vector<std::unique_ptr<ClassNode>> classes;
+  ModuleNode(Token st) : AstNode(st) {}
 
-  ModuleNode();
+  std::vector<std::unique_ptr<ClassNode>> classes;
 };
 
 /***********************
@@ -106,7 +114,7 @@ private:
   Symbol value;
 
 public:
-  LiteralNode(Token t) : value(t.symbol()), ExpressionNode(t, t) {}
+  LiteralNode(Token t) : value(t.symbol()), ExpressionNode(t) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
@@ -116,7 +124,7 @@ private:
   Symbol name;
 
 public:
-  VariableNode(Token t) : name(t.symbol()), ExpressionNode(t, t) {}
+  VariableNode(Token t) : name(t.symbol()), ExpressionNode(t) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
@@ -138,10 +146,8 @@ public:
     LEQ,
     EQ,
   };
-  BinaryOpNode(ExpressionPtr l, Operator o, ExpressionPtr r, Token st,
-               Token end)
-      : left(std::move(l)), op(o), right(std::move(r)),
-        ExpressionNode(st, end) {}
+  BinaryOpNode(ExpressionPtr l, Operator o, ExpressionPtr r, Token st)
+      : left(std::move(l)), op(o), right(std::move(r)), ExpressionNode(st) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
@@ -164,8 +170,8 @@ private:
   ExpressionPtr operand;
 
 public:
-  IsVoidNode(ExpressionPtr o, Token s, Token e)
-      : operand(std::move(o)), ExpressionNode(s, e) {}
+  IsVoidNode(ExpressionPtr o, Token s)
+      : operand(std::move(o)), ExpressionNode(s) {}
 };
 
 class NewNode : public ExpressionNode {
@@ -173,7 +179,7 @@ private:
   Symbol created_type;
 
 public:
-  NewNode(Symbol c, Token s, Token e) : created_type(c), ExpressionNode(s, e) {}
+  NewNode(Symbol c, Token s) : created_type(c), ExpressionNode(s) {}
 };
 
 class AssignNode : public ExpressionNode {
@@ -182,8 +188,8 @@ private:
   ExpressionPtr expression;
 
 public:
-  AssignNode(Symbol v, ExpressionPtr ex, Token s, Token e)
-      : variable(v), expression(std::move(ex)), ExpressionNode(s, e) {}
+  AssignNode(Symbol v, ExpressionPtr ex, Token s)
+      : variable(v), expression(std::move(ex)), ExpressionNode(s) {}
 };
 
 class DispatchNode : public ExpressionNode {
@@ -193,8 +199,8 @@ private:
   std::vector<ExpressionPtr> arguments;
 
 public:
-  DispatchNode(ExpressionPtr t, std::optional<Symbol> dt, Token s, Token e)
-      : target(std::move(t)), dispatch_type(dt), ExpressionNode(s, e) {}
+  DispatchNode(ExpressionPtr t, std::optional<Symbol> dt, Token s)
+      : target(std::move(t)), dispatch_type(dt), ExpressionNode(s) {}
 };
 
 /***********************
