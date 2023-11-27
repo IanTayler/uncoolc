@@ -12,7 +12,7 @@ class A {
   };
 };
 
-class B {
+class B inherits A {
   a_more_complicated_object_name : SomeComplexType <- 1;
   b : Bool <- true;
   c : String <- "oh my god";
