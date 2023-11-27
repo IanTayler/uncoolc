@@ -149,6 +149,8 @@ ExpressionPtr Parser::parse_expression() {
   switch (token.type()) {
   case TokenType::NUMBER:
   case TokenType::STRING:
+  case TokenType::KW_TRUE:
+  case TokenType::KW_FALSE:
     return std::make_unique<LiteralNode>(token);
   case TokenType::OBJECT_NAME:
     return std::make_unique<VariableNode>(token);
