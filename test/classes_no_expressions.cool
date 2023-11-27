@@ -1,0 +1,11 @@
+class A {
+  a : Int <- 1;
+  b : Bool <- true;
+  c : String <- "oh my god";
+};
+
+class B {
+  a_more_complicated_object_name : SomeComplexType <- 1;
+  b : Bool <- true;
+  c : String <- "oh my god";
+};
