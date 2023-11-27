@@ -278,7 +278,7 @@ Token TokenStream::next(bool skip_whitespace) {
 Token TokenStream::lookahead(unsigned int k) {
   State state = get_state();
 
-  Token token = at(pos_);
+  Token token = next();
   for (int i = 0; i < k; i++) {
     token = next();
   }
@@ -321,4 +321,3 @@ void TokenStream::restore_state(TokenStream::State state) {
   opened_comments = state.opened_comments;
   line_comment = state.line_comment;
 }
-
