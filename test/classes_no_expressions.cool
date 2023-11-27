@@ -1,11 +1,23 @@
 class A {
   a : Int <- 1;
-  b : Bool <- true;
+  b : Bool <- a;
   c : String <- "oh my god";
+
+  f() : Int {
+    115
+  };
+
+ glorious_method(a:Bool) : Bool {
+    a
+  };
 };
 
 class B {
   a_more_complicated_object_name : SomeComplexType <- 1;
   b : Bool <- true;
   c : String <- "oh my god";
+
+ maybeEvenMoreGloriousMethod(some_param : Int, more_params:String) : String {
+    "this one is glorious"
+  };
 };
