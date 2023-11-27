@@ -81,6 +81,8 @@ public:
 
   Symbol object_id;
   Symbol declared_type;
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 class MethodNode : public AstNode {
@@ -96,6 +98,8 @@ public:
 
   std::vector<std::unique_ptr<ParameterNode>> parameters;
   ExpressionPtr body;
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 class ClassNode : public AstNode {

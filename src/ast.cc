@@ -60,7 +60,7 @@ void AttributeNode::print(AstPrinter printer,
   {
     printer.print(std::format("type {}", symbols->get_string(declared_type)));
     if (initializer) {
-      printer.print("<-");
+      printer.print("initializer");
       printer.enter();
       (*initializer)->print(printer, symbols);
       printer.exit();
@@ -68,6 +68,37 @@ void AttributeNode::print(AstPrinter printer,
   }
   printer.exit();
 }
+
+void ParameterNode::print(AstPrinter printer,
+                          std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("param {} : {}", symbols->get_string(object_id),
+                            symbols->get_string(declared_type)));
+}
+
+void MethodNode::print(AstPrinter printer,
+                       std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("method {}", symbols->get_string(name)));
+
+  printer.enter();
+  {
+    for (auto &param : parameters) {
+      param->print(printer, symbols);
+    }
+    printer.print(std::format("return {}", symbols->get_string(return_type)));
+
+    printer.print("body");
+    printer.enter();
+    body->print(printer, symbols);
+    printer.exit();
+  }
+  printer.exit();
+}
+
+/***********************
+ *                     *
+ * Expression Printers *
+ *                     *
+ **********************/
 
 void ExpressionNode::print(AstPrinter printer,
                            std::shared_ptr<SymbolTable> symbols) {
