@@ -61,13 +61,13 @@ typedef std::unique_ptr<ExpressionNode> ExpressionPtr;
 class AttributeNode : public AstNode {
 public:
   AttributeNode(Symbol v, Symbol ty, Token st)
-      : variable(v), declared_type(ty), AstNode(st) {}
+      : object_id(v), declared_type(ty), AstNode(st) {}
 
   AttributeNode(Symbol v, Symbol ty, ExpressionPtr ex, Token st)
-      : variable(v), declared_type(ty), initializer(std::move(ex)),
+      : object_id(v), declared_type(ty), initializer(std::move(ex)),
         AstNode(st) {}
 
-  Symbol variable;
+  Symbol object_id;
   Symbol declared_type;
   std::optional<ExpressionPtr> initializer;
 };
