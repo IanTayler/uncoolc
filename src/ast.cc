@@ -55,13 +55,13 @@ void ClassNode::print(AstPrinter printer,
 
 void AttributeNode::print(AstPrinter printer,
                           std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("attr {}", symbols->get_string(object_id)));
+  printer.print(std::format("attr {} : {}", symbols->get_string(object_id),
+                            symbols->get_string(declared_type)));
 
   printer.enter();
   {
-    printer.print(std::format("type {}", symbols->get_string(declared_type)));
     if (initializer) {
-      printer.print("initializer");
+      printer.print("<-");
       printer.enter();
       (*initializer)->print(printer, symbols);
       printer.exit();
@@ -78,15 +78,14 @@ void ParameterNode::print(AstPrinter printer,
 
 void MethodNode::print(AstPrinter printer,
                        std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("method {}", symbols->get_string(name)));
+  printer.print(std::format("method {} : {}", symbols->get_string(name),
+                            symbols->get_string(return_type)));
 
   printer.enter();
   {
     for (auto &param : parameters) {
       param->print(printer, symbols);
     }
-    printer.print(std::format("return {}", symbols->get_string(return_type)));
-
     printer.print("body");
     printer.enter();
     body->print(printer, symbols);
@@ -121,7 +120,10 @@ void UnaryOpNode::print(AstPrinter printer,
   printer.print(std::format("UnaryOp {}", symbols->get_string(op)));
 
   printer.enter();
-  child->print(printer, symbols);
+  if (child)
+    child->print(printer, symbols);
+  else
+    printer.print("__missing_child__");
   printer.exit();
 }
 
@@ -131,8 +133,14 @@ void BinaryOpNode::print(AstPrinter printer,
 
   printer.enter();
   {
-    left->print(printer, symbols);
-    right->print(printer, symbols);
+    if (left)
+      left->print(printer, symbols);
+    else
+    printer.print("__missing_left__");
+    if(right)
+      right->print(printer, symbols);
+    else
+    printer.print("__missing_right__");
   }
   printer.exit();
 }
