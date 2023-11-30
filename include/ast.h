@@ -56,6 +56,7 @@ public:
                      std::shared_ptr<SymbolTable> symbols) override;
 
   virtual int arity();
+  virtual void add_child(std::unique_ptr<ExpressionNode> &new_child);
 };
 
 typedef std::unique_ptr<ExpressionNode> ExpressionPtr;
@@ -168,6 +169,7 @@ public:
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
   virtual int arity() override;
+  virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
 
 private:
   ExpressionPtr child;
@@ -185,6 +187,7 @@ public:
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
   virtual int arity() override;
+  virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
 
 private:
   ExpressionPtr left;

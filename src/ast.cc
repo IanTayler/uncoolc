@@ -161,3 +161,30 @@ int BinaryOpNode::arity() {
 }
 int UnaryOpNode::arity() { if (child == nullptr) return 1; return 0; }
 int ExpressionNode::arity() { return 0; }
+
+/***********************
+ *                     *
+ *      Add child      *
+ *                     *
+ **********************/
+
+void ExpressionNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
+  throw std::logic_error("not implemented");
+}
+
+void UnaryOpNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
+  if (child == nullptr) {
+    child = std::move(new_child);
+  } else {
+    throw std::logic_error("too many children in unary op");
+  }
+}
+
+void BinaryOpNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
+  if (left == nullptr)
+    left = std::move(new_child);
+  else if (right == nullptr)
+    right = std::move(new_child);
+  else
+    throw std::logic_error("too many children in binary op");
+}
