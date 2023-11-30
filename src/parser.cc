@@ -3,6 +3,12 @@
 #include "error.h"
 #include <format>
 
+/***********************
+ *                     *
+ *     Parser Utils    *
+ *                     *
+ **********************/
+
 /// Skip Tokens until we find one of the appropriate type
 void Parser::skip_until(TokenType type) {
   Token next_token = tokens.lookahead();
@@ -29,6 +35,12 @@ bool Parser::expect(Token token, TokenType type) {
   }
   return true;
 }
+
+/***********************
+ *                     *
+ *  Top-level Parsers  *
+ *                     *
+ **********************/
 
 std::unique_ptr<ModuleNode> Parser::parse_module() {
   Token next = tokens.lookahead();
@@ -212,8 +224,25 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
   return nullptr;
 }
 
-ExpressionPtr Parser::parse_expression() {
-  // TODO: parse most kinds of expressions
+/***********************
+ *                     *
+ * Expression parsers  *
+ *                     *
+ **********************/
+
+bool is_expression_end(TokenType type) {
+  switch (type) {
+  case TokenType::SEMICOLON:
+  case TokenType::R_BRACKET:
+  case TokenType::R_PAREN:
+  case TokenType::KW_CLASS:
+    return true;
+  default:
+    return false;
+  }
+}
+
+ExpressionPtr Parser::parse_expression_atom() {
   Token token = tokens.next();
   switch (token.type()) {
   case TokenType::NUMBER:
@@ -223,10 +252,69 @@ ExpressionPtr Parser::parse_expression() {
     return std::make_unique<LiteralNode>(token);
   case TokenType::OBJECT_NAME:
     return std::make_unique<VariableNode>(token);
+  case TokenType::SIMPLE_OP:
+    return std::make_unique<BinaryOpNode>(token.symbol(), token);
+  case TokenType::NEG_OP:
+  case TokenType::KW_NOT:
+  case TokenType::KW_ISVOID:
+    return std::make_unique<UnaryOpNode>(token.symbol(), token);
   default:
     error("Could not parse expression", token);
+    return nullptr;
   }
-  return nullptr;
 }
+
+ExpressionPtr Parser::parse_expression() {
+  std::vector<ExpressionPtr> node_stack;
+  Token lookahead = tokens.lookahead();
+  // TODO: parse most kinds of expressions
+  while (!is_expression_end(lookahead.type()) || node_stack.size() > 1) {
+    if (!reduce_stack(node_stack, lookahead)) {
+      node_stack.push_back(parse_expression_atom());
+      lookahead = tokens.lookahead();
+    }
+  }
+  if (node_stack.size() != 1) {
+    error("could not parse expression nearby", lookahead);
+  }
+  return std::move(node_stack.back());
+}
+
+/***********************
+ *                     *
+ *      Reducers       *
+ *                     *
+ **********************/
+
+bool Parser::reduce_stack(std::vector<ExpressionPtr> &node_stack,
+                          Token lookahead) {
+  // TODO(IT): consider precedence
+  int stack_size = node_stack.size();
+  if (stack_size > 1) {
+    if (node_stack[stack_size - 1]->arity() == 2 &&
+        node_stack[stack_size - 2]->arity() == 0) {
+      ExpressionPtr op = std::move(node_stack[stack_size - 1]);
+      op->add_child(node_stack[stack_size - 2]);
+      node_stack.pop_back();
+      node_stack.pop_back();
+      node_stack.push_back(std::move(op));
+      return true;
+    }
+
+    if (node_stack[stack_size - 1]->arity() == 0 &&
+        node_stack[stack_size - 2]->arity() == 1) {
+      node_stack[stack_size - 2]->add_child(node_stack[stack_size - 1]);
+      node_stack.pop_back();
+      return true;
+    }
+  }
+  return false;
+}
+
+/***********************
+ *                     *
+ *      Exported       *
+ *                     *
+ **********************/
 
 std::unique_ptr<ModuleNode> Parser::parse() { return parse_module(); }
