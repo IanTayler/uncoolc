@@ -136,11 +136,11 @@ void BinaryOpNode::print(AstPrinter printer,
     if (left)
       left->print(printer, symbols);
     else
-    printer.print("__missing_left__");
-    if(right)
+      printer.print("__missing_left__");
+    if (right)
       right->print(printer, symbols);
     else
-    printer.print("__missing_right__");
+      printer.print("__missing_right__");
   }
   printer.exit();
 }
