@@ -84,57 +84,57 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
   switch (len) {
   case 2: // if, in, fi, of
     if (c0 == 'i' && c1 == 'f')
-      return Token(TokenType::KW_IF);
+      return Token(TokenType::KW_IF, symbols->if_kw);
 
     if (c0 == 'i' && c1 == 'n')
-      return Token(TokenType::KW_IN);
+      return Token(TokenType::KW_IN, symbols->in_kw);
 
     if (c0 == 'f' && c1 == 'i')
-      return Token(TokenType::KW_FI);
+      return Token(TokenType::KW_FI, symbols->fi_kw);
 
     if (c0 == 'o' && c1 == 'f')
-      return Token(TokenType::KW_OF);
+      return Token(TokenType::KW_OF, symbols->of_kw);
 
     break;
   case 3: // let, end
     if (c0 == 'l' && c1 == 'e' && c2 == 't')
-      return Token(TokenType::KW_LET);
+      return Token(TokenType::KW_LET, symbols->let_kw);
 
     if (c0 == 'n' && c1 == 'e' && c2 == 'w')
-      return Token(TokenType::KW_NEW);
+      return Token(TokenType::KW_NEW, symbols->new_kw);
     if (c0 == 'n' && c1 == 'o' && c2 == 't')
-      return Token(TokenType::KW_NOT);
+      return Token(TokenType::KW_NOT, symbols->not_kw);
 
     break;
   case 4: // else, esac, then, true, loop and pool
     if (c0 == 'e' && c1 == 'l' && c2 == 's' && c3 == 'e')
-      return Token(TokenType::KW_ELSE);
+      return Token(TokenType::KW_ELSE, symbols->else_kw);
 
     if (c0 == 'e' && c1 == 's' && c2 == 'a' && c3 == 'c')
-      return Token(TokenType::KW_ESAC);
+      return Token(TokenType::KW_ESAC, symbols->esac_kw);
 
     if (c0 == 't' && c1 == 'h' && c2 == 'e' && c3 == 'n')
-      return Token(TokenType::KW_THEN);
+      return Token(TokenType::KW_THEN, symbols->then_kw);
 
     if (c0 == 't' && c1 == 'r' && c2 == 'u' && c3 == 'e')
-      return Token(TokenType::KW_TRUE);
+      return Token(TokenType::KW_TRUE, symbols->true_const);
 
     if (c0 == 'l' && c1 == 'o' && c2 == 'o' && c3 == 'p')
-      return Token(TokenType::KW_LOOP);
+      return Token(TokenType::KW_LOOP, symbols->loop_kw);
 
     if (c0 == 'p' && c1 == 'o' && c2 == 'o' && c3 == 'l')
-      return Token(TokenType::KW_POOL);
+      return Token(TokenType::KW_POOL, symbols->pool_kw);
 
     break;
   case 5: // while, class, false
     if (c0 == 'w' && c1 == 'h' && c2 == 'i' && c3 == 'l' && c4 == 'e')
-      return Token(TokenType::KW_WHILE);
+      return Token(TokenType::KW_WHILE, symbols->while_kw);
 
     if (c0 == 'c' && c1 == 'l' && c2 == 'a' && c3 == 's' && c4 == 's')
-      return Token(TokenType::KW_CLASS);
+      return Token(TokenType::KW_CLASS, symbols->class_kw);
 
     if (c0 == 'f' && c1 == 'a' && c2 == 'l' && c3 == 's' && c4 == 'e')
-      return Token(TokenType::KW_FALSE);
+      return Token(TokenType::KW_FALSE, symbols->false_const);
 
     break;
   case 8: // inherits
@@ -145,7 +145,7 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
 
     if (c0 == 'i' && c1 == 'n' && c2 == 'h' && c3 == 'e' && c4 == 'r' &&
         c5 == 'i' && c6 == 't' && c7 == 's')
-      return Token(TokenType::KW_INHERITS);
+      return Token(TokenType::KW_INHERITS, symbols->inherits_kw);
 
     break;
   }

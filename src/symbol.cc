@@ -48,6 +48,21 @@ SymbolTable::SymbolTable() {
   leq_op = from("<=");
   lt_op = from("<");
   eq_op = from("=");
+  if_kw = from("if");
+  in_kw = from("in");
+  fi_kw = from("fi");
+  of_kw = from("of");
+  let_kw = from("let");
+  new_kw = from("new");
+  not_kw = from("not");
+  else_kw = from("else");
+  esac_kw = from("esac");
+  then_kw = from("then");
+  loop_kw = from("loop");
+  pool_kw = from("pool");
+  while_kw = from("while");
+  class_kw = from("class");
+  inherits_kw = from("inherits");
 }
 
 Symbol SymbolTable::from(const std::string &str) {

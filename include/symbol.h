@@ -44,6 +44,21 @@ public:
   Symbol leq_op;
   Symbol lt_op;
   Symbol eq_op;
+  Symbol if_kw;
+  Symbol in_kw;
+  Symbol fi_kw;
+  Symbol of_kw;
+  Symbol let_kw;
+  Symbol new_kw;
+  Symbol not_kw;
+  Symbol else_kw;
+  Symbol esac_kw;
+  Symbol then_kw;
+  Symbol loop_kw;
+  Symbol pool_kw;
+  Symbol while_kw;
+  Symbol class_kw;
+  Symbol inherits_kw;
 };
 
 #endif
