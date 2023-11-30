@@ -152,6 +152,7 @@ void BinaryOpNode::print(AstPrinter printer,
  **********************/
 
 int ExpressionNode::arity() { return 0; }
+
 int BinaryOpNode::arity() {
   if (left == nullptr)
     return 2;
@@ -159,8 +160,12 @@ int BinaryOpNode::arity() {
     return 1;
   return 0;
 }
-int UnaryOpNode::arity() { if (child == nullptr) return 1; return 0; }
-int ExpressionNode::arity() { return 0; }
+
+int UnaryOpNode::arity() {
+  if (child == nullptr)
+    return 1;
+  return 0;
+}
 
 /***********************
  *                     *
