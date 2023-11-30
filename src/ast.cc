@@ -116,6 +116,14 @@ void VariableNode::print(AstPrinter printer,
   printer.print(std::format("Variable {}", symbols->get_string(name)));
 }
 
+void UnaryOpNode::print(AstPrinter printer,
+                        std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("UnaryOp {}", symbols->get_string(op)));
+
+  printer.enter();
+  child->print(printer, symbols);
+  printer.exit();
+}
 
 void BinaryOpNode::print(AstPrinter printer,
                          std::shared_ptr<SymbolTable> symbols) {

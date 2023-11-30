@@ -156,11 +156,20 @@ public:
  *                     *
  **********************/
 
+class UnaryOpNode : public ExpressionNode {
 public:
+  UnaryOpNode(Symbol o, Token st) : op(o), ExpressionNode(st) {}
+
+  UnaryOpNode(Symbol o, ExpressionPtr ch, Token st)
+      : op(o), child(std::move(ch)), ExpressionNode(st) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
 private:
+  ExpressionPtr child;
+  Symbol op;
+};
+
 class BinaryOpNode : public ExpressionNode {
 public:
   BinaryOpNode(Symbol o, Token st)
