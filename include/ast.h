@@ -156,33 +156,24 @@ public:
  *                     *
  **********************/
 
+public:
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+
+private:
 class BinaryOpNode : public ExpressionNode {
 public:
-  enum class Operator {
-    ADD,
-    SUB,
-    DIV,
-    MULT,
-    LT,
-    LEQ,
-    EQ,
-  };
-  BinaryOpNode(ExpressionPtr l, Operator o, ExpressionPtr r, Token st)
+  BinaryOpNode(Symbol o, Token st)
+      : left(nullptr), op(o), right(nullptr), ExpressionNode(st) {}
+
+  BinaryOpNode(ExpressionPtr l, Symbol o, ExpressionPtr r, Token st)
       : left(std::move(l)), op(o), right(std::move(r)), ExpressionNode(st) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
 private:
-  bool is_arithmetic() const {
-    return op >= Operator::ADD && op <= Operator::MULT;
-  };
-
-  bool is_comparison() const {
-    return op >= Operator::LT && op <= Operator::EQ;
-  };
-
   ExpressionPtr left;
-  Operator op;
+  Symbol op;
   ExpressionPtr right;
 };
 

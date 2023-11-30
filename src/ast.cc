@@ -116,37 +116,10 @@ void VariableNode::print(AstPrinter printer,
   printer.print(std::format("Variable {}", symbols->get_string(name)));
 }
 
+
 void BinaryOpNode::print(AstPrinter printer,
                          std::shared_ptr<SymbolTable> symbols) {
-  std::string op_rep;
-  switch (op) {
-  case Operator::ADD:
-    op_rep = "+";
-    break;
-  case Operator::SUB:
-    op_rep = "-";
-    break;
-  case Operator::DIV:
-    op_rep = "/";
-    break;
-  case Operator::MULT:
-    op_rep = "*";
-    break;
-  case Operator::LEQ:
-    op_rep = "<=";
-    break;
-  case Operator::LT:
-    op_rep = "<";
-    break;
-  case Operator::EQ:
-    op_rep = "=";
-    break;
-  default:
-    op_rep = "__UNKNOWN_OPERATOR_TYPE__";
-    break;
-  }
-
-  printer.print(std::format("BinaryOp {}", op_rep));
+  printer.print(std::format("BinaryOp {}", symbols->get_string(op)));
 
   printer.enter();
   {
