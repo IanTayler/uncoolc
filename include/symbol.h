@@ -25,7 +25,7 @@ private:
 
 public:
   SymbolTable();
-  Symbol from(std::string);
+  Symbol from(const std::string&);
   const std::string &get_string(Symbol) const;
 
   Symbol true_const;

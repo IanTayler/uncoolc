@@ -50,7 +50,7 @@ SymbolTable::SymbolTable() {
   eq_op = from("=");
 }
 
-Symbol SymbolTable::from(std::string str) {
+Symbol SymbolTable::from(const std::string &str) {
   if (id_map.count(str) > 0) {
     return Symbol{id_map.at(str)};
   }
