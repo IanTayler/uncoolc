@@ -23,8 +23,7 @@ private:
   ExpressionPtr parse_expression_atom();
 
   // Reducers
-  void reduce_stack(std::vector<ExpressionPtr> &node_stack,
-                    const ExpressionPtr &next);
+  bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);
 
 public:
   Parser(TokenStream &ts, std::shared_ptr<SymbolTable> ss)
