@@ -54,6 +54,8 @@ public:
 
   virtual void print(AstPrinter printer,
                      std::shared_ptr<SymbolTable> symbols) override;
+
+  virtual int arity();
 };
 
 typedef std::unique_ptr<ExpressionNode> ExpressionPtr;
@@ -165,6 +167,8 @@ public:
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
+  virtual int arity() override;
+
 private:
   ExpressionPtr child;
   Symbol op;
@@ -180,19 +184,12 @@ public:
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
+  virtual int arity() override;
+
 private:
   ExpressionPtr left;
   Symbol op;
   ExpressionPtr right;
-};
-
-class IsVoidNode : public ExpressionNode {
-private:
-  ExpressionPtr operand;
-
-public:
-  IsVoidNode(ExpressionPtr o, Token s)
-      : operand(std::move(o)), ExpressionNode(s) {}
 };
 
 class NewNode : public ExpressionNode {
