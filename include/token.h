@@ -12,6 +12,7 @@ enum class TokenType {
   R_BRACKET,
   L_SQ_BRACKET,
   R_SQ_BRACKET,
+  AT,
   DOT,
   COMMA,
   COLON,

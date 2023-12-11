@@ -24,6 +24,8 @@ std::string token_type_str(TokenType t) {
     return "[";
   case TokenType::R_SQ_BRACKET:
     return "]";
+  case TokenType::AT:
+    return "@";
   case TokenType::DOT:
     return ".";
   case TokenType::COMMA:
@@ -159,6 +161,8 @@ TokenType token_type_from_start(char start) {
     return TokenType::L_SQ_BRACKET;
   case ']':
     return TokenType::R_SQ_BRACKET;
+  case '@':
+    return TokenType::AT;
   case '.':
     return TokenType::DOT;
   case ',':
