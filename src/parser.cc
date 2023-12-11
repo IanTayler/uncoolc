@@ -294,18 +294,27 @@ ExpressionPtr Parser::parse_expression() {
   return std::move(node_stack.back());
 }
 
+ExpressionPtr Parser::parse_object_expression(Token object_token) {
+  if (tokens.lookahead().type() != TokenType::L_PAREN)
+    return std::make_unique<VariableNode>(object_token);
+
+  std::unique_ptr<DispatchNode> dispatch = std::make_unique<DispatchNode>(
+      object_token.symbol(), parse_dispatch_args(), object_token);
+  dispatch->set_target_to_self();
+
+  return dispatch;
+}
+
 ExpressionPtr Parser::parse_parenthesised_expression() {
   ExpressionPtr expr = parse_expression();
   expect(TokenType::R_PAREN);
   return expr;
 }
 
-std::unique_ptr<DispatchNode> Parser::parse_dynamic_dispatch() {
-  std::vector<ExpressionPtr> args;
-  Token method_token = tokens.next();
-  expect(method_token.type(), TokenType::OBJECT_NAME);
+std::vector<ExpressionPtr> Parser::parse_dispatch_args() {
   expect(TokenType::L_PAREN);
 
+  std::vector<ExpressionPtr> args;
   Token lookahead = tokens.lookahead();
   while (!is_expression_end(lookahead.type())) {
     args.push_back(parse_expression());
@@ -313,10 +322,17 @@ std::unique_ptr<DispatchNode> Parser::parse_dynamic_dispatch() {
     if (lookahead.type() == TokenType::COMMA)
       tokens.next();
   }
-  expect(TokenType::R_PAREN);
 
-  return std::make_unique<DispatchNode>(method_token.symbol(), std::move(args),
-                                        method_token);
+  expect(TokenType::R_PAREN);
+  return args;
+}
+
+std::unique_ptr<DispatchNode> Parser::parse_dynamic_dispatch() {
+  Token method_token = tokens.next();
+  expect(method_token.type(), TokenType::OBJECT_NAME);
+
+  return std::make_unique<DispatchNode>(method_token.symbol(),
+                                        parse_dispatch_args(), method_token);
 }
 
 std::unique_ptr<DispatchNode> Parser::parse_static_dispatch() {

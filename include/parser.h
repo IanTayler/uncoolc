@@ -21,7 +21,10 @@ private:
   // Expression parsers
   ExpressionPtr parse_expression();
   ExpressionPtr parse_expression_atom();
+  ExpressionPtr parse_object_expression(Token);
   ExpressionPtr parse_parenthesised_expression();
+
+  std::vector<ExpressionPtr> parse_dispatch_args();
   std::unique_ptr<DispatchNode> parse_dynamic_dispatch();
   std::unique_ptr<DispatchNode> parse_static_dispatch();
 
