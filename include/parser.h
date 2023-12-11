@@ -22,6 +22,8 @@ private:
   ExpressionPtr parse_expression();
   ExpressionPtr parse_expression_atom();
   ExpressionPtr parse_parenthesised_expression();
+  std::unique_ptr<DispatchNode> parse_dynamic_dispatch();
+  std::unique_ptr<DispatchNode> parse_static_dispatch();
 
   // Reducers
   bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);

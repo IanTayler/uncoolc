@@ -268,6 +268,10 @@ ExpressionPtr Parser::parse_expression_atom() {
     return std::make_unique<NewNode>(second_token.symbol(), token);
   case TokenType::L_PAREN:
     return parse_parenthesised_expression();
+  case TokenType::DOT:
+    return parse_dynamic_dispatch();
+  case TokenType::AT:
+    return parse_static_dispatch();
   default:
     error("Could not parse expression", token);
     return nullptr;
@@ -296,6 +300,35 @@ ExpressionPtr Parser::parse_parenthesised_expression() {
   return expr;
 }
 
+std::unique_ptr<DispatchNode> Parser::parse_dynamic_dispatch() {
+  std::vector<ExpressionPtr> args;
+  Token method_token = tokens.next();
+  expect(method_token.type(), TokenType::OBJECT_NAME);
+  expect(TokenType::L_PAREN);
+
+  Token lookahead = tokens.lookahead();
+  while (!is_expression_end(lookahead.type())) {
+    args.push_back(parse_expression());
+    lookahead = tokens.lookahead();
+    if (lookahead.type() == TokenType::COMMA)
+      tokens.next();
+  }
+  expect(TokenType::R_PAREN);
+
+  return std::make_unique<DispatchNode>(method_token.symbol(), std::move(args),
+                                        method_token);
+}
+
+std::unique_ptr<DispatchNode> Parser::parse_static_dispatch() {
+  Token type_token = tokens.next();
+  expect(type_token.type(), TokenType::TYPE_NAME);
+  expect(type_token.type(), TokenType::DOT);
+
+  std::unique_ptr<DispatchNode> dispatch = parse_dynamic_dispatch();
+  dispatch->static_type = type_token.symbol();
+
+  return dispatch;
+}
 /***********************
  *                     *
  *      Reducers       *
