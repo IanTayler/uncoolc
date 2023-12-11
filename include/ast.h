@@ -216,12 +216,18 @@ public:
 class DispatchNode : public ExpressionNode {
 private:
   ExpressionPtr target;
+  Symbol method;
   std::optional<Symbol> dispatch_type;
   std::vector<ExpressionPtr> arguments;
 
 public:
-  DispatchNode(ExpressionPtr t, std::optional<Symbol> dt, Token s)
-      : target(std::move(t)), dispatch_type(dt), ExpressionNode(s) {}
+  DispatchNode(std::optional<Symbol> dt, Symbol m,
+               std::vector<ExpressionPtr> args, Token s)
+      : target(nullptr), method(m), dispatch_type(dt),
+        arguments(std::move(args)), ExpressionNode(s) {}
+  DispatchNode(Symbol m, std::vector<ExpressionPtr> args, Token s)
+      : DispatchNode(std::nullopt, m, std::move(args), s) {}
+
 };
 
 /***********************
