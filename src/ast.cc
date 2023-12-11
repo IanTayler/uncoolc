@@ -167,6 +167,12 @@ int UnaryOpNode::arity() {
   return 0;
 }
 
+int DispatchNode::arity() {
+  if (target == nullptr)
+    return 1;
+  return 0;
+}
+
 /***********************
  *                     *
  *      Add child      *
@@ -192,4 +198,12 @@ void BinaryOpNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
     right = std::move(new_child);
   else
     throw std::logic_error("too many children in binary op");
+}
+
+void DispatchNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
+  if (target == nullptr) {
+    target = std::move(new_child);
+  } else {
+    throw std::logic_error("too many children in dispatch");
+  }
 }

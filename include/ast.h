@@ -228,6 +228,8 @@ public:
   DispatchNode(Symbol m, std::vector<ExpressionPtr> args, Token s)
       : DispatchNode(std::nullopt, m, std::move(args), s) {}
 
+  virtual int arity() override;
+  virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
 };
 
 /***********************
