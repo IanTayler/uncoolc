@@ -244,6 +244,10 @@ bool is_expression_end(TokenType type) {
 
 ExpressionPtr Parser::parse_expression_atom() {
   Token token = tokens.next();
+
+  // This second token will only be filled for expressions that need it
+  Token second_token;
+
   switch (token.type()) {
   case TokenType::NUMBER:
   case TokenType::STRING:
@@ -258,6 +262,10 @@ ExpressionPtr Parser::parse_expression_atom() {
   case TokenType::KW_NOT:
   case TokenType::KW_ISVOID:
     return std::make_unique<UnaryOpNode>(token.symbol(), token);
+  case TokenType::KW_NEW:
+    second_token = tokens.next();
+    expect(second_token.type(), TokenType::TYPE_NAME);
+    return std::make_unique<NewNode>(second_token.symbol(), token);
   default:
     error("Could not parse expression", token);
     return nullptr;
