@@ -266,6 +266,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     second_token = tokens.next();
     expect(second_token.type(), TokenType::TYPE_NAME);
     return std::make_unique<NewNode>(second_token.symbol(), token);
+  case TokenType::L_PAREN:
+    return parse_parenthesised_expression();
   default:
     error("Could not parse expression", token);
     return nullptr;
@@ -286,6 +288,12 @@ ExpressionPtr Parser::parse_expression() {
     error("could not parse expression nearby", lookahead);
   }
   return std::move(node_stack.back());
+}
+
+ExpressionPtr Parser::parse_parenthesised_expression() {
+  ExpressionPtr expr = parse_expression();
+  expect(TokenType::R_PAREN);
+  return expr;
 }
 
 /***********************

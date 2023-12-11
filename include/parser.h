@@ -21,6 +21,7 @@ private:
   // Expression parsers
   ExpressionPtr parse_expression();
   ExpressionPtr parse_expression_atom();
+  ExpressionPtr parse_parenthesised_expression();
 
   // Reducers
   bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);
