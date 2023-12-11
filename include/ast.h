@@ -215,7 +215,11 @@ public:
 
 class DispatchNode : public ExpressionNode {
 private:
+  /// Set to true when the dispatch is known to have no target
+  bool target_self;
+
   ExpressionPtr target;
+
   Symbol method;
   std::optional<Symbol> dispatch_type;
   std::vector<ExpressionPtr> arguments;
@@ -224,12 +228,15 @@ public:
   DispatchNode(std::optional<Symbol> dt, Symbol m,
                std::vector<ExpressionPtr> args, Token s)
       : target(nullptr), method(m), dispatch_type(dt),
-        arguments(std::move(args)), ExpressionNode(s) {}
+        arguments(std::move(args)), target_self(false), ExpressionNode(s) {}
   DispatchNode(Symbol m, std::vector<ExpressionPtr> args, Token s)
       : DispatchNode(std::nullopt, m, std::move(args), s) {}
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
+
+  void set_target_to_self() { target_self = true; }
+  bool has_self_target() { return target_self; }
 };
 
 /***********************
