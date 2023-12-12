@@ -36,6 +36,34 @@ bool Parser::expect(Token token, TokenType type) {
   return true;
 }
 
+bool is_class_end(TokenType type) {
+  switch (type) {
+  case TokenType::SEMICOLON:
+  case TokenType::R_BRACKET:
+  case TokenType::R_PAREN:
+  case TokenType::KW_CLASS:
+  case TokenType::END:
+  case TokenType::INVALID:
+    return true;
+  default:
+    return false;
+  }
+}
+
+bool is_expression_end(TokenType type) {
+  switch (type) {
+  case TokenType::SEMICOLON:
+  case TokenType::R_BRACKET:
+  case TokenType::R_PAREN:
+  case TokenType::KW_CLASS:
+  case TokenType::END:
+  case TokenType::INVALID:
+    return true;
+  default:
+    return false;
+  }
+}
+
 /***********************
  *                     *
  *  Top-level Parsers  *
@@ -111,7 +139,7 @@ std::unique_ptr<ClassNode> Parser::parse_class() {
       skip_until(TokenType::SEMICOLON);
       tokens.next();
     }
-  } while (tokens.lookahead().type() != TokenType::R_BRACKET);
+  } while (!is_class_end(tokens.lookahead().type()));
 
   expect(TokenType::R_BRACKET);
   expect(TokenType::SEMICOLON);
@@ -230,18 +258,6 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
  *                     *
  **********************/
 
-bool is_expression_end(TokenType type) {
-  switch (type) {
-  case TokenType::SEMICOLON:
-  case TokenType::R_BRACKET:
-  case TokenType::R_PAREN:
-  case TokenType::KW_CLASS:
-    return true;
-  default:
-    return false;
-  }
-}
-
 ExpressionPtr Parser::parse_expression_atom() {
   Token token = tokens.next();
 
@@ -284,7 +300,15 @@ ExpressionPtr Parser::parse_expression() {
   // TODO: parse most kinds of expressions
   while (!is_expression_end(lookahead.type()) || node_stack.size() > 1) {
     if (!reduce_stack(node_stack, lookahead)) {
-      node_stack.push_back(parse_expression_atom());
+      // Failed reduction at the end of an expression will continue to fail
+      if (is_expression_end(lookahead.type())) {
+        fatal("Could not reduce expression", lookahead);
+      }
+
+      ExpressionPtr expr = parse_expression_atom();
+      if (expr)
+        node_stack.push_back(std::move(expr));
+
       lookahead = tokens.lookahead();
     }
   }
@@ -356,19 +380,23 @@ bool Parser::reduce_stack(std::vector<ExpressionPtr> &node_stack,
   // TODO(IT): consider precedence
   int stack_size = node_stack.size();
   if (stack_size > 1) {
-    if (node_stack[stack_size - 1]->arity() == 2 &&
-        node_stack[stack_size - 2]->arity() == 0) {
-      ExpressionPtr op = std::move(node_stack[stack_size - 1]);
-      op->add_child(node_stack[stack_size - 2]);
+    ExpressionPtr &top = node_stack[stack_size - 1];
+    ExpressionPtr &second = node_stack[stack_size - 2];
+
+    if (top->arity() > 0 && top->child_side() == ChildSide::LEFT &&
+        second->arity() == 0) {
+      // preserve top;
+      ExpressionPtr top_node = std::move(top);
+      top_node->add_child(second);
       node_stack.pop_back();
       node_stack.pop_back();
-      node_stack.push_back(std::move(op));
+      node_stack.push_back(std::move(top_node));
       return true;
     }
 
-    if (node_stack[stack_size - 1]->arity() == 0 &&
-        node_stack[stack_size - 2]->arity() == 1) {
-      node_stack[stack_size - 2]->add_child(node_stack[stack_size - 1]);
+    if (top->arity() == 0 && second->arity() > 0 &&
+        second->child_side() == ChildSide::RIGHT) {
+      second->add_child(top);
       node_stack.pop_back();
       return true;
     }
