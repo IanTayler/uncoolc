@@ -9,5 +9,5 @@ class Main {
   a_obj: A <- new A;
   main() : Object {
     a_obj.f()
-  }
+  };
 };
