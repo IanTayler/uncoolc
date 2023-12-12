@@ -34,6 +34,19 @@ public:
 
 /***********************
  *                     *
+ *      ChildSide      *
+ *                     *
+ **********************/
+
+/// Marks where an incomplete expression expects a child
+enum class ChildSide {
+  LEFT,
+  RIGHT,
+  NONE,
+};
+
+/***********************
+ *                     *
  *     Basic Nodes     *
  *                     *
  **********************/
@@ -56,6 +69,7 @@ public:
                      std::shared_ptr<SymbolTable> symbols) override;
 
   virtual int arity();
+  virtual ChildSide child_side();
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child);
 };
 
@@ -170,6 +184,7 @@ public:
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
+  virtual ChildSide child_side() override;
 
 private:
   ExpressionPtr child;
@@ -188,6 +203,7 @@ public:
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
+  virtual ChildSide child_side() override;
 
 private:
   ExpressionPtr left;
@@ -234,6 +250,7 @@ public:
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
+  virtual ChildSide child_side() override;
 
   void set_target_to_self() { target_self = true; }
   bool has_self_target() { return target_self; }

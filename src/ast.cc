@@ -207,3 +207,31 @@ void DispatchNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
     throw std::logic_error("too many children in dispatch");
   }
 }
+
+/***********************
+ *                     *
+ *      ChildSide      *
+ *                     *
+ **********************/
+
+ChildSide ExpressionNode::child_side() { return ChildSide::NONE; }
+
+ChildSide BinaryOpNode::child_side() {
+  if (left == nullptr)
+    return ChildSide::LEFT;
+  if (right == nullptr)
+    return ChildSide::RIGHT;
+  return ChildSide::NONE;
+}
+
+ChildSide UnaryOpNode::child_side() {
+  if (child == nullptr)
+    return ChildSide::RIGHT;
+  return ChildSide::NONE;
+}
+
+ChildSide DispatchNode::child_side() {
+  if (!target_self && target == nullptr)
+    return ChildSide::LEFT;
+  return ChildSide::NONE;
+}
