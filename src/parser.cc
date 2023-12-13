@@ -62,6 +62,8 @@ bool is_expression_end(TokenType type) {
   case TokenType::KW_THEN:
   case TokenType::KW_ELSE:
   case TokenType::KW_FI:
+  case TokenType::KW_POOL:
+  case TokenType::KW_LOOP:
     return true;
   default:
     return false;
@@ -335,6 +337,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     return parse_block(token);
   case TokenType::KW_IF:
     return parse_if(token);
+  case TokenType::KW_WHILE:
+    return parse_while(token);
   case TokenType::DOT:
     return parse_dynamic_dispatch();
   case TokenType::AT:
@@ -446,6 +450,15 @@ std::unique_ptr<IfNode> Parser::parse_if(Token start_token) {
   return std::make_unique<IfNode>(cond_expr, then_expr, else_expr, start_token);
 }
 
+std::unique_ptr<WhileNode> Parser::parse_while(Token start_token) {
+  ExpressionPtr cond_expr = parse_expression();
+
+  expect(TokenType::KW_LOOP);
+  ExpressionPtr body_expr = parse_expression();
+
+  expect(TokenType::KW_POOL);
+  return std::make_unique<WhileNode>(cond_expr, body_expr, start_token);
+}
 /***********************
  *                     *
  *      Reducers       *
