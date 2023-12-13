@@ -232,6 +232,7 @@ public:
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
+  virtual ChildSide child_side() override;
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };

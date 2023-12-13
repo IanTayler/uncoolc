@@ -315,6 +315,14 @@ ChildSide UnaryOpNode::child_side() {
   return ChildSide::NONE;
 }
 
+ChildSide AssignNode::child_side() {
+  if (variable.is_empty())
+    return ChildSide::LEFT;
+  if (expression == nullptr)
+    return ChildSide::RIGHT;
+  return ChildSide::NONE;
+}
+
 ChildSide DispatchNode::child_side() {
   if (!target_self && target == nullptr)
     return ChildSide::LEFT;
