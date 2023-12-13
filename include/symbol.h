@@ -25,7 +25,7 @@ private:
 
 public:
   SymbolTable();
-  Symbol from(const std::string&);
+  Symbol from(const std::string &);
   const std::string &get_string(Symbol) const;
 
   Symbol true_const;
@@ -44,6 +44,8 @@ public:
   Symbol leq_op;
   Symbol lt_op;
   Symbol eq_op;
+  Symbol assign_op;
+  Symbol neg_op;
   Symbol if_kw;
   Symbol in_kw;
   Symbol fi_kw;
@@ -58,6 +60,7 @@ public:
   Symbol pool_kw;
   Symbol while_kw;
   Symbol class_kw;
+  Symbol isvoid_kw;
   Symbol inherits_kw;
 };
 

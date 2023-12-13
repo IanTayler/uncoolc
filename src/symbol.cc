@@ -48,6 +48,8 @@ SymbolTable::SymbolTable() {
   leq_op = from("<=");
   lt_op = from("<");
   eq_op = from("=");
+  assign_op = from("<-");
+  neg_op = from("~");
   if_kw = from("if");
   in_kw = from("in");
   fi_kw = from("fi");
@@ -62,6 +64,7 @@ SymbolTable::SymbolTable() {
   pool_kw = from("pool");
   while_kw = from("while");
   class_kw = from("class");
+  isvoid_kw = from("isvoid");
   inherits_kw = from("inherits");
 }
 
