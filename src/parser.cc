@@ -345,6 +345,8 @@ ExpressionPtr Parser::parse_expression() {
     if (!reduce_stack(node_stack, lookahead)) {
       // Failed reduction at the end of an expression will continue to fail
       if (is_expression_end(lookahead.type())) {
+        // Dump the unreducible node stack before fatal message
+        dump_node_stack(node_stack, symbols);
         fatal("Could not reduce expression", lookahead);
       }
 
