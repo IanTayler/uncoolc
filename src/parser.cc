@@ -53,6 +53,7 @@ bool is_class_end(TokenType type) {
 bool is_expression_end(TokenType type) {
   switch (type) {
   case TokenType::SEMICOLON:
+  case TokenType::COMMA:
   case TokenType::R_BRACKET:
   case TokenType::R_PAREN:
   case TokenType::KW_CLASS:
@@ -315,7 +316,7 @@ ExpressionPtr Parser::parse_expression_atom() {
   case TokenType::KW_FALSE:
     return std::make_unique<LiteralNode>(token);
   case TokenType::OBJECT_NAME:
-    return std::make_unique<VariableNode>(token);
+    return parse_object_expression(token);
   case TokenType::SIMPLE_OP:
     return std::make_unique<BinaryOpNode>(token);
   case TokenType::ASSIGN:
@@ -391,12 +392,11 @@ std::vector<ExpressionPtr> Parser::parse_dispatch_args() {
   expect(TokenType::L_PAREN);
 
   std::vector<ExpressionPtr> args;
-  Token lookahead = tokens.lookahead();
-  while (!is_expression_end(lookahead.type())) {
+  while (!is_expression_end(tokens.lookahead().type())) {
     args.push_back(parse_expression());
-    lookahead = tokens.lookahead();
-    if (lookahead.type() == TokenType::COMMA)
+    if (tokens.lookahead().type() == TokenType::COMMA) {
       tokens.next();
+    }
   }
 
   expect(TokenType::R_PAREN);
