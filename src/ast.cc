@@ -162,6 +162,23 @@ void BinaryOpNode::print(AstPrinter printer,
   printer.exit();
 }
 
+void AssignNode::print(AstPrinter printer,
+                       std::shared_ptr<SymbolTable> symbols) {
+  if (variable.is_empty())
+    printer.print("__missing__variable__ <-");
+  else
+    printer.print(std::format("{} <-", symbols->get_string(variable)));
+
+  printer.enter();
+  {
+    if (expression)
+      expression->print(printer, symbols);
+    else
+      printer.print("__missing_expression__");
+  }
+  printer.exit();
+}
+
 void DispatchNode::print(AstPrinter printer,
                          std::shared_ptr<SymbolTable> symbols) {
   printer.print("Dispatch");
@@ -218,6 +235,14 @@ int UnaryOpNode::arity() {
   return 0;
 }
 
+int AssignNode::arity() {
+  if (variable.is_empty())
+    return 2;
+  if (!expression)
+    return 1;
+  return 0;
+}
+
 int DispatchNode::arity() {
   if (!target_self && target == nullptr)
     return 1;
@@ -249,6 +274,15 @@ void BinaryOpNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
     right = std::move(new_child);
   else
     throw std::logic_error("too many children in binary op");
+}
+
+void AssignNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {
+  if (variable.is_empty())
+    variable = new_child->start_token.symbol();
+  else if (expression == nullptr)
+    expression = std::move(new_child);
+  else
+    throw std::logic_error("too many children in assignment op");
 }
 
 void DispatchNode::add_child(std::unique_ptr<ExpressionNode> &new_child) {

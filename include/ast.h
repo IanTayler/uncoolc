@@ -228,8 +228,12 @@ private:
   ExpressionPtr expression;
 
 public:
-  AssignNode(Symbol v, ExpressionPtr ex, Token s)
-      : variable(v), expression(std::move(ex)), ExpressionNode(s) {}
+  AssignNode(Token s) : ExpressionNode(s) {}
+
+  virtual int arity() override;
+  virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 class DispatchNode : public ExpressionNode {
