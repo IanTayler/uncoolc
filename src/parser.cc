@@ -155,6 +155,7 @@ std::unique_ptr<ClassNode> Parser::parse_class() {
       skip_until(TokenType::SEMICOLON);
       tokens.next();
     }
+    expect(TokenType::SEMICOLON);
   } while (!is_class_end(tokens.lookahead().type()));
 
   expect(TokenType::R_BRACKET);
@@ -217,8 +218,6 @@ std::unique_ptr<MethodNode> Parser::parse_method() {
 
   // }
   expect(TokenType::R_BRACKET);
-  // ;
-  expect(TokenType::SEMICOLON);
 
   return std::make_unique<MethodNode>(
       method_name.symbol(), return_type.symbol(), std::move(parameters),
@@ -248,21 +247,22 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
   }
 
   // either ; or <-
-  Token next = tokens.next();
+  Token lookahead = tokens.lookahead();
   ExpressionPtr expr;
 
-  switch (next.type()) {
+  switch (lookahead.type()) {
   case TokenType::SEMICOLON:
+  case TokenType::COMMA:
     return std::make_unique<AttributeNode>(start_token.symbol(),
                                            type_token.symbol(), start_token);
   case TokenType::ASSIGN:
+    tokens.next(); // Consume <-
     expr = parse_expression();
-    expect(TokenType::SEMICOLON);
     return std::make_unique<AttributeNode>(start_token.symbol(),
                                            type_token.symbol(), std::move(expr),
                                            start_token);
   default:
-    error("Expected : or <-", next);
+    error("Expected ';', ',' or '<-'", lookahead);
     skip_until(TokenType::SEMICOLON);
   }
   return nullptr;
