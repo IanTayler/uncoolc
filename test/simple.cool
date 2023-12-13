@@ -9,6 +9,10 @@ class A inherits B {
 class Main {
   a_obj: A <- new A;
   main() : Object {
-    a_obj.f()
+    if (3 < 4) then
+      a_obj.f()
+    else
+      a_obj.f() + 1
+    fi
   };
 };
