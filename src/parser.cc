@@ -254,6 +254,37 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
 
 /***********************
  *                     *
+ * Operator attributes *
+ *                     *
+ **********************/
+
+inline int Parser::op_precedence(Token t) const {
+  Symbol s = t.symbol();
+
+  if (s == symbols->not_kw || s == symbols->neg_op)
+    return 10;
+  if (s == symbols->mult_op || s == symbols->div_op)
+    return 8;
+  if (s == symbols->add_op || s == symbols->sub_op)
+    return 6;
+  if (s == symbols->leq_op || s == symbols->lt_op || s == symbols->eq_op)
+    return 4;
+  if (s == symbols->assign_op)
+    return 2;
+  if (s == symbols->isvoid_kw)
+    return 1;
+
+  return 0;
+}
+
+inline bool Parser::takes_left(Token t) const {
+  if (t.type() == TokenType::SIMPLE_OP)
+    return true;
+  return false;
+}
+
+/***********************
+ *                     *
  * Expression parsers  *
  *                     *
  **********************/

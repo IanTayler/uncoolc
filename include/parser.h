@@ -28,6 +28,9 @@ private:
   std::unique_ptr<DispatchNode> parse_dynamic_dispatch();
   std::unique_ptr<DispatchNode> parse_static_dispatch();
 
+  // Helpers for expression parsers
+  inline int op_precedence(Token) const;
+  inline bool takes_left(Token) const;
   // Reducers
   bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);
 
