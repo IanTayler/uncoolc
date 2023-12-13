@@ -58,6 +58,9 @@ bool is_expression_end(TokenType type) {
   case TokenType::KW_CLASS:
   case TokenType::END:
   case TokenType::INVALID:
+  case TokenType::KW_THEN:
+  case TokenType::KW_ELSE:
+  case TokenType::KW_FI:
     return true;
   default:
     return false;
@@ -329,6 +332,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     return parse_parenthesised_expression();
   case TokenType::L_BRACKET:
     return parse_block(token);
+  case TokenType::KW_IF:
+    return parse_if(token);
   case TokenType::DOT:
     return parse_dynamic_dispatch();
   case TokenType::AT:
@@ -425,6 +430,20 @@ std::unique_ptr<BlockNode> Parser::parse_block(Token start_token) {
   }
   expect(TokenType::R_BRACKET);
   return std::move(block);
+}
+
+std::unique_ptr<IfNode> Parser::parse_if(Token start_token) {
+  ExpressionPtr cond_expr = parse_expression();
+
+  expect(TokenType::KW_THEN);
+  ExpressionPtr then_expr = parse_expression();
+
+  expect(TokenType::KW_ELSE);
+  ExpressionPtr else_expr = parse_expression();
+
+  expect(TokenType::KW_FI);
+
+  return std::make_unique<IfNode>(cond_expr, then_expr, else_expr, start_token);
 }
 
 /***********************
