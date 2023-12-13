@@ -315,6 +315,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     return std::make_unique<VariableNode>(token);
   case TokenType::SIMPLE_OP:
     return std::make_unique<BinaryOpNode>(token);
+  case TokenType::ASSIGN:
+    return std::make_unique<AssignNode>(token);
   case TokenType::NEG_OP:
   case TokenType::KW_NOT:
   case TokenType::KW_ISVOID:
