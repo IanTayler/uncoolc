@@ -408,7 +408,6 @@ std::unique_ptr<DispatchNode> Parser::parse_static_dispatch() {
 
 bool Parser::reduce_stack(std::vector<ExpressionPtr> &node_stack,
                           Token lookahead) {
-  // TODO(IT): consider precedence
   int stack_size = node_stack.size();
   if (stack_size > 1) {
     ExpressionPtr &top = node_stack[stack_size - 1];
@@ -427,9 +426,14 @@ bool Parser::reduce_stack(std::vector<ExpressionPtr> &node_stack,
 
     if (top->arity() == 0 && second->arity() > 0 &&
         second->child_side() == ChildSide::RIGHT) {
-      second->add_child(top);
-      node_stack.pop_back();
-      return true;
+      // TODO(IT): consider associativity
+      int second_precedence = op_precedence(second->start_token);
+      bool is_competing = takes_left(lookahead);
+      if (!is_competing || second_precedence >= op_precedence(lookahead)) {
+        second->add_child(top);
+        node_stack.pop_back();
+        return true;
+      }
     }
   }
   return false;
