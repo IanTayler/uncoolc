@@ -94,6 +94,19 @@ void MethodNode::print(AstPrinter printer,
   printer.exit();
 }
 
+void BlockNode::print(AstPrinter printer,
+                      std::shared_ptr<SymbolTable> symbols) {
+  printer.print("Block");
+
+  printer.enter();
+  {
+    for (auto &expr : expressions) {
+      expr->print(printer, symbols);
+    }
+  }
+  printer.exit();
+}
+
 /***********************
  *                     *
  * Expression Printers *

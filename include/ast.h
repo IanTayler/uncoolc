@@ -266,6 +266,20 @@ public:
  *                     *
  **********************/
 
-// TODO(IT): LET, WHILE, IF, CASE, BLOCKS
+class BlockNode : public ExpressionNode {
+private:
+  std::vector<ExpressionPtr> expressions;
+
+public:
+  BlockNode(Token s) : ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+
+  void add_expression(ExpressionPtr expr) {
+    expressions.push_back(std::move(expr));
+  }
+};
+
+// TODO(IT): LET, WHILE, IF, CASE
 
 #endif
