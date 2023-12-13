@@ -304,11 +304,11 @@ ExpressionPtr Parser::parse_expression_atom() {
   case TokenType::OBJECT_NAME:
     return std::make_unique<VariableNode>(token);
   case TokenType::SIMPLE_OP:
-    return std::make_unique<BinaryOpNode>(token.symbol(), token);
+    return std::make_unique<BinaryOpNode>(token);
   case TokenType::NEG_OP:
   case TokenType::KW_NOT:
   case TokenType::KW_ISVOID:
-    return std::make_unique<UnaryOpNode>(token.symbol(), token);
+    return std::make_unique<UnaryOpNode>(token);
   case TokenType::KW_NEW:
     second_token = tokens.next();
     expect(second_token.type(), TokenType::TYPE_NAME);

@@ -175,10 +175,10 @@ public:
 
 class UnaryOpNode : public ExpressionNode {
 public:
-  UnaryOpNode(Symbol o, Token st) : op(o), ExpressionNode(st) {}
+  UnaryOpNode(Token st) : op(st.symbol()), ExpressionNode(st) {}
 
-  UnaryOpNode(Symbol o, ExpressionPtr ch, Token st)
-      : op(o), child(std::move(ch)), ExpressionNode(st) {}
+  UnaryOpNode(ExpressionPtr ch, Token st)
+      : op(st.symbol()), child(std::move(ch)), ExpressionNode(st) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
@@ -193,11 +193,12 @@ private:
 
 class BinaryOpNode : public ExpressionNode {
 public:
-  BinaryOpNode(Symbol o, Token st)
-      : left(nullptr), op(o), right(nullptr), ExpressionNode(st) {}
+  BinaryOpNode(Token st)
+      : left(nullptr), op(st.symbol()), right(nullptr), ExpressionNode(st) {}
 
-  BinaryOpNode(ExpressionPtr l, Symbol o, ExpressionPtr r, Token st)
-      : left(std::move(l)), op(o), right(std::move(r)), ExpressionNode(st) {}
+  BinaryOpNode(ExpressionPtr l, ExpressionPtr r, Token st)
+      : left(std::move(l)), op(st.symbol()), right(std::move(r)),
+        ExpressionNode(st) {}
 
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 
