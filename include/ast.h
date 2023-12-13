@@ -286,6 +286,20 @@ public:
   }
 };
 
+class IfNode : public ExpressionNode {
+private:
+  ExpressionPtr condition_expr;
+  ExpressionPtr then_expr;
+  ExpressionPtr else_expr;
+
+public:
+  IfNode(ExpressionPtr &c, ExpressionPtr &t, ExpressionPtr &e, Token s)
+      : condition_expr(std::move(c)), then_expr(std::move(t)),
+        else_expr(std::move(e)), ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+};
+
 // TODO(IT): LET, WHILE, IF, CASE
 
 #endif

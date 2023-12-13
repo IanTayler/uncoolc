@@ -210,6 +210,41 @@ void BlockNode::print(AstPrinter printer,
   printer.exit();
 }
 
+void IfNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+  printer.print("If");
+
+  printer.enter();
+  {
+    if (condition_expr) {
+      printer.print("Condition");
+      printer.enter();
+      condition_expr->print(printer, symbols);
+      printer.exit();
+    } else {
+      printer.print("__missing_condition__");
+    }
+
+    if (then_expr) {
+      printer.print("Then");
+      printer.enter();
+      then_expr->print(printer, symbols);
+      printer.exit();
+    } else {
+      printer.print("__missing_then_expr__");
+    }
+
+    if (else_expr) {
+      printer.print("Else");
+      printer.enter();
+      else_expr->print(printer, symbols);
+      printer.exit();
+    } else {
+      printer.print("__missing_else_expr__");
+    }
+  }
+  printer.exit();
+}
+
 /***********************
  *                     *
  *        Arity        *
