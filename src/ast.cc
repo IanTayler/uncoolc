@@ -245,6 +245,33 @@ void IfNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
   printer.exit();
 }
 
+void WhileNode::print(AstPrinter printer,
+                      std::shared_ptr<SymbolTable> symbols) {
+  printer.print("While");
+
+  printer.enter();
+  {
+    if (condition_expr) {
+      printer.print("Condition");
+      printer.enter();
+      condition_expr->print(printer, symbols);
+      printer.exit();
+    } else {
+      printer.print("__missing_condition__");
+    }
+
+    if (body_expr) {
+      printer.print("Body");
+      printer.enter();
+      body_expr->print(printer, symbols);
+      printer.exit();
+    } else {
+      printer.print("__missing_body_expr__");
+    }
+  }
+  printer.exit();
+}
+
 /***********************
  *                     *
  *        Arity        *

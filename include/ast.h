@@ -300,6 +300,19 @@ public:
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
-// TODO(IT): LET, WHILE, IF, CASE
+class WhileNode : public ExpressionNode {
+private:
+  ExpressionPtr condition_expr;
+  ExpressionPtr body_expr;
+
+public:
+  WhileNode(ExpressionPtr &c, ExpressionPtr &b, Token s)
+      : condition_expr(std::move(c)), body_expr(std::move(b)),
+        ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+};
+
+// TODO(IT): LET, CASE
 
 #endif
