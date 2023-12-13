@@ -1,5 +1,5 @@
 class A {
-  a : Int <- 1;
+  a : Int <- not true;
   b : Bool <- a;
   c : String <- "oh my god";
 
@@ -8,7 +8,7 @@ class A {
   };
 
  glorious_method(a:Bool) : Bool {
-    a
+    a + b - ~c / not 15 + 3
   };
 };
 
