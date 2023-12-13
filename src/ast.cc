@@ -55,19 +55,16 @@ void ClassNode::print(AstPrinter printer,
 
 void AttributeNode::print(AstPrinter printer,
                           std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("attr {} : {}", symbols->get_string(object_id),
-                            symbols->get_string(declared_type)));
-
-  printer.enter();
-  {
-    if (initializer) {
-      printer.print("<-");
-      printer.enter();
-      (*initializer)->print(printer, symbols);
-      printer.exit();
-    }
+  if (initializer) {
+    printer.print(std::format("attr {} : {} <-", symbols->get_string(object_id),
+                              symbols->get_string(declared_type)));
+    printer.enter();
+    (*initializer)->print(printer, symbols);
+    printer.exit();
+  } else {
+    printer.print(std::format("attr {} : {}", symbols->get_string(object_id),
+                              symbols->get_string(declared_type)));
   }
-  printer.exit();
 }
 
 void ParameterNode::print(AstPrinter printer,
