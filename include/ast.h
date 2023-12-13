@@ -217,6 +217,8 @@ private:
 
 public:
   NewNode(Symbol c, Token s) : created_type(c), ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 class AssignNode : public ExpressionNode {
@@ -254,6 +256,8 @@ public:
 
   void set_target_to_self() { target_self = true; }
   bool has_self_target() { return target_self; }
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
 /***********************

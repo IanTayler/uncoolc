@@ -115,6 +115,10 @@ void VariableNode::print(AstPrinter printer,
   printer.print(std::format("Variable {}", symbols->get_string(name)));
 }
 
+void NewNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("new {}", symbols->get_string(created_type)));
+}
+
 void UnaryOpNode::print(AstPrinter printer,
                         std::shared_ptr<SymbolTable> symbols) {
   printer.print(std::format("UnaryOp {}", symbols->get_string(op)));
@@ -141,6 +145,40 @@ void BinaryOpNode::print(AstPrinter printer,
       right->print(printer, symbols);
     else
       printer.print("__missing_right__");
+  }
+  printer.exit();
+}
+
+void DispatchNode::print(AstPrinter printer,
+                         std::shared_ptr<SymbolTable> symbols) {
+  printer.print("Dispatch");
+
+  printer.enter();
+  {
+    printer.print("target");
+
+    printer.enter();
+    {
+      if (target_self)
+        printer.print("self");
+      else if (target)
+        target->print(printer, symbols);
+      else
+        printer.print("__missing_target__");
+    }
+    printer.exit();
+
+    if (dispatch_type)
+      printer.print(std::format("@{}", symbols->get_string(*dispatch_type)));
+
+    printer.print(std::format("method {}", symbols->get_string(method)));
+
+    printer.print("arguments");
+    printer.enter();
+    for (auto &arg : arguments) {
+      arg->print(printer, symbols);
+    }
+    printer.exit();
   }
   printer.exit();
 }
