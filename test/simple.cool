@@ -1,8 +1,9 @@
 class A inherits B {
   a : Int <- 10;
-  f() : Int {
-    2 + 2 / 3 * 4 - 1
-  };
+  f() : Int {{
+    2 + 2 / 3 * 4 - 1;
+    {3 * 5 + ~a / 2; ~a;};
+  }};
 };
 
 class Main {
