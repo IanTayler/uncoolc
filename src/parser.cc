@@ -315,6 +315,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     return std::make_unique<NewNode>(second_token.symbol(), token);
   case TokenType::L_PAREN:
     return parse_parenthesised_expression();
+  case TokenType::L_BRACKET:
+    return parse_block(token);
   case TokenType::DOT:
     return parse_dynamic_dispatch();
   case TokenType::AT:
@@ -400,6 +402,17 @@ std::unique_ptr<DispatchNode> Parser::parse_static_dispatch() {
 
   return dispatch;
 }
+
+std::unique_ptr<BlockNode> Parser::parse_block(Token start_token) {
+  auto block = std::make_unique<BlockNode>(start_token);
+  while (!is_class_end(tokens.lookahead().type())) {
+    block->add_expression(parse_expression());
+    expect(TokenType::SEMICOLON);
+  }
+  expect(TokenType::R_BRACKET);
+  return std::move(block);
+}
+
 /***********************
  *                     *
  *      Reducers       *
