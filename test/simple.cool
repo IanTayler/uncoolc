@@ -1,7 +1,9 @@
 class A inherits B {
   a : Int <- 10;
   f() : Int {{
-    2 + 2 / 3 * 4 - 1;
+    while a < 10 loop
+      2 + 2 / 3 * 4 - 1
+    pool;
     { a <- 3 * 5 + ~a / 2; ~a;};
   }};
 };
