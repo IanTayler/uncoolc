@@ -70,7 +70,7 @@ bool Tokenizer::is_alphanum(char c) {
 std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
                                               unsigned int end_pos) {
   int len = end_pos - start_pos;
-  char c0, c1, c2, c3, c4;
+  char c0, c1, c2, c3, c4, c5;
   c0 = lookahead();
   if (len > 1)
     c1 = lookahead(1);
@@ -80,6 +80,8 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
     c3 = lookahead(3);
   if (len > 4)
     c4 = lookahead(4);
+  if (len > 5)
+    c5 = lookahead(5);
 
   switch (len) {
   case 2: // if, in, fi, of
@@ -137,9 +139,16 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
       return Token(TokenType::KW_FALSE, symbols->false_const);
 
     break;
+
+  case 6: // isvoid
+    if (c0 == 'i' && c1 == 's' && c2 == 'v' && c3 == 'o' && c4 == 'i' &&
+        c5 == 'd')
+      return Token(TokenType::KW_ISVOID, symbols->isvoid_kw);
+
+    break;
+
   case 8: // inherits
-    char c5, c6, c7;
-    c5 = lookahead(5);
+    char c6, c7;
     c6 = lookahead(6);
     c7 = lookahead(7);
 
