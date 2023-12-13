@@ -86,9 +86,9 @@ std::unique_ptr<ModuleNode> Parser::parse_module() {
 /// Parse the beginning line of a class declaration
 std::unique_ptr<ClassNode> Parser::parse_class_header() {
   Token start_token = tokens.next();
-  if (start_token.type() != TokenType::KW_CLASS) {
-    error("Expected class identifier", start_token);
-    return parse_class();
+  if (!expect(start_token, TokenType::KW_CLASS)) {
+    skip_until(TokenType::KW_CLASS);
+    start_token = tokens.next();
   }
 
   Token token = tokens.next();
