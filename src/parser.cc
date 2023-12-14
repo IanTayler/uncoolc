@@ -362,7 +362,6 @@ ExpressionPtr Parser::parse_expression_atom() {
 ExpressionPtr Parser::parse_expression() {
   std::vector<ExpressionPtr> node_stack;
   Token lookahead = tokens.lookahead();
-  // TODO: parse most kinds of expressions
   while (!is_expression_end(lookahead.type()) || node_stack.size() > 1) {
     if (!reduce_stack(node_stack, lookahead)) {
       // Failed reduction at the end of an expression will continue to fail
