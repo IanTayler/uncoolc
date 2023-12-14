@@ -272,6 +272,28 @@ void WhileNode::print(AstPrinter printer,
   printer.exit();
 }
 
+void LetNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+  printer.print("Let");
+
+  printer.enter();
+  {
+    printer.print("Declarations");
+
+    printer.enter();
+    for (auto &attr : declarations) {
+      attr->print(printer, symbols);
+    }
+    printer.exit();
+
+    printer.print("Body");
+
+    printer.enter();
+    body_expr->print(printer, symbols);
+    printer.exit();
+  }
+  printer.exit();
+}
+
 /***********************
  *                     *
  *        Arity        *

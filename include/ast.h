@@ -313,6 +313,23 @@ public:
   void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
 };
 
+class LetNode : public ExpressionNode {
+private:
+  std::vector<std::unique_ptr<AttributeNode>> declarations;
+  ExpressionPtr body_expr;
+
+public:
+  LetNode(Token s) : body_expr(nullptr), ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+
+  void add_declaration(std::unique_ptr<AttributeNode> attr) {
+    declarations.push_back(std::move(attr));
+  }
+
+  void set_body(ExpressionPtr expr) { body_expr = std::move(expr); }
+};
+
 // TODO(IT): LET, CASE
 
 #endif
