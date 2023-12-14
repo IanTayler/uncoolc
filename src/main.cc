@@ -90,9 +90,19 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
 
   std::unique_ptr<ModuleNode> node = Parser(tokens, symbols).parse();
 
-  AstPrinter printer;
-  if (options.debug_output)
+  std::ostream *output = nullptr;
+  std::fstream out_file;
+
+  if (options.debug_output) {
+    std::filesystem::create_directories(options.debug_dir);
+    out_file.open(options.debug_dir / "parser.log", std::ios::out);
+    output = &out_file;
+  }
+
+  if (output != nullptr) {
+    AstPrinter printer{2, output};
     node->print(printer, symbols);
+  }
 
   return node;
 }
