@@ -1,5 +1,6 @@
 class A inherits B {
   a : Int <- 10;
+  b : Int <- a <- b <- 2;
   f() : Int {{
     while a < 10 loop
       let c : Int <- a * 2 + 1, d : Int <- c + 3 in
@@ -13,7 +14,8 @@ class Main {
   a_obj: A <- new A;
   main() : Object {
     if (3 < 4) then
-      a_obj@A.f()
+      let b_obj : A in
+        a_obj@A.f(a_obj <- b_obj <- 2)
     else
       a_obj.f() + 1
     fi
