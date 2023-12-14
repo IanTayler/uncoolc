@@ -108,7 +108,10 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
       return Token(TokenType::KW_NOT, symbols->not_kw);
 
     break;
-  case 4: // else, esac, then, true, loop and pool
+  case 4: // case, else, esac, then, true, loop and pool
+    if (c0 == 'c' && c1 == 'a' && c2 == 's' && c3 == 'e')
+      return Token(TokenType::KW_CASE, symbols->case_kw);
+
     if (c0 == 'e' && c1 == 'l' && c2 == 's' && c3 == 'e')
       return Token(TokenType::KW_ELSE, symbols->else_kw);
 
