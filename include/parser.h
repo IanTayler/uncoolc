@@ -27,6 +27,8 @@ private:
   std::unique_ptr<IfNode> parse_if(Token);
   std::unique_ptr<WhileNode> parse_while(Token);
   std::unique_ptr<LetNode> parse_let(Token);
+  std::unique_ptr<CaseBranchNode> parse_case_branch();
+  std::unique_ptr<CaseNode> parse_case(Token);
 
   std::vector<ExpressionPtr> parse_dispatch_args();
   std::unique_ptr<DispatchNode> parse_dynamic_dispatch();

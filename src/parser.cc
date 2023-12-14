@@ -65,6 +65,8 @@ bool is_expression_end(TokenType type) {
   case TokenType::KW_POOL:
   case TokenType::KW_LOOP:
   case TokenType::KW_IN:
+  case TokenType::KW_ESAC:
+  case TokenType::KW_OF:
     return true;
   default:
     return false;
@@ -345,6 +347,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     return parse_while(token);
   case TokenType::KW_LET:
     return parse_let(token);
+  case TokenType::KW_CASE:
+    return parse_case(token);
   case TokenType::DOT:
     return parse_dynamic_dispatch();
   case TokenType::AT:
@@ -479,6 +483,38 @@ std::unique_ptr<LetNode> Parser::parse_let(Token start_token) {
   let->set_body(parse_expression());
 
   return let;
+}
+
+std::unique_ptr<CaseBranchNode> Parser::parse_case_branch() {
+  Token start_token = tokens.next();
+  expect(start_token, TokenType::OBJECT_NAME);
+
+  expect(TokenType::COLON);
+
+  Token type_token = tokens.next();
+  expect(type_token, TokenType::TYPE_NAME);
+
+  expect(TokenType::ARROW);
+
+  return std::make_unique<CaseBranchNode>(start_token.symbol(),
+                                          type_token.symbol(),
+                                          parse_expression(), start_token);
+}
+
+std::unique_ptr<CaseNode> Parser::parse_case(Token start_token) {
+  std::unique_ptr<CaseNode> case_ =
+      std::make_unique<CaseNode>(parse_expression(), start_token);
+
+  expect(TokenType::KW_OF);
+
+  do {
+    case_->add_branch(parse_case_branch());
+    expect(TokenType::SEMICOLON);
+  } while (!is_expression_end(tokens.lookahead().type()));
+
+  expect(TokenType::KW_ESAC);
+
+  return case_;
 }
 
 /***********************
