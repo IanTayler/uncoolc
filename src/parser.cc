@@ -554,10 +554,15 @@ bool Parser::reduce_stack(std::vector<ExpressionPtr> &node_stack,
 
     if (top->arity() == 0 && second->arity() > 0 &&
         second->child_side() == ChildSide::RIGHT) {
-      // TODO(IT): consider associativity
       int second_precedence = op_precedence(second->start_token);
-      bool is_competing = takes_left(lookahead);
-      if (!is_competing || second_precedence >= op_precedence(lookahead)) {
+
+      bool not_competing = !takes_left(lookahead);
+      bool higher_precedence = second_precedence > op_precedence(lookahead);
+      bool same_prec_left_assoc =
+          ((second_precedence == op_precedence(lookahead)) &&
+           op_associativity(lookahead) == Associativity::LEFT);
+
+      if (not_competing || higher_precedence || same_prec_left_assoc) {
         second->add_child(top);
         node_stack.pop_back();
         return true;
