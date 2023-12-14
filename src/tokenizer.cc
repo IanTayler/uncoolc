@@ -285,9 +285,12 @@ Token Tokenizer::get_number(TokenType t) {
 Token Tokenizer::get_string(TokenType t) {
   unsigned int start_pos = pos_;
   char c = consume(); // Consume the starting quotes.
-  for (c = consume(); (c != '\00' && c != '"'); c = consume()) {
+  for (c = consume(); (c != '\00' && c != '"' && c != '\n'); c = consume()) {
   }
-  // TODO(IT) handle broken string here
+
+  if (c != '"')
+    return Token(TokenType::INVALID, symbols->from("__unterminated_string__"));
+
   unsigned int len = pos_ - start_pos;
   return Token(t, symbols->from(s_.substr(start_pos, len)));
 }
