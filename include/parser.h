@@ -26,6 +26,7 @@ private:
   std::unique_ptr<BlockNode> parse_block(Token);
   std::unique_ptr<IfNode> parse_if(Token);
   std::unique_ptr<WhileNode> parse_while(Token);
+  std::unique_ptr<LetNode> parse_let(Token);
 
   std::vector<ExpressionPtr> parse_dispatch_args();
   std::unique_ptr<DispatchNode> parse_dynamic_dispatch();

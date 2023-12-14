@@ -64,6 +64,7 @@ bool is_expression_end(TokenType type) {
   case TokenType::KW_FI:
   case TokenType::KW_POOL:
   case TokenType::KW_LOOP:
+  case TokenType::KW_IN:
     return true;
   default:
     return false;
@@ -251,8 +252,11 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
   ExpressionPtr expr;
 
   switch (lookahead.type()) {
+  // Class attributes end with a semicolon
   case TokenType::SEMICOLON:
+  // attributes in let expressions end with comma or in
   case TokenType::COMMA:
+  case TokenType::KW_IN:
     return std::make_unique<AttributeNode>(start_token.symbol(),
                                            type_token.symbol(), start_token);
   case TokenType::ASSIGN:
@@ -262,7 +266,7 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
                                            type_token.symbol(), std::move(expr),
                                            start_token);
   default:
-    error("Expected ';', ',' or '<-'", lookahead);
+    error("Expected ';', ',' 'in' or '<-'", lookahead);
     skip_until(TokenType::SEMICOLON);
   }
   return nullptr;
@@ -339,6 +343,8 @@ ExpressionPtr Parser::parse_expression_atom() {
     return parse_if(token);
   case TokenType::KW_WHILE:
     return parse_while(token);
+  case TokenType::KW_LET:
+    return parse_let(token);
   case TokenType::DOT:
     return parse_dynamic_dispatch();
   case TokenType::AT:
@@ -459,6 +465,22 @@ std::unique_ptr<WhileNode> Parser::parse_while(Token start_token) {
   expect(TokenType::KW_POOL);
   return std::make_unique<WhileNode>(cond_expr, body_expr, start_token);
 }
+
+std::unique_ptr<LetNode> Parser::parse_let(Token start_token) {
+  std::unique_ptr<LetNode> let = std::make_unique<LetNode>(start_token);
+
+  Token next;
+  do {
+    let->add_declaration(parse_attribute());
+  } while ((next = tokens.next()).type() == TokenType::COMMA);
+
+  expect(next, TokenType::KW_IN);
+
+  let->set_body(parse_expression());
+
+  return let;
+}
+
 /***********************
  *                     *
  *      Reducers       *

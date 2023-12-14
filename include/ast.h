@@ -330,6 +330,6 @@ public:
   void set_body(ExpressionPtr expr) { body_expr = std::move(expr); }
 };
 
-// TODO(IT): LET, CASE
+// TODO(IT): CASE
 
 #endif
