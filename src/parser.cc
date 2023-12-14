@@ -280,6 +280,12 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
  *                     *
  **********************/
 
+inline Associativity Parser::op_associativity(Token t) const {
+  if (t.symbol() == symbols->assign_op)
+    return Associativity::RIGHT;
+  return Associativity::LEFT;
+}
+
 inline int Parser::op_precedence(Token t) const {
   Symbol s = t.symbol();
 

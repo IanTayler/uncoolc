@@ -3,6 +3,11 @@
 
 #include "ast.h"
 
+enum class Associativity {
+  LEFT,
+  RIGHT,
+};
+
 class Parser {
 private:
   TokenStream &tokens;
@@ -36,6 +41,7 @@ private:
 
   // Helpers for expression parsers
   inline int op_precedence(Token) const;
+  inline Associativity op_associativity(Token) const;
   inline bool takes_left(Token) const;
   // Reducers
   bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);
