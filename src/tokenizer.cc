@@ -236,7 +236,7 @@ Token Tokenizer::get_minor_op(TokenType t) {
   char c = current();
   if (c == '-') {
     consume();
-    return Token(TokenType::ASSIGN);
+    return Token(TokenType::ASSIGN, symbols->assign_op);
   }
   if (c == '=') {
     consume();

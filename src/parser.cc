@@ -308,9 +308,13 @@ inline int Parser::op_precedence(Token t) const {
 }
 
 inline bool Parser::takes_left(Token t) const {
-  if (t.type() == TokenType::SIMPLE_OP)
+  switch (t.type()) {
+  case TokenType::SIMPLE_OP:
+  case TokenType::ASSIGN:
     return true;
-  return false;
+  default:
+    return false;
+  }
 }
 
 /***********************
