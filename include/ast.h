@@ -260,6 +260,7 @@ public:
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
   virtual ChildSide child_side() override;
 
+  void set_dispatch_type(Symbol d) { dispatch_type = d; }
   void set_target_to_self() { target_self = true; }
   bool has_self_target() { return target_self; }
 

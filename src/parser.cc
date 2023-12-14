@@ -424,10 +424,10 @@ std::unique_ptr<DispatchNode> Parser::parse_dynamic_dispatch() {
 std::unique_ptr<DispatchNode> Parser::parse_static_dispatch() {
   Token type_token = tokens.next();
   expect(type_token.type(), TokenType::TYPE_NAME);
-  expect(type_token.type(), TokenType::DOT);
+  expect(TokenType::DOT);
 
   std::unique_ptr<DispatchNode> dispatch = parse_dynamic_dispatch();
-  dispatch->static_type = type_token.symbol();
+  dispatch->set_dispatch_type(type_token.symbol());
 
   return dispatch;
 }
