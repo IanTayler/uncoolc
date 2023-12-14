@@ -294,6 +294,36 @@ void LetNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
   printer.exit();
 }
 
+void CaseBranchNode::print(AstPrinter printer,
+                           std::shared_ptr<SymbolTable> symbols) {
+  printer.print(std::format("{} : {}", symbols->get_string(object_id),
+                            symbols->get_string(declared_type)));
+
+  printer.enter();
+  body_expr->print(printer, symbols);
+  printer.exit();
+}
+
+void CaseNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+  printer.print("Case");
+
+  printer.enter();
+  {
+    printer.print("Eval");
+    printer.enter();
+    eval_expr->print(printer, symbols);
+    printer.exit();
+
+    printer.print("Branches");
+    printer.enter();
+    for (auto &branch : branches) {
+      branch->print(printer, symbols);
+    }
+    printer.exit();
+  }
+  printer.exit();
+}
+
 /***********************
  *                     *
  *        Arity        *

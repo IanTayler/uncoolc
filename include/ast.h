@@ -331,6 +331,34 @@ public:
   void set_body(ExpressionPtr expr) { body_expr = std::move(expr); }
 };
 
-// TODO(IT): CASE
+class CaseBranchNode : public ExpressionNode {
+private:
+  Symbol object_id;
+  Symbol declared_type;
+  ExpressionPtr body_expr;
+
+public:
+  CaseBranchNode(Symbol o, Symbol t, ExpressionPtr b, Token s)
+      : object_id(o), declared_type(t), body_expr(std::move(b)),
+        ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+};
+
+class CaseNode : public ExpressionNode {
+private:
+  ExpressionPtr eval_expr;
+  std::vector<std::unique_ptr<CaseBranchNode>> branches;
+
+public:
+  CaseNode(ExpressionPtr e, Token s)
+      : eval_expr(std::move(e)), ExpressionNode(s) {}
+
+  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+
+  void add_branch(std::unique_ptr<CaseBranchNode> branch) {
+    branches.push_back(std::move(branch));
+  }
+};
 
 #endif
