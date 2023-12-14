@@ -57,6 +57,7 @@ SymbolTable::SymbolTable() {
   let_kw = from("let");
   new_kw = from("new");
   not_kw = from("not");
+  case_kw = from("case");
   else_kw = from("else");
   esac_kw = from("esac");
   then_kw = from("then");

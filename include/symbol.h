@@ -53,6 +53,7 @@ public:
   Symbol let_kw;
   Symbol new_kw;
   Symbol not_kw;
+  Symbol case_kw;
   Symbol else_kw;
   Symbol esac_kw;
   Symbol then_kw;
