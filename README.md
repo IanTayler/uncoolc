@@ -13,6 +13,13 @@ cmake ..
 cmake --build .
 ```
 
+## Test
+
+Tests are built as part of the normal build. After you build with the instructions above, just run:
+
+```sh
+./tests
+```
 
 ## License & Copyright
 
