@@ -21,5 +21,20 @@ target_include_directories(coolc
   include
 )
 
+add_executable(tests
+  test/test_symbol.cpp
+  src/tokenizer.cc
+  src/token.cc
+  src/symbol.cc
+  src/ast.cc
+  src/error.cc
+  src/parser.cc
+)
+target_include_directories(tests
+  PUBLIC
+  include
+  test/include
+)
+
 add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
