@@ -2,7 +2,23 @@
 
 This repo is just my implementation of a compiler following the Stanford course [Compilers](https://www.edx.org/learn/computer-science/stanford-university-compilers). The implementation is a work in progress.
 
-The code might be very different from the implementations presented in the course as I'm trying to write each bit _ahead_ of the relevant class, which I think maximizes the educational purpose of the project.
+The code is very different from the implementations presented in the course. This implementation tries to go one step closer to what a production compiler would look like.
+
+Here are some of the bigger differences (marked as planned if not yet done).
+
+- More modern C++.
+- Hand-written lexer instead of using flex.
+- Hand-written parser instead of using bison.
+- Target an intermediate representation (IR) instead of assembly directly [planned]
+- Implement an optimization pipeline over the IR [planned]
+- Implement an LLVM backend [planned]
+- Implement a hand-written backend [planned]
+
+Here are some of the things that are **out of scope** for uncoolc, which would need to be much better in a production compiler.
+
+- Performance of the compiler is not a concern. E.g. the code uses `std::` containers whenever it simplifies the code.
+- Performance of the produced code is a non-goal. Showing good examples of optimization passes _is_ a goal, though.
+- Quality of error reporting is pretty poor. The course's assignment compiler is a better example of reasonable error reporting, and actual production compilers like `clang` are on a different level entirely.
 
 ## Build 
 
