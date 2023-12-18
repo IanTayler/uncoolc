@@ -23,6 +23,7 @@ target_include_directories(coolc
 
 add_executable(tests
   test/test_symbol.cc
+  test/test_token.cc
   src/tokenizer.cc
   src/token.cc
   src/symbol.cc
