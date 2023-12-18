@@ -12,3 +12,12 @@ cd build
 cmake ..
 cmake --build .
 ```
+
+
+## License & Copyright
+
+The code in this repo is shared under the MIT License, which you can find under [LICENSE.txt](/LICENSE.txt).
+
+Copyright © 2023 Ian Tayler.
+
+The only exception is [Doctest](https://github.com/doctest/doctest/tree/master) which is bundled and shared under the license in [test/include/LICENSE.txt](/test/include/LICENSE.txt). 
