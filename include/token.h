@@ -84,11 +84,13 @@ public:
   Token(TokenType);
   Token(TokenType, Symbol);
   static Token end();
-  TokenType type();
-  Symbol symbol();
+  TokenType type() const;
+  Symbol symbol() const;
   unsigned int line();
   unsigned int column();
   void set_position(unsigned int, unsigned int);
+
+  bool operator==(const Token &) const;
 };
 
 class TokenStream {

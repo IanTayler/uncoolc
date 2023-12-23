@@ -204,10 +204,10 @@ Token::Token() : Token(TokenType::INVALID) {}
 Token Token::end() { return Token(TokenType::END); }
 
 /// Return token type.
-TokenType Token::type() { return type_; }
+TokenType Token::type() const { return type_; }
 
 /// Return a representation. Empty string if no representation.
-Symbol Token::symbol() { return symb_; }
+Symbol Token::symbol() const { return symb_; }
 
 /// Return the token's line number.
 unsigned int Token::line() { return line_; }
@@ -219,6 +219,10 @@ unsigned int Token::column() { return col_; }
 void Token::set_position(unsigned int l, unsigned int c) {
   line_ = l;
   col_ = c;
+}
+
+bool Token::operator==(const Token &other) const {
+  return other.symbol() == symb_ && other.type() == type_;
 }
 
 /**********************
