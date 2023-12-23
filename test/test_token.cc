@@ -4,7 +4,7 @@
 TEST_SUITE("TokenType") {
   TEST_CASE("token_type_str has correct values") {
     CHECK(token_type_str(TokenType::ARROW) == "=>");
-    CHECK(token_type_str(TokenType::NEW_LINE) == "NEw_LINE");
+    CHECK(token_type_str(TokenType::NEW_LINE) == "NEW_LINE");
     CHECK(token_type_str(TokenType::KW_LET) == "LET");
     CHECK(token_type_str(TokenType::OBJECT_NAME) == "OBJECT_NAME");
     CHECK(token_type_str(TokenType::TYPE_NAME) == "TYPE_NAME");
@@ -38,6 +38,9 @@ TEST_SUITE("Token") {
     CHECK(token.symbol() == Symbol(0));
     CHECK(token.type() == TokenType::OPEN_COMMENT);
 
+    token = Token{TokenType::OPEN_COMMENT, Symbol(0)};
+    CHECK(token.symbol() == Symbol(0));
+    CHECK(token.type() == TokenType::OPEN_COMMENT);
   }
 
   TEST_CASE("end returns empty symbol") {
@@ -61,5 +64,31 @@ TEST_SUITE("Token") {
 }
 
 TEST_SUITE("TokenStream") {
-  TEST_CASE("at returns correct value") {}
+  TEST_CASE("constructor is correct") {
+    TokenStream stream = TokenStream();
+    CHECK(stream.position() == 0);
+    CHECK(stream.next().type() == TokenType::END);
+  }
+
+  TEST_CASE("add adds what next reads") {
+    TokenStream stream = TokenStream();
+
+    Token t0 = Token(TokenType::L_PAREN, Symbol(0));
+    Token t1 = Token(TokenType::NUMBER, Symbol(1));
+    Token t2 = Token(TokenType::SIMPLE_OP, Symbol(2));
+    Token t3 = Token(TokenType::NUMBER, Symbol(3));
+    Token t4 = Token(TokenType::R_PAREN, Symbol(4));
+
+    stream.add(t0);
+    stream.add(t1);
+    stream.add(t2);
+    stream.add(t3);
+    stream.add(t4);
+
+    CHECK(stream.next() == t0);
+    CHECK(stream.next() == t1);
+    CHECK(stream.next() == t2);
+    CHECK(stream.next() == t3);
+    CHECK(stream.next() == t4);
+  }
 }
