@@ -21,11 +21,11 @@ TEST_SUITE("TokenType") {
 }
 
 TEST_SUITE("Token") {
-  TEST_CASE("end returns END type") {
+  TEST_CASE("Token end returns END type") {
     CHECK(Token::end().type() == TokenType::END);
   }
 
-  TEST_CASE("constructor respects inputs") {
+  TEST_CASE("Token constructor respects inputs") {
     Token token = Token{TokenType::COLON, Symbol(15)};
     CHECK(token.symbol() == Symbol(15));
     CHECK(token.type() == TokenType::COLON);
@@ -43,11 +43,11 @@ TEST_SUITE("Token") {
     CHECK(token.type() == TokenType::OPEN_COMMENT);
   }
 
-  TEST_CASE("end returns empty symbol") {
+  TEST_CASE("Token end returns empty symbol") {
     CHECK(Token::end().symbol() == Symbol());
   }
 
-  TEST_CASE("set_position sets position correctly") {
+  TEST_CASE("Token set_position sets position correctly") {
     Token token = Token(TokenType::SPACE, Symbol(1));
     token.set_position(0, 1);
     CHECK(token.line() == 0);
@@ -64,13 +64,13 @@ TEST_SUITE("Token") {
 }
 
 TEST_SUITE("TokenStream") {
-  TEST_CASE("constructor is correct") {
+  TEST_CASE("TokenStream constructor is correct") {
     TokenStream stream = TokenStream();
     CHECK(stream.position() == 0);
     CHECK(stream.next().type() == TokenType::END);
   }
 
-  TEST_CASE("add adds what next reads") {
+  TEST_CASE("TokenStream add adds what next reads") {
     TokenStream stream = TokenStream();
 
     Token t0 = Token(TokenType::L_PAREN, Symbol(0));
@@ -93,7 +93,7 @@ TEST_SUITE("TokenStream") {
     CHECK(stream.next() == Token::end());
   }
 
-  TEST_CASE("next skip_whitespace skips newline") {
+  TEST_CASE("TokenStream next skip_whitespace skips newline") {
     TokenStream stream = TokenStream();
 
     // non-whitespace
@@ -131,7 +131,7 @@ TEST_SUITE("TokenStream") {
     CHECK(stream.next(true) == Token::end());
   }
 
-  TEST_CASE("next skip_whitespace skips space") {
+  TEST_CASE("TokenStream next skip_whitespace skips space") {
     TokenStream stream = TokenStream();
 
     // non-whitespace
@@ -169,7 +169,7 @@ TEST_SUITE("TokenStream") {
     CHECK(stream.next(true) == Token::end());
   }
 
-  TEST_CASE("next skip_whitespace skips line comment") {
+  TEST_CASE("TokenStream next skip_whitespace skips line comment") {
     TokenStream stream = TokenStream();
 
     // non-whitespace
@@ -213,7 +213,7 @@ TEST_SUITE("TokenStream") {
     CHECK(stream.next(true) == Token::end());
   }
 
-  TEST_CASE("next skip_whitespace skips (* comment") {
+  TEST_CASE("TokenStream next skip_whitespace skips (* comment") {
     TokenStream stream = TokenStream();
 
     // non-whitespace

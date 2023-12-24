@@ -19,7 +19,7 @@ void check_cases(std::vector<InputOutput> cases,
   }
 }
 TEST_SUITE("tokenize") {
-  TEST_CASE("single token parsing") {
+  TEST_CASE("tokenize single token") {
     std::shared_ptr<SymbolTable> symbs = std::make_shared<SymbolTable>();
 
     std::vector<InputOutput> cases = {
