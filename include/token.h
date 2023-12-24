@@ -93,6 +93,8 @@ public:
   bool operator==(const Token &) const;
 };
 
+std::ostream &operator<<(std::ostream &, const Token &);
+
 class TokenStream {
 private:
   struct State {

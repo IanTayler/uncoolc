@@ -1,5 +1,6 @@
 #include "token.h"
 
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -223,6 +224,12 @@ void Token::set_position(unsigned int l, unsigned int c) {
 
 bool Token::operator==(const Token &other) const {
   return other.symbol() == symb_ && other.type() == type_;
+}
+
+std::ostream &operator<<(std::ostream &os, const Token &tok) {
+  os << "Token('" << token_type_str(tok.type()) << "', " << tok.symbol().id
+     << ")";
+  return os;
 }
 
 /**********************
