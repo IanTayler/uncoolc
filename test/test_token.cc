@@ -90,5 +90,176 @@ TEST_SUITE("TokenStream") {
     CHECK(stream.next() == t2);
     CHECK(stream.next() == t3);
     CHECK(stream.next() == t4);
+    CHECK(stream.next() == Token::end());
+  }
+
+  TEST_CASE("next skip_whitespace skips newline") {
+    TokenStream stream = TokenStream();
+
+    // non-whitespace
+    Token t0 = Token(TokenType::L_PAREN, Symbol(0));
+    // whitespace
+    Token t1 = Token(TokenType::NEW_LINE, Symbol(1));
+    Token t2 = Token(TokenType::NEW_LINE, Symbol(2));
+    // non-whitespace
+    Token t3 = Token(TokenType::NUMBER, Symbol(3));
+    // whitespace
+    Token t4 = Token(TokenType::NEW_LINE, Symbol(4));
+    // non-whitespace
+    Token t5 = Token(TokenType::R_PAREN, Symbol(5));
+
+    stream.add(t0);
+    stream.add(t1);
+    stream.add(t2);
+    stream.add(t3);
+    stream.add(t4);
+    stream.add(t5);
+
+    CHECK(stream.next(false) == t0);
+    CHECK(stream.next(false) == t1);
+    CHECK(stream.next(false) == t2);
+    CHECK(stream.next(false) == t3);
+    CHECK(stream.next(false) == t4);
+    CHECK(stream.next(false) == t5);
+    CHECK(stream.next(false) == Token::end());
+
+    stream.reset_state();
+
+    CHECK(stream.next(true) == t0);
+    CHECK(stream.next(true) == t3);
+    CHECK(stream.next(true) == t5);
+    CHECK(stream.next(true) == Token::end());
+  }
+
+  TEST_CASE("next skip_whitespace skips space") {
+    TokenStream stream = TokenStream();
+
+    // non-whitespace
+    Token t0 = Token(TokenType::L_PAREN, Symbol(0));
+    // whitespace
+    Token t1 = Token(TokenType::SPACE, Symbol(1));
+    Token t2 = Token(TokenType::SPACE, Symbol(2));
+    // non-whitespace
+    Token t3 = Token(TokenType::NUMBER, Symbol(3));
+    // whitespace
+    Token t4 = Token(TokenType::SPACE, Symbol(4));
+    // non-whitespace
+    Token t5 = Token(TokenType::R_PAREN, Symbol(5));
+
+    stream.add(t0);
+    stream.add(t1);
+    stream.add(t2);
+    stream.add(t3);
+    stream.add(t4);
+    stream.add(t5);
+
+    CHECK(stream.next(false) == t0);
+    CHECK(stream.next(false) == t1);
+    CHECK(stream.next(false) == t2);
+    CHECK(stream.next(false) == t3);
+    CHECK(stream.next(false) == t4);
+    CHECK(stream.next(false) == t5);
+    CHECK(stream.next(false) == Token::end());
+
+    stream.reset_state();
+
+    CHECK(stream.next(true) == t0);
+    CHECK(stream.next(true) == t3);
+    CHECK(stream.next(true) == t5);
+    CHECK(stream.next(true) == Token::end());
+  }
+
+  TEST_CASE("next skip_whitespace skips line comment") {
+    TokenStream stream = TokenStream();
+
+    // non-whitespace
+    Token t0 = Token(TokenType::L_PAREN, Symbol(0));
+    // whitespace
+    Token t1 = Token(TokenType::LINE_COMMENT, Symbol(1));
+    Token t2 = Token(TokenType::STRING, Symbol(2));
+    Token t3 = Token(TokenType::NEW_LINE, Symbol(3));
+    // non-whitespace
+    Token t4 = Token(TokenType::NUMBER, Symbol(4));
+    // whitespace
+    Token t5 = Token(TokenType::LINE_COMMENT, Symbol(5));
+    Token t6 = Token(TokenType::NEW_LINE, Symbol(6));
+    // non-whitespace
+    Token t7 = Token(TokenType::R_PAREN, Symbol(7));
+
+    stream.add(t0);
+    stream.add(t1);
+    stream.add(t2);
+    stream.add(t3);
+    stream.add(t4);
+    stream.add(t5);
+    stream.add(t6);
+    stream.add(t7);
+
+    CHECK(stream.next(false) == t0);
+    CHECK(stream.next(false) == t1);
+    CHECK(stream.next(false) == t2);
+    CHECK(stream.next(false) == t3);
+    CHECK(stream.next(false) == t4);
+    CHECK(stream.next(false) == t5);
+    CHECK(stream.next(false) == t6);
+    CHECK(stream.next(false) == t7);
+    CHECK(stream.next(false) == Token::end());
+
+    stream.reset_state();
+
+    CHECK(stream.next(true) == t0);
+    CHECK(stream.next(true) == t4);
+    CHECK(stream.next(true) == t7);
+    CHECK(stream.next(true) == Token::end());
+  }
+
+  TEST_CASE("next skip_whitespace skips (* comment") {
+    TokenStream stream = TokenStream();
+
+    // non-whitespace
+    Token t0 = Token(TokenType::L_PAREN, Symbol(0));
+    // whitespace
+    Token t1 = Token(TokenType::OPEN_COMMENT, Symbol(1));
+    Token t2 = Token(TokenType::STRING, Symbol(2));
+    Token t3 = Token(TokenType::NUMBER, Symbol(3));
+    Token t4 = Token(TokenType::INVALID, Symbol(4));
+    Token t5 = Token(TokenType::CLOSE_COMMENT, Symbol(5));
+    // non-whitespace
+    Token t6 = Token(TokenType::NUMBER, Symbol(6));
+    // whitespace
+    Token t7 = Token(TokenType::OPEN_COMMENT, Symbol(7));
+    Token t8 = Token(TokenType::CLOSE_COMMENT, Symbol(8));
+    // non-whitespace
+    Token t9 = Token(TokenType::R_PAREN, Symbol(9));
+
+    stream.add(t0);
+    stream.add(t1);
+    stream.add(t2);
+    stream.add(t3);
+    stream.add(t4);
+    stream.add(t5);
+    stream.add(t6);
+    stream.add(t7);
+    stream.add(t8);
+    stream.add(t9);
+
+    CHECK(stream.next(false) == t0);
+    CHECK(stream.next(false) == t1);
+    CHECK(stream.next(false) == t2);
+    CHECK(stream.next(false) == t3);
+    CHECK(stream.next(false) == t4);
+    CHECK(stream.next(false) == t5);
+    CHECK(stream.next(false) == t6);
+    CHECK(stream.next(false) == t7);
+    CHECK(stream.next(false) == t8);
+    CHECK(stream.next(false) == t9);
+    CHECK(stream.next(false) == Token::end());
+
+    stream.reset_state();
+
+    CHECK(stream.next(true) == t0);
+    CHECK(stream.next(true) == t6);
+    CHECK(stream.next(true) == t9);
+    CHECK(stream.next(true) == Token::end());
   }
 }
