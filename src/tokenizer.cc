@@ -196,16 +196,16 @@ Token Tokenizer::get_parenthesis(TokenType t) {
   consume();
 
   if (t == TokenType::R_PAREN) {
-    return Token(t);
+    return Token(t, symbols->from(")"));
   }
 
   char c = current();
   if (c == '*') {
     consume();
-    return Token(TokenType::OPEN_COMMENT);
+    return Token(TokenType::OPEN_COMMENT, symbols->from("(*"));
   }
 
-  return Token(TokenType::L_PAREN);
+  return Token(TokenType::L_PAREN, symbols->from("("));
 }
 
 Token Tokenizer::get_dash(TokenType t) {
