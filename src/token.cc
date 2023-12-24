@@ -239,7 +239,7 @@ std::ostream &operator<<(std::ostream &os, const Token &tok) {
  *********************/
 
 /// Create new TokenStream with no Tokens.
-TokenStream::TokenStream() : pos_(0) {}
+TokenStream::TokenStream() : pos_(0), opened_comments(0), line_comment(false) {}
 
 /// Return position of the TokenStream pointer.
 unsigned int TokenStream::position() { return pos_; }
