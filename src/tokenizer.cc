@@ -214,7 +214,7 @@ Token Tokenizer::get_dash(TokenType t) {
   char c = current();
   if (c == '-') {
     consume();
-    return Token(TokenType::LINE_COMMENT);
+    return Token(TokenType::LINE_COMMENT, symbols->from("--"));
   }
   return Token(TokenType::SIMPLE_OP, symbols->sub_op);
 }
@@ -225,7 +225,7 @@ Token Tokenizer::get_asterisk(TokenType t) {
   char c = current();
   if (c == ')') {
     consume();
-    return Token(TokenType::CLOSE_COMMENT);
+    return Token(TokenType::CLOSE_COMMENT, symbols->from("*)"));
   }
   return Token(TokenType::SIMPLE_OP, symbols->mult_op);
 }
@@ -251,7 +251,7 @@ Token Tokenizer::get_eq_op(TokenType t) {
   char c = current();
   if (c == '>') {
     consume();
-    return Token(TokenType::ARROW);
+    return Token(TokenType::ARROW, symbols->from("=>"));
   }
   return Token(TokenType::SIMPLE_OP, symbols->eq_op);
 }
