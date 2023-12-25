@@ -8,14 +8,14 @@ struct InputOutput {
 };
 
 void check_cases(std::vector<InputOutput> cases,
-                 std::shared_ptr<SymbolTable> symbs) {
+                 std::shared_ptr<SymbolTable> symbs, bool skip_whitespace) {
   for (const auto &[inp, expected] : cases) {
     std::istringstream inp_stream(inp);
     auto tokens = tokenize(&inp_stream, symbs);
     for (auto &exp : expected) {
-      CHECK(exp == tokens.next(true));
+      CHECK(exp == tokens.next(skip_whitespace));
     }
-    CHECK(Token::end() == tokens.next());
+    CHECK(Token::end() == tokens.next(skip_whitespace));
   }
 }
 TEST_SUITE("tokenize") {
@@ -23,19 +23,30 @@ TEST_SUITE("tokenize") {
     std::shared_ptr<SymbolTable> symbs = std::make_shared<SymbolTable>();
 
     std::vector<InputOutput> cases = {
-        {"812", {Token(TokenType::NUMBER, symbs->from("812"))}},
+        // Symbols
+        {"{", {Token(TokenType::L_BRACKET, symbs->from("{"))}},
+        {"}", {Token(TokenType::R_BRACKET, symbs->from("}"))}},
+        {"@", {Token(TokenType::AT, symbs->from("@"))}},
+        {".", {Token(TokenType::DOT, symbs->from("."))}},
+        {",", {Token(TokenType::COMMA, symbs->from(","))}},
+        {":", {Token(TokenType::COLON, symbs->from(":"))}},
+        {";", {Token(TokenType::SEMICOLON, symbs->from(";"))}},
         {"(", {Token(TokenType::L_PAREN, symbs->from("("))}},
-        {"\"dance\"", {Token(TokenType::STRING, symbs->from("\"dance\""))}},
-        {"inherits", {Token(TokenType::KW_INHERITS, symbs->from("inherits"))}},
-        {"let", {Token(TokenType::KW_LET, symbs->from("let"))}},
-        {"812", {Token(TokenType::NUMBER, symbs->from("812"))}},
+        {"(*", {Token(TokenType::OPEN_COMMENT, symbs->from("(*"))}},
+        {")", {Token(TokenType::R_PAREN, symbs->from(")"))}},
+        {"*)", {Token(TokenType::CLOSE_COMMENT, symbs->from("*)"))}},
+        {"--", {Token(TokenType::LINE_COMMENT, symbs->from("--"))}},
+        {"<-", {Token(TokenType::ASSIGN, symbs->from("<-"))}},
+        {"=>", {Token(TokenType::ARROW, symbs->from("=>"))}},
+        {"~", {Token(TokenType::NEG_OP, symbs->from("~"))}},
+        {"+", {Token(TokenType::SIMPLE_OP, symbs->from("+"))}},
+        {"-", {Token(TokenType::SIMPLE_OP, symbs->from("-"))}},
         {"*", {Token(TokenType::SIMPLE_OP, symbs->from("*"))}},
         {"/", {Token(TokenType::SIMPLE_OP, symbs->from("/"))}},
         {"=", {Token(TokenType::SIMPLE_OP, symbs->from("="))}},
         {"<=", {Token(TokenType::SIMPLE_OP, symbs->from("<="))}},
-        {"Main", {Token(TokenType::TYPE_NAME, symbs->from("Main"))}},
-        {"MultiWordTypeName",
-         {Token(TokenType::TYPE_NAME, symbs->from("MultiWordTypeName"))}},
+        {"<", {Token(TokenType::SIMPLE_OP, symbs->from("<"))}},
+        // OBJECT_NAME
         {"main", {Token(TokenType::OBJECT_NAME, symbs->from("main"))}},
         {"some_method_with_snake_case",
          {Token(TokenType::OBJECT_NAME,
@@ -43,8 +54,42 @@ TEST_SUITE("tokenize") {
         {"someMethodWithCamelCase",
          {Token(TokenType::OBJECT_NAME,
                 symbs->from("someMethodWithCamelCase"))}},
+        // TYPE_NAME
+        {"MultiWordTypeName",
+         {Token(TokenType::TYPE_NAME, symbs->from("MultiWordTypeName"))}},
+        {"ALL_CAPS", {Token(TokenType::TYPE_NAME, symbs->from("ALL_CAPS"))}},
+        {"Main", {Token(TokenType::TYPE_NAME, symbs->from("Main"))}},
+        // Constants
+        {"812", {Token(TokenType::NUMBER, symbs->from("812"))}},
+        {"1", {Token(TokenType::NUMBER, symbs->from("1"))}},
+        {"\"dance\"", {Token(TokenType::STRING, symbs->from("\"dance\""))}},
+        {"\"\"", {Token(TokenType::STRING, symbs->from("\"\""))}},
+        // Keywords
+        {"true", {Token(TokenType::KW_TRUE, symbs->from("true"))}},
+        {"false", {Token(TokenType::KW_FALSE, symbs->from("false"))}},
+        {"isvoid", {Token(TokenType::KW_ISVOID, symbs->from("isvoid"))}},
+        {"if", {Token(TokenType::KW_IF, symbs->from("if"))}},
+        {"fi", {Token(TokenType::KW_FI, symbs->from("fi"))}},
+        {"then", {Token(TokenType::KW_THEN, symbs->from("then"))}},
+        {"else", {Token(TokenType::KW_ELSE, symbs->from("else"))}},
+        {"let", {Token(TokenType::KW_LET, symbs->from("let"))}},
+        {"new", {Token(TokenType::KW_NEW, symbs->from("new"))}},
+        {"not", {Token(TokenType::KW_NOT, symbs->from("not"))}},
+        {"in", {Token(TokenType::KW_IN, symbs->from("in"))}},
+        {"while", {Token(TokenType::KW_WHILE, symbs->from("while"))}},
+        {"case", {Token(TokenType::KW_CASE, symbs->from("case"))}},
+        {"esac", {Token(TokenType::KW_ESAC, symbs->from("esac"))}},
+        {"of", {Token(TokenType::KW_OF, symbs->from("of"))}},
+        {"loop", {Token(TokenType::KW_LOOP, symbs->from("loop"))}},
+        {"pool", {Token(TokenType::KW_POOL, symbs->from("pool"))}},
+        {"class", {Token(TokenType::KW_CLASS, symbs->from("class"))}},
+        {"inherits", {Token(TokenType::KW_INHERITS, symbs->from("inherits"))}},
+        // Misc
+        {"   \t", {Token(TokenType::SPACE, symbs->from("   \t"))}},
+        {"\n", {Token(TokenType::NEW_LINE, symbs->from("\n"))}},
+        {"!", {Token(TokenType::INVALID, symbs->from("!"))}},
     };
-    check_cases(cases, symbs);
+    check_cases(cases, symbs, false);
   }
 
   TEST_CASE("tokenize class attributes examples") {
@@ -85,7 +130,7 @@ TEST_SUITE("tokenize") {
              Token{TokenType::SEMICOLON, symbs->from(";")},
          }},
     };
-    check_cases(cases, symbs);
+    check_cases(cases, symbs, true);
   }
 
   TEST_CASE("tokenize class long example") {
@@ -190,6 +235,6 @@ TEST_SUITE("tokenize") {
     };
 
     std::vector<InputOutput> cases = {{example_long, example_long_expected}};
-    check_cases(cases, symbs);
+    check_cases(cases, symbs, true);
   }
 }
