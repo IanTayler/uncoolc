@@ -38,7 +38,7 @@ public:
  *                     *
  **********************/
 
-/// Marks where an incomplete expression expects a child
+/// Marks where an incomplete expression expects a child in parsing
 enum class ChildSide {
   LEFT,
   RIGHT,
