@@ -51,13 +51,18 @@ enum class ChildSide {
  *                     *
  **********************/
 
+class TypeContext;
+
 class AstNode {
 public:
   AstNode(Token st) : start_token(st) {}
   Token start_token;
 
   virtual void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols);
-  // TODO(IT): will need to add typecheck and generate_ir as virtual methods
+  /// Will typecheck and annotate the type of Expressions. Returns whether types
+  /// are consistent.
+  virtual bool typecheck(TypeContext context);
+  // TODO(IT): will need to add generate_ir as a virtual method
 };
 
 class ExpressionNode : public AstNode {
