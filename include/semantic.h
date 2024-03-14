@@ -79,6 +79,8 @@ public:
   Scopes scopes;
   Symbol current_class;
   ClassTree tree;
+
+  bool match(Symbol type_a, Symbol type_b);
 };
 
 #endif
