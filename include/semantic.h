@@ -45,9 +45,9 @@ private:
 public:
   ClassInfo(ClassNode *cn, int d);
 
-  int depth();
-  Symbol name();
-  Symbol superclass();
+  int depth() const;
+  Symbol name() const;
+  Symbol superclass() const;
   MethodNode *method(Symbol name);
   AttributeNode *attribute(Symbol name);
 };
@@ -61,14 +61,20 @@ public:
 class ClassTree {
 private:
   std::vector<ClassInfo> classes;
-  std::unordered_map<Symbol, NodeIdx> classes_by_name;
+  std::unordered_map<int, NodeIdx> classes_by_name;
 
 public:
-  ClassInfo get(Symbol name);
-  ClassInfo get(NodeIdx idx);
+  bool exists(Symbol name) const;
+  bool exists(NodeIdx idx) const;
 
-  ClassInfo common_ancestor(NodeIdx node_a, NodeIdx node_b);
-  ClassInfo common_ancestor(Symbol name_a, Symbol name_b);
+  std::optional<ClassInfo> get(Symbol name) const;
+  std::optional<ClassInfo> get(NodeIdx idx) const;
+
+  std::optional<ClassInfo> common_ancestor(NodeIdx node_a,
+                                           NodeIdx node_b) const;
+  std::optional<ClassInfo> common_ancestor(Symbol name_a, Symbol name_b) const;
+  std::optional<ClassInfo> common_ancestor(const ClassInfo &class_a,
+                                           const ClassInfo &class_b) const;
 };
 
 /***********************

@@ -46,11 +46,11 @@ ClassInfo::ClassInfo(ClassNode *cn, int d)
   }
 }
 
-int ClassInfo::depth() { return depth_; }
+int ClassInfo::depth() const { return depth_; }
 
-Symbol ClassInfo::name() { return class_node->name; }
+Symbol ClassInfo::name() const { return class_node->name; }
 
-Symbol ClassInfo::superclass() { return class_node->superclass; }
+Symbol ClassInfo::superclass() const { return class_node->superclass; }
 
 MethodNode *ClassInfo::method(Symbol name) { return methods[name.id]; }
 
@@ -61,20 +61,73 @@ AttributeNode *ClassInfo::attribute(Symbol name) { return attributes[name.id]; }
  *      ClassTree      *
  *                     *
  **********************/
-// TODO(IT) fill in
-ClassInfo ClassTree::get(Symbol name) { return ClassInfo(nullptr, 0); }
+bool ClassTree::exists(Symbol name) const {
+  if (classes_by_name.find(name.id) == classes_by_name.end())
+    return false;
+  return exists(classes_by_name.at(name.id));
+}
+bool ClassTree::exists(NodeIdx idx) const { return idx < classes.size(); }
 
-// TODO(IT) fill in
-ClassInfo ClassTree::get(NodeIdx idx) { return ClassInfo(nullptr, 0); }
-
-// TODO(IT) fill in
-ClassInfo ClassTree::common_ancestor(NodeIdx node_a, NodeIdx node_b) {
-  return ClassInfo(nullptr, 0);
+std::optional<ClassInfo> ClassTree::get(Symbol name) const {
+  if (exists(name)) {
+    NodeIdx idx = classes_by_name.at(name.id);
+    return get(idx);
+  }
+  return std::nullopt;
 }
 
-// TODO(IT) fill in
-ClassInfo ClassTree::common_ancestor(Symbol name_a, Symbol name_b) {
-  return ClassInfo(nullptr, 0);
+std::optional<ClassInfo> ClassTree::get(NodeIdx idx) const {
+  if (exists(idx))
+    return classes[idx];
+  return std::nullopt;
+}
+
+std::optional<ClassInfo> ClassTree::common_ancestor(NodeIdx node_a,
+                                                    NodeIdx node_b) const {
+  if (!exists(node_a) || !exists(node_b))
+    return std::nullopt;
+  return common_ancestor(classes[node_a], classes[node_b]);
+}
+
+std::optional<ClassInfo> ClassTree::common_ancestor(Symbol name_a,
+                                                    Symbol name_b) const {
+  const auto &class_a = get(name_a);
+  if (!class_a.has_value())
+    return std::nullopt;
+  const auto &class_b = get(name_b);
+  if (!class_b.has_value())
+    return std::nullopt;
+  return common_ancestor(class_a.value(), class_b.value());
+}
+
+std::optional<ClassInfo>
+ClassTree::common_ancestor(const ClassInfo &class_a,
+                           const ClassInfo &class_b) const {
+  const ClassInfo *a_side = &class_a;
+  const ClassInfo *b_side = &class_b;
+
+  while (a_side->name() != b_side->name()) {
+    Symbol superclass;
+    NodeIdx idx;
+
+    bool a_is_deeper = a_side->depth() > b_side->depth();
+
+    if (a_is_deeper)
+      superclass = a_side->superclass();
+    else
+      superclass = b_side->superclass();
+
+    if (exists(superclass))
+      idx = classes_by_name.at(superclass.id);
+    else
+      return std::nullopt;
+
+    if (a_is_deeper)
+      a_side = &classes[idx];
+    else
+      b_side = &classes[idx];
+  }
+  return *a_side;
 }
 
 /***********************
