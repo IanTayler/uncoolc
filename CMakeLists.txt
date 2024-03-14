@@ -15,6 +15,7 @@ add_executable(coolc
   src/ast.cc
   src/error.cc
   src/parser.cc
+  src/semantic.cc
 )
 target_include_directories(coolc
   PUBLIC
@@ -31,6 +32,7 @@ add_executable(tests
   src/ast.cc
   src/error.cc
   src/parser.cc
+  src/semantic.cc
 )
 target_include_directories(tests
   PUBLIC
