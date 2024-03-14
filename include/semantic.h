@@ -13,8 +13,10 @@
 
 class Scopes {
 private:
-  std::forward_list<std::unordered_map<Symbol, Symbol>> scopes;
+  std::forward_list<std::unordered_map<int, Symbol>> scopes;
 
+public:
+  Scopes();
   void enter();
   void exit();
 

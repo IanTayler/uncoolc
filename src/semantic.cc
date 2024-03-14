@@ -4,14 +4,26 @@
  *        Scope        *
  *                     *
  **********************/
-// TODO(IT) fill in
-void Scopes::enter() {}
-// TODO(IT) fill in
-void Scopes::exit() {}
-// TODO(IT) fill in
-Symbol Scopes::get(Symbol name) { return Symbol{}; }
-// TODO(IT) fill in
-Symbol Scopes::lookup(Symbol name) { return Symbol{}; }
+Scopes::Scopes() {}
+
+void Scopes::enter() { scopes.push_front(std::unordered_map<int, Symbol>()); }
+void Scopes::exit() { scopes.pop_front(); }
+
+void Scopes::assign(Symbol name, Symbol type) {
+  scopes.front()[name.id] = type;
+}
+
+Symbol Scopes::get(Symbol name) {
+  for (auto &scope : scopes) {
+    if (scope.find(name.id) != scope.end()) {
+      return scope[name.id];
+    }
+  }
+  return Symbol{};
+}
+
+Symbol Scopes::lookup(Symbol name) { return scopes.front()[name.id]; }
+
 /***********************
  *                     *
  *      ClassInfo      *
