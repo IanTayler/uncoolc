@@ -46,6 +46,7 @@ public:
   ClassInfo(ClassNode *cn, int d);
 
   int depth();
+  Symbol name();
   Symbol superclass();
   MethodNode *method(Symbol name);
   AttributeNode *attribute(Symbol name);

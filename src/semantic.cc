@@ -29,21 +29,32 @@ Symbol Scopes::lookup(Symbol name) { return scopes.front()[name.id]; }
  *      ClassInfo      *
  *                     *
  **********************/
-// TODO(IT) fill in initializing member maps
 ClassInfo::ClassInfo(ClassNode *cn, int d)
     : class_node(cn), depth_(d),
       methods(std::unordered_map<int, MethodNode *>()),
-      attributes(std::unordered_map<int, AttributeNode *>()) {}
+      attributes(std::unordered_map<int, AttributeNode *>()) {
+  for (const auto &method_ptr : cn->methods) {
+    Symbol name = method_ptr->name;
+    MethodNode *raw_method_ptr = method_ptr.get();
+    methods[name.id] = raw_method_ptr;
+  }
+
+  for (const auto &attr_ptr : cn->attributes) {
+    Symbol object_id = attr_ptr->object_id;
+    AttributeNode *raw_attr_ptr = attr_ptr.get();
+    attributes[object_id.id] = raw_attr_ptr;
+  }
+}
 
 int ClassInfo::depth() { return depth_; }
 
+Symbol ClassInfo::name() { return class_node->name; }
+
 Symbol ClassInfo::superclass() { return class_node->superclass; }
 
-// TODO(IT) fill in
-MethodNode *ClassInfo::method(Symbol name) { return nullptr; }
+MethodNode *ClassInfo::method(Symbol name) { return methods[name.id]; }
 
-// TODO(IT) fill in
-AttributeNode *ClassInfo::attribute(Symbol name) { return nullptr; }
+AttributeNode *ClassInfo::attribute(Symbol name) { return attributes[name.id]; }
 
 /***********************
  *                     *
