@@ -34,12 +34,19 @@ private:
 typedef int NodeIdx;
 
 class ClassInfo {
+private:
+  std::unordered_map<Symbol, MethodNode *> methods;
+  std::unordered_map<Symbol, AttributeNode *> attributes;
+  ClassNode *class_node;
+  int depth_;
+
 public:
-  Symbol name;
-  int depth;
-  Symbol parent;
-  std::vector<MethodNode *> methods;
-  std::vector<AttributeNode *> attributes;
+  ClassInfo(ClassNode *cn, int d);
+
+  int depth();
+  Symbol superclass();
+  MethodNode *method(Symbol name);
+  AttributeNode *attribute(Symbol name);
 };
 
 /***********************
