@@ -18,7 +18,7 @@ bool AttributeNode::typecheck(TypeContext context) {
     return true;
   };
 
-  initializer.value()->typecheck(context);
+  bool init_check = initializer.value()->typecheck(context);
   if (!initializer.value()->static_type.has_value()) {
     fatal("Expression static_type is not set after calling typecheck",
           initializer.value()->start_token);
@@ -30,7 +30,7 @@ bool AttributeNode::typecheck(TypeContext context) {
     return false;
   }
 
-  return true;
+  return init_check;
 }
 
 bool ParameterNode::typecheck(TypeContext context) { return true; }
