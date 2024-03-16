@@ -96,6 +96,10 @@ void ExpressionNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("__EXPRESSION_PRINT_UNDEFINED__");
 }
 
+void BuiltinNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("Builtin: {}", symbols.get_string(name)));
+}
+
 void LiteralNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("Literal {}", symbols.get_string(value)));
 }

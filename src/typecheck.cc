@@ -87,6 +87,14 @@ bool ModuleNode::typecheck(TypeContext context) {
  *                     *
  **********************/
 
+bool BuiltinNode::typecheck(TypeContext context) {
+  fatal(std::format(
+            "INTERNAL: Calling typecheck on BuiltinNode ({}) is not permitted",
+            context.symbols.get_string(name)),
+        start_token);
+  return false; // fool the linters
+}
+
 bool LiteralNode::typecheck(TypeContext context) {
   switch (start_token.type()) {
   case TokenType::STRING:

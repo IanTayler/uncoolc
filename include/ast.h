@@ -163,6 +163,18 @@ public:
  *                     *
  **********************/
 
+class BuiltinNode : public ExpressionNode {
+private:
+  Symbol name;
+
+public:
+  BuiltinNode(Symbol n) : name(n), ExpressionNode(Token{}) {}
+
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
+
+  bool typecheck(TypeContext context) override;
+};
+
 class LiteralNode : public ExpressionNode {
 private:
   Symbol value;
