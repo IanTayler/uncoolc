@@ -147,12 +147,3 @@ bool TypeContext::match(Symbol type_a, Symbol type_b) {
 
   return false;
 }
-
-/***********************
- *                     *
- *     typechecks      *
- *                     *
- **********************/
-
-// TODO(IT) fill in
-bool AstNode::typecheck(TypeContext context) { return true; }
