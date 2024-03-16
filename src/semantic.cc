@@ -139,6 +139,7 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
  *                     *
  **********************/
 
+// TODO(IT) take class hierarchies into consideration
 bool TypeContext::match(Symbol type_a, Symbol type_b) {
   if (type_a == type_b)
     return true;
