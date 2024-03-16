@@ -33,7 +33,10 @@ bool AttributeNode::typecheck(TypeContext context) {
   return init_check;
 }
 
-bool ParameterNode::typecheck(TypeContext context) { return true; }
+bool ParameterNode::typecheck(TypeContext context) {
+  warning("Unnecessary call to typecheck for ParameterNode", start_token);
+  return true;
+}
 
 // TODO(IT) fill in
 bool MethodNode::typecheck(TypeContext context) { return true; }
