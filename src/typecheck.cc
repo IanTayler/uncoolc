@@ -9,7 +9,8 @@
  **********************/
 
 bool ExpressionNode::typecheck(TypeContext context) {
-  fatal("Calling typecheck on an abstract ExpressionNode is not permitted",
+  fatal("INTERNAL: Calling typecheck on an abstract ExpressionNode is "
+        "not permitted",
         start_token);
   return false; // fool the linters
 }
@@ -21,7 +22,8 @@ bool AttributeNode::typecheck(TypeContext context) {
 
   bool init_check = initializer.value()->typecheck(context);
   if (!initializer.value()->static_type.has_value()) {
-    fatal("Expression static_type is not set after calling typecheck",
+    fatal("INTERNAL: Expression static_type is not set after calling "
+          "typecheck",
           initializer.value()->start_token);
     return false; // fool the linters
   }
@@ -35,7 +37,8 @@ bool AttributeNode::typecheck(TypeContext context) {
 }
 
 bool ParameterNode::typecheck(TypeContext context) {
-  warning("Unnecessary call to typecheck for ParameterNode", start_token);
+  warning("INTERNAL: Unnecessary call to typecheck for ParameterNode",
+          start_token);
   return true;
 }
 
