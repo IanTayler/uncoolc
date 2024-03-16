@@ -69,24 +69,24 @@ bool ClassTree::exists(Symbol name) const {
     return false;
   return exists(classes_by_name.at(name.id));
 }
-bool ClassTree::exists(NodeIdx idx) const { return idx < classes.size(); }
+bool ClassTree::exists(ClassIdx idx) const { return idx < classes.size(); }
 
 std::optional<ClassInfo> ClassTree::get(Symbol name) const {
   if (exists(name)) {
-    NodeIdx idx = classes_by_name.at(name.id);
+    ClassIdx idx = classes_by_name.at(name.id);
     return get(idx);
   }
   return std::nullopt;
 }
 
-std::optional<ClassInfo> ClassTree::get(NodeIdx idx) const {
+std::optional<ClassInfo> ClassTree::get(ClassIdx idx) const {
   if (exists(idx))
     return classes[idx];
   return std::nullopt;
 }
 
-std::optional<ClassInfo> ClassTree::common_ancestor(NodeIdx node_a,
-                                                    NodeIdx node_b) const {
+std::optional<ClassInfo> ClassTree::common_ancestor(ClassIdx node_a,
+                                                    ClassIdx node_b) const {
   if (!exists(node_a) || !exists(node_b))
     return std::nullopt;
   return common_ancestor(classes[node_a], classes[node_b]);
@@ -111,7 +111,7 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
 
   while (a_side->name() != b_side->name()) {
     Symbol superclass;
-    NodeIdx idx;
+    ClassIdx idx;
 
     bool a_is_deeper = a_side->depth() > b_side->depth();
 

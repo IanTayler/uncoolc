@@ -33,7 +33,7 @@ public:
  *                     *
  **********************/
 
-typedef int NodeIdx;
+typedef int ClassIdx;
 
 class ClassInfo {
 private:
@@ -61,17 +61,17 @@ public:
 class ClassTree {
 private:
   std::vector<ClassInfo> classes;
-  std::unordered_map<int, NodeIdx> classes_by_name;
+  std::unordered_map<int, ClassIdx> classes_by_name;
 
 public:
   bool exists(Symbol name) const;
-  bool exists(NodeIdx idx) const;
+  bool exists(ClassIdx idx) const;
 
   std::optional<ClassInfo> get(Symbol name) const;
-  std::optional<ClassInfo> get(NodeIdx idx) const;
+  std::optional<ClassInfo> get(ClassIdx idx) const;
 
-  std::optional<ClassInfo> common_ancestor(NodeIdx node_a,
-                                           NodeIdx node_b) const;
+  std::optional<ClassInfo> common_ancestor(ClassIdx node_a,
+                                           ClassIdx node_b) const;
   std::optional<ClassInfo> common_ancestor(Symbol name_a, Symbol name_b) const;
   std::optional<ClassInfo> common_ancestor(const ClassInfo &class_a,
                                            const ClassInfo &class_b) const;
