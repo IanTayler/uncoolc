@@ -58,7 +58,7 @@ public:
   AstNode(Token st) : start_token(st) {}
   Token start_token;
 
-  virtual void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols);
+  virtual void print(AstPrinter printer, const SymbolTable &symbols);
   /// Will typecheck and annotate the type of Expressions. Returns whether types
   /// are consistent.
   virtual bool typecheck(TypeContext context);
@@ -70,8 +70,7 @@ public:
   ExpressionNode(Token st) : AstNode(st) {}
   std::optional<Symbol> static_type;
 
-  virtual void print(AstPrinter printer,
-                     std::shared_ptr<SymbolTable> symbols) override;
+  virtual void print(AstPrinter printer, const SymbolTable &symbols) override;
 
   virtual int arity();
   virtual ChildSide child_side();
@@ -93,7 +92,7 @@ public:
   Symbol declared_type;
   std::optional<ExpressionPtr> initializer;
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class ParameterNode : public AstNode {
@@ -104,7 +103,7 @@ public:
   Symbol object_id;
   Symbol declared_type;
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class MethodNode : public AstNode {
@@ -121,7 +120,7 @@ public:
   std::vector<std::unique_ptr<ParameterNode>> parameters;
   ExpressionPtr body;
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class ClassNode : public AstNode {
@@ -134,7 +133,7 @@ public:
   std::vector<std::unique_ptr<AttributeNode>> attributes;
   std::vector<std::unique_ptr<MethodNode>> methods;
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class ModuleNode : public AstNode {
@@ -143,7 +142,7 @@ public:
 
   std::vector<std::unique_ptr<ClassNode>> classes;
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 /***********************
@@ -159,7 +158,7 @@ private:
 public:
   LiteralNode(Token t) : value(t.symbol()), ExpressionNode(t) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class VariableNode : public ExpressionNode {
@@ -169,7 +168,7 @@ private:
 public:
   VariableNode(Token t) : name(t.symbol()), ExpressionNode(t) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 /***********************
@@ -185,7 +184,7 @@ public:
   UnaryOpNode(ExpressionPtr ch, Token st)
       : op(st.symbol()), child(std::move(ch)), ExpressionNode(st) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
@@ -205,7 +204,7 @@ public:
       : left(std::move(l)), op(st.symbol()), right(std::move(r)),
         ExpressionNode(st) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
@@ -224,7 +223,7 @@ private:
 public:
   NewNode(Symbol c, Token s) : created_type(c), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class AssignNode : public ExpressionNode {
@@ -239,7 +238,7 @@ public:
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
   virtual ChildSide child_side() override;
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class DispatchNode : public ExpressionNode {
@@ -269,7 +268,7 @@ public:
   void set_target_to_self() { target_self = true; }
   bool has_self_target() { return target_self; }
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 /***********************
@@ -285,7 +284,7 @@ private:
 public:
   BlockNode(Token s) : ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 
   void add_expression(ExpressionPtr expr) {
     expressions.push_back(std::move(expr));
@@ -303,7 +302,7 @@ public:
       : condition_expr(std::move(c)), then_expr(std::move(t)),
         else_expr(std::move(e)), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class WhileNode : public ExpressionNode {
@@ -316,7 +315,7 @@ public:
       : condition_expr(std::move(c)), body_expr(std::move(b)),
         ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class LetNode : public ExpressionNode {
@@ -327,7 +326,7 @@ private:
 public:
   LetNode(Token s) : body_expr(nullptr), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 
   void add_declaration(std::unique_ptr<AttributeNode> attr) {
     declarations.push_back(std::move(attr));
@@ -347,7 +346,7 @@ public:
       : object_id(o), declared_type(t), body_expr(std::move(b)),
         ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 };
 
 class CaseNode : public ExpressionNode {
@@ -359,7 +358,7 @@ public:
   CaseNode(ExpressionPtr e, Token s)
       : eval_expr(std::move(e)), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) override;
+  void print(AstPrinter printer, const SymbolTable &symbols) override;
 
   void add_branch(std::unique_ptr<CaseBranchNode> branch) {
     branches.push_back(std::move(branch));

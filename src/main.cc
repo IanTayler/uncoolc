@@ -30,8 +30,7 @@ struct CliOptions {
  *                    *
  *********************/
 
-TokenStream run_tokenizer(std::istream *input,
-                          std::shared_ptr<SymbolTable> symbols,
+TokenStream run_tokenizer(std::istream *input, SymbolTable &symbols,
                           const CliOptions &options) {
   TokenStream tokens = tokenize(input, symbols);
 
@@ -70,7 +69,7 @@ TokenStream run_tokenizer(std::istream *input,
       *output << std::setw(position_width)
               << std::format("{}:{}", token.line(), token.column()) << " | "
               << std::setw(token_width) << token_type_str(type) << " | "
-              << symbols->get_string(token.symbol()) << std::endl;
+              << symbols.get_string(token.symbol()) << std::endl;
     }
 
     tokens.reset_state();
@@ -85,7 +84,7 @@ TokenStream run_tokenizer(std::istream *input,
  *********************/
 
 std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
-                                       std::shared_ptr<SymbolTable> symbols,
+                                       const SymbolTable &symbols,
                                        const CliOptions &options) {
 
   std::unique_ptr<ModuleNode> node = Parser(tokens, symbols).parse();
@@ -139,12 +138,12 @@ int main(int argc, char *argv[]) {
     arg_pos++;
   }
 
-  std::shared_ptr<SymbolTable> symbols = std::make_shared<SymbolTable>();
+  std::unique_ptr<SymbolTable> symbols = std::make_unique<SymbolTable>();
 
   CliOptions options = {
       .debug_output = debug, .debug_dir = debug_dir, .verbose = verbose};
 
-  TokenStream tokens = run_tokenizer(stream, symbols, options);
+  TokenStream tokens = run_tokenizer(stream, *symbols, options);
 
-  std::unique_ptr<ModuleNode> ast = run_parser(tokens, symbols, options);
+  std::unique_ptr<ModuleNode> ast = run_parser(tokens, *symbols, options);
 }

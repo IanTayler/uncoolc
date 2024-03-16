@@ -24,21 +24,19 @@ void AstPrinter::exit() { current_depth--; }
  *                     *
  **********************/
 
-void AstNode::print(AstPrinter printer, std::shared_ptr<SymbolTable>) {
+void AstNode::print(AstPrinter printer, const SymbolTable &) {
   printer.print("__NODE_PRINT_UNDEFINED__");
 }
 
-void ModuleNode::print(AstPrinter printer,
-                       std::shared_ptr<SymbolTable> symbols) {
+void ModuleNode::print(AstPrinter printer, const SymbolTable &symbols) {
   for (auto &class_ : classes) {
     class_->print(printer, symbols);
   }
 }
 
-void ClassNode::print(AstPrinter printer,
-                      std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("class {} inherits {}", symbols->get_string(name),
-                            symbols->get_string(superclass)));
+void ClassNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("class {} inherits {}", symbols.get_string(name),
+                            symbols.get_string(superclass)));
 
   printer.enter();
   {
@@ -53,30 +51,27 @@ void ClassNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void AttributeNode::print(AstPrinter printer,
-                          std::shared_ptr<SymbolTable> symbols) {
+void AttributeNode::print(AstPrinter printer, const SymbolTable &symbols) {
   if (initializer) {
-    printer.print(std::format("attr {} : {} <-", symbols->get_string(object_id),
-                              symbols->get_string(declared_type)));
+    printer.print(std::format("attr {} : {} <-", symbols.get_string(object_id),
+                              symbols.get_string(declared_type)));
     printer.enter();
     (*initializer)->print(printer, symbols);
     printer.exit();
   } else {
-    printer.print(std::format("attr {} : {}", symbols->get_string(object_id),
-                              symbols->get_string(declared_type)));
+    printer.print(std::format("attr {} : {}", symbols.get_string(object_id),
+                              symbols.get_string(declared_type)));
   }
 }
 
-void ParameterNode::print(AstPrinter printer,
-                          std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("param {} : {}", symbols->get_string(object_id),
-                            symbols->get_string(declared_type)));
+void ParameterNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("param {} : {}", symbols.get_string(object_id),
+                            symbols.get_string(declared_type)));
 }
 
-void MethodNode::print(AstPrinter printer,
-                       std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("method {} : {}", symbols->get_string(name),
-                            symbols->get_string(return_type)));
+void MethodNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("method {} : {}", symbols.get_string(name),
+                            symbols.get_string(return_type)));
 
   printer.enter();
   {
@@ -97,28 +92,24 @@ void MethodNode::print(AstPrinter printer,
  *                     *
  **********************/
 
-void ExpressionNode::print(AstPrinter printer,
-                           std::shared_ptr<SymbolTable> symbols) {
+void ExpressionNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("__EXPRESSION_PRINT_UNDEFINED__");
 }
 
-void LiteralNode::print(AstPrinter printer,
-                        std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("Literal {}", symbols->get_string(value)));
+void LiteralNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("Literal {}", symbols.get_string(value)));
 }
 
-void VariableNode::print(AstPrinter printer,
-                         std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("Variable {}", symbols->get_string(name)));
+void VariableNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("Variable {}", symbols.get_string(name)));
 }
 
-void NewNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("new {}", symbols->get_string(created_type)));
+void NewNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("new {}", symbols.get_string(created_type)));
 }
 
-void UnaryOpNode::print(AstPrinter printer,
-                        std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("UnaryOp {}", symbols->get_string(op)));
+void UnaryOpNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("UnaryOp {}", symbols.get_string(op)));
 
   printer.enter();
   if (child)
@@ -128,9 +119,8 @@ void UnaryOpNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void BinaryOpNode::print(AstPrinter printer,
-                         std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("BinaryOp {}", symbols->get_string(op)));
+void BinaryOpNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("BinaryOp {}", symbols.get_string(op)));
 
   printer.enter();
   {
@@ -146,12 +136,11 @@ void BinaryOpNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void AssignNode::print(AstPrinter printer,
-                       std::shared_ptr<SymbolTable> symbols) {
+void AssignNode::print(AstPrinter printer, const SymbolTable &symbols) {
   if (variable.is_empty())
     printer.print("__missing__variable__ <-");
   else
-    printer.print(std::format("{} <-", symbols->get_string(variable)));
+    printer.print(std::format("{} <-", symbols.get_string(variable)));
 
   printer.enter();
   {
@@ -163,8 +152,7 @@ void AssignNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void DispatchNode::print(AstPrinter printer,
-                         std::shared_ptr<SymbolTable> symbols) {
+void DispatchNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Dispatch");
 
   printer.enter();
@@ -183,9 +171,9 @@ void DispatchNode::print(AstPrinter printer,
     printer.exit();
 
     if (dispatch_type)
-      printer.print(std::format("@{}", symbols->get_string(*dispatch_type)));
+      printer.print(std::format("@{}", symbols.get_string(*dispatch_type)));
 
-    printer.print(std::format("method {}", symbols->get_string(method)));
+    printer.print(std::format("method {}", symbols.get_string(method)));
 
     printer.print("arguments");
     printer.enter();
@@ -197,8 +185,7 @@ void DispatchNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void BlockNode::print(AstPrinter printer,
-                      std::shared_ptr<SymbolTable> symbols) {
+void BlockNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Block");
 
   printer.enter();
@@ -210,7 +197,7 @@ void BlockNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void IfNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+void IfNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("If");
 
   printer.enter();
@@ -245,8 +232,7 @@ void IfNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
   printer.exit();
 }
 
-void WhileNode::print(AstPrinter printer,
-                      std::shared_ptr<SymbolTable> symbols) {
+void WhileNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("While");
 
   printer.enter();
@@ -272,7 +258,7 @@ void WhileNode::print(AstPrinter printer,
   printer.exit();
 }
 
-void LetNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+void LetNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Let");
 
   printer.enter();
@@ -294,17 +280,16 @@ void LetNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
   printer.exit();
 }
 
-void CaseBranchNode::print(AstPrinter printer,
-                           std::shared_ptr<SymbolTable> symbols) {
-  printer.print(std::format("{} : {}", symbols->get_string(object_id),
-                            symbols->get_string(declared_type)));
+void CaseBranchNode::print(AstPrinter printer, const SymbolTable &symbols) {
+  printer.print(std::format("{} : {}", symbols.get_string(object_id),
+                            symbols.get_string(declared_type)));
 
   printer.enter();
   body_expr->print(printer, symbols);
   printer.exit();
 }
 
-void CaseNode::print(AstPrinter printer, std::shared_ptr<SymbolTable> symbols) {
+void CaseNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Case");
 
   printer.enter();

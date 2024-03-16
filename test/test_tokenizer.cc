@@ -7,8 +7,8 @@ struct InputOutput {
   std::vector<Token> expected;
 };
 
-void check_cases(std::vector<InputOutput> cases,
-                 std::shared_ptr<SymbolTable> symbs, bool skip_whitespace) {
+void check_cases(std::vector<InputOutput> cases, SymbolTable &symbs,
+                 bool skip_whitespace) {
   for (const auto &[inp, expected] : cases) {
     std::istringstream inp_stream(inp);
     auto tokens = tokenize(&inp_stream, symbs);
@@ -20,7 +20,7 @@ void check_cases(std::vector<InputOutput> cases,
 }
 TEST_SUITE("tokenize") {
   TEST_CASE("tokenize single token") {
-    std::shared_ptr<SymbolTable> symbs = std::make_shared<SymbolTable>();
+    std::unique_ptr<SymbolTable> symbs = std::make_unique<SymbolTable>();
 
     std::vector<InputOutput> cases = {
         // Symbols
@@ -89,11 +89,11 @@ TEST_SUITE("tokenize") {
         {"\n", {Token(TokenType::NEW_LINE, symbs->from("\n"))}},
         {"!", {Token(TokenType::INVALID, symbs->from("!"))}},
     };
-    check_cases(cases, symbs, false);
+    check_cases(cases, *symbs, false);
   }
 
   TEST_CASE("tokenize class attributes examples") {
-    std::shared_ptr<SymbolTable> symbs = std::make_shared<SymbolTable>();
+    std::unique_ptr<SymbolTable> symbs = std::make_unique<SymbolTable>();
 
     std::vector<InputOutput> cases = {
         {"class A inherits B {\n\tmyGreatObject : Int <- 12;\n};",
@@ -130,11 +130,11 @@ TEST_SUITE("tokenize") {
              Token{TokenType::SEMICOLON, symbs->from(";")},
          }},
     };
-    check_cases(cases, symbs, true);
+    check_cases(cases, *symbs, true);
   }
 
   TEST_CASE("tokenize class long example") {
-    std::shared_ptr<SymbolTable> symbs = std::make_shared<SymbolTable>();
+    std::unique_ptr<SymbolTable> symbs = std::make_unique<SymbolTable>();
 
     const char *example_long = R"""(
     class A {
@@ -235,6 +235,6 @@ TEST_SUITE("tokenize") {
     };
 
     std::vector<InputOutput> cases = {{example_long, example_long_expected}};
-    check_cases(cases, symbs, true);
+    check_cases(cases, *symbs, true);
   }
 }

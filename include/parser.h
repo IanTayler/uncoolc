@@ -11,7 +11,7 @@ enum class Associativity {
 class Parser {
 private:
   TokenStream &tokens;
-  std::shared_ptr<SymbolTable> symbols;
+  const SymbolTable &symbols;
 
   bool expect(TokenType);
   bool expect(Token, TokenType);
@@ -47,7 +47,7 @@ private:
   bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);
 
 public:
-  Parser(TokenStream &ts, std::shared_ptr<SymbolTable> ss)
+  Parser(TokenStream &ts, const SymbolTable& ss)
       : tokens(ts), symbols(ss) {}
 
   std::unique_ptr<ModuleNode> parse();

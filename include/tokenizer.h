@@ -19,7 +19,7 @@ private:
 
   // Handlers to external resources we're composing here
   std::istream *input;
-  std::shared_ptr<SymbolTable> symbols;
+  SymbolTable &symbols;
 
   // Buffer storing input text as we process it
   // TODO(IT) only keep a lookahead buffer instead of the entire string
@@ -49,7 +49,7 @@ private:
   Token get_in_category(TokenType t);
 
 public:
-  explicit Tokenizer(std::istream *inp, std::shared_ptr<SymbolTable> symbs)
+  explicit Tokenizer(std::istream *inp, SymbolTable &symbs)
       : pos_(0), input(inp), symbols(symbs), line_(1), col_(1) {}
 
   Token get();
@@ -61,6 +61,6 @@ public:
  *                    *
  *********************/
 
-TokenStream tokenize(std::istream *, std::shared_ptr<SymbolTable>);
+TokenStream tokenize(std::istream *, SymbolTable &);
 
 #endif // _TOKENIZER_H

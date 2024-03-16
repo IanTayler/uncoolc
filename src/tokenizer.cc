@@ -86,67 +86,67 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
   switch (len) {
   case 2: // if, in, fi, of
     if (c0 == 'i' && c1 == 'f')
-      return Token(TokenType::KW_IF, symbols->if_kw);
+      return Token(TokenType::KW_IF, symbols.if_kw);
 
     if (c0 == 'i' && c1 == 'n')
-      return Token(TokenType::KW_IN, symbols->in_kw);
+      return Token(TokenType::KW_IN, symbols.in_kw);
 
     if (c0 == 'f' && c1 == 'i')
-      return Token(TokenType::KW_FI, symbols->fi_kw);
+      return Token(TokenType::KW_FI, symbols.fi_kw);
 
     if (c0 == 'o' && c1 == 'f')
-      return Token(TokenType::KW_OF, symbols->of_kw);
+      return Token(TokenType::KW_OF, symbols.of_kw);
 
     break;
   case 3: // let, end
     if (c0 == 'l' && c1 == 'e' && c2 == 't')
-      return Token(TokenType::KW_LET, symbols->let_kw);
+      return Token(TokenType::KW_LET, symbols.let_kw);
 
     if (c0 == 'n' && c1 == 'e' && c2 == 'w')
-      return Token(TokenType::KW_NEW, symbols->new_kw);
+      return Token(TokenType::KW_NEW, symbols.new_kw);
     if (c0 == 'n' && c1 == 'o' && c2 == 't')
-      return Token(TokenType::KW_NOT, symbols->not_kw);
+      return Token(TokenType::KW_NOT, symbols.not_kw);
 
     break;
   case 4: // case, else, esac, then, true, loop and pool
     if (c0 == 'c' && c1 == 'a' && c2 == 's' && c3 == 'e')
-      return Token(TokenType::KW_CASE, symbols->case_kw);
+      return Token(TokenType::KW_CASE, symbols.case_kw);
 
     if (c0 == 'e' && c1 == 'l' && c2 == 's' && c3 == 'e')
-      return Token(TokenType::KW_ELSE, symbols->else_kw);
+      return Token(TokenType::KW_ELSE, symbols.else_kw);
 
     if (c0 == 'e' && c1 == 's' && c2 == 'a' && c3 == 'c')
-      return Token(TokenType::KW_ESAC, symbols->esac_kw);
+      return Token(TokenType::KW_ESAC, symbols.esac_kw);
 
     if (c0 == 't' && c1 == 'h' && c2 == 'e' && c3 == 'n')
-      return Token(TokenType::KW_THEN, symbols->then_kw);
+      return Token(TokenType::KW_THEN, symbols.then_kw);
 
     if (c0 == 't' && c1 == 'r' && c2 == 'u' && c3 == 'e')
-      return Token(TokenType::KW_TRUE, symbols->true_const);
+      return Token(TokenType::KW_TRUE, symbols.true_const);
 
     if (c0 == 'l' && c1 == 'o' && c2 == 'o' && c3 == 'p')
-      return Token(TokenType::KW_LOOP, symbols->loop_kw);
+      return Token(TokenType::KW_LOOP, symbols.loop_kw);
 
     if (c0 == 'p' && c1 == 'o' && c2 == 'o' && c3 == 'l')
-      return Token(TokenType::KW_POOL, symbols->pool_kw);
+      return Token(TokenType::KW_POOL, symbols.pool_kw);
 
     break;
   case 5: // while, class, false
     if (c0 == 'w' && c1 == 'h' && c2 == 'i' && c3 == 'l' && c4 == 'e')
-      return Token(TokenType::KW_WHILE, symbols->while_kw);
+      return Token(TokenType::KW_WHILE, symbols.while_kw);
 
     if (c0 == 'c' && c1 == 'l' && c2 == 'a' && c3 == 's' && c4 == 's')
-      return Token(TokenType::KW_CLASS, symbols->class_kw);
+      return Token(TokenType::KW_CLASS, symbols.class_kw);
 
     if (c0 == 'f' && c1 == 'a' && c2 == 'l' && c3 == 's' && c4 == 'e')
-      return Token(TokenType::KW_FALSE, symbols->false_const);
+      return Token(TokenType::KW_FALSE, symbols.false_const);
 
     break;
 
   case 6: // isvoid
     if (c0 == 'i' && c1 == 's' && c2 == 'v' && c3 == 'o' && c4 == 'i' &&
         c5 == 'd')
-      return Token(TokenType::KW_ISVOID, symbols->isvoid_kw);
+      return Token(TokenType::KW_ISVOID, symbols.isvoid_kw);
 
     break;
 
@@ -157,7 +157,7 @@ std::optional<Token> Tokenizer::match_keyword(unsigned int start_pos,
 
     if (c0 == 'i' && c1 == 'n' && c2 == 'h' && c3 == 'e' && c4 == 'r' &&
         c5 == 'i' && c6 == 't' && c7 == 's')
-      return Token(TokenType::KW_INHERITS, symbols->inherits_kw);
+      return Token(TokenType::KW_INHERITS, symbols.inherits_kw);
 
     break;
   }
@@ -183,12 +183,12 @@ Token Tokenizer::get_name(TokenType t) {
 
   // Didn't match a keyword
   int len = end_pos - start_pos;
-  return Token(t, symbols->from(s_.substr(start_pos, len)));
+  return Token(t, symbols.from(s_.substr(start_pos, len)));
 }
 
 Token Tokenizer::get_symbol(TokenType t) {
   char c = consume();
-  return Token(t, symbols->from(std::string(1, c)));
+  return Token(t, symbols.from(std::string(1, c)));
 }
 
 Token Tokenizer::get_parenthesis(TokenType t) {
@@ -196,16 +196,16 @@ Token Tokenizer::get_parenthesis(TokenType t) {
   consume();
 
   if (t == TokenType::R_PAREN) {
-    return Token(t, symbols->from(")"));
+    return Token(t, symbols.from(")"));
   }
 
   char c = current();
   if (c == '*') {
     consume();
-    return Token(TokenType::OPEN_COMMENT, symbols->from("(*"));
+    return Token(TokenType::OPEN_COMMENT, symbols.from("(*"));
   }
 
-  return Token(TokenType::L_PAREN, symbols->from("("));
+  return Token(TokenType::L_PAREN, symbols.from("("));
 }
 
 Token Tokenizer::get_dash(TokenType t) {
@@ -214,9 +214,9 @@ Token Tokenizer::get_dash(TokenType t) {
   char c = current();
   if (c == '-') {
     consume();
-    return Token(TokenType::LINE_COMMENT, symbols->from("--"));
+    return Token(TokenType::LINE_COMMENT, symbols.from("--"));
   }
-  return Token(TokenType::SIMPLE_OP, symbols->sub_op);
+  return Token(TokenType::SIMPLE_OP, symbols.sub_op);
 }
 
 Token Tokenizer::get_asterisk(TokenType t) {
@@ -225,9 +225,9 @@ Token Tokenizer::get_asterisk(TokenType t) {
   char c = current();
   if (c == ')') {
     consume();
-    return Token(TokenType::CLOSE_COMMENT, symbols->from("*)"));
+    return Token(TokenType::CLOSE_COMMENT, symbols.from("*)"));
   }
-  return Token(TokenType::SIMPLE_OP, symbols->mult_op);
+  return Token(TokenType::SIMPLE_OP, symbols.mult_op);
 }
 
 Token Tokenizer::get_minor_op(TokenType t) {
@@ -236,13 +236,13 @@ Token Tokenizer::get_minor_op(TokenType t) {
   char c = current();
   if (c == '-') {
     consume();
-    return Token(TokenType::ASSIGN, symbols->assign_op);
+    return Token(TokenType::ASSIGN, symbols.assign_op);
   }
   if (c == '=') {
     consume();
-    return Token(TokenType::SIMPLE_OP, symbols->leq_op);
+    return Token(TokenType::SIMPLE_OP, symbols.leq_op);
   }
-  return Token(TokenType::SIMPLE_OP, symbols->lt_op);
+  return Token(TokenType::SIMPLE_OP, symbols.lt_op);
 }
 
 Token Tokenizer::get_eq_op(TokenType t) {
@@ -251,9 +251,9 @@ Token Tokenizer::get_eq_op(TokenType t) {
   char c = current();
   if (c == '>') {
     consume();
-    return Token(TokenType::ARROW, symbols->from("=>"));
+    return Token(TokenType::ARROW, symbols.from("=>"));
   }
-  return Token(TokenType::SIMPLE_OP, symbols->eq_op);
+  return Token(TokenType::SIMPLE_OP, symbols.eq_op);
 }
 
 Token Tokenizer::get_space(TokenType t) {
@@ -266,7 +266,7 @@ Token Tokenizer::get_space(TokenType t) {
   unsigned int end_pos = pos_;
 
   int len = end_pos - start_pos;
-  return Token(t, symbols->from(s_.substr(start_pos, len)));
+  return Token(t, symbols.from(s_.substr(start_pos, len)));
 }
 
 Token Tokenizer::get_number(TokenType t) {
@@ -279,7 +279,7 @@ Token Tokenizer::get_number(TokenType t) {
   unsigned int end_pos = pos_;
 
   int len = end_pos - start_pos;
-  return Token(t, symbols->from(s_.substr(start_pos, len)));
+  return Token(t, symbols.from(s_.substr(start_pos, len)));
 }
 
 Token Tokenizer::get_string(TokenType t) {
@@ -289,10 +289,10 @@ Token Tokenizer::get_string(TokenType t) {
   }
 
   if (c != '"')
-    return Token(TokenType::INVALID, symbols->from("__unterminated_string__"));
+    return Token(TokenType::INVALID, symbols.from("__unterminated_string__"));
 
   unsigned int len = pos_ - start_pos;
-  return Token(t, symbols->from(s_.substr(start_pos, len)));
+  return Token(t, symbols.from(s_.substr(start_pos, len)));
 }
 
 Token Tokenizer::get_in_category(TokenType t) {
@@ -340,8 +340,7 @@ Token Tokenizer::get() {
 }
 
 /// Main exported function in the tokenizer. Return a stream of tokens.
-TokenStream tokenize(std::istream *input,
-                     std::shared_ptr<SymbolTable> symbols) {
+TokenStream tokenize(std::istream *input, SymbolTable &symbols) {
   TokenStream tokens = TokenStream();
   Tokenizer tokenizer = Tokenizer(input, symbols);
   Token last_token;

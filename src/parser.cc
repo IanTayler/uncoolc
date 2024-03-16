@@ -29,7 +29,7 @@ bool Parser::expect(Token token, TokenType type) {
   if (token.type() != type) {
     error(std::format("Expected {}, but got {} {}", token_type_str(type),
                       token_type_str(token.type()),
-                      symbols->get_string(token.symbol())),
+                      symbols.get_string(token.symbol())),
           token);
     return false;
   }
@@ -74,7 +74,7 @@ bool is_expression_end(TokenType type) {
 }
 
 void dump_node_stack(std::vector<ExpressionPtr> &node_stack,
-                     std::shared_ptr<SymbolTable> symbols) {
+                     const SymbolTable &symbols) {
   AstPrinter printer{2, &std::cerr};
   printer.print("-- node_stack dump --");
 
@@ -117,7 +117,7 @@ std::unique_ptr<ClassNode> Parser::parse_class_header() {
     return nullptr;
   }
 
-  Symbol parent_class = symbols->object_type;
+  Symbol parent_class = symbols.object_type;
 
   if (tokens.lookahead().type() == TokenType::KW_INHERITS) {
     tokens.next();
@@ -281,7 +281,7 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
  **********************/
 
 inline Associativity Parser::op_associativity(Token t) const {
-  if (t.symbol() == symbols->assign_op)
+  if (t.symbol() == symbols.assign_op)
     return Associativity::RIGHT;
   return Associativity::LEFT;
 }
@@ -289,19 +289,19 @@ inline Associativity Parser::op_associativity(Token t) const {
 inline int Parser::op_precedence(Token t) const {
   Symbol s = t.symbol();
 
-  if (s == symbols->neg_op)
+  if (s == symbols.neg_op)
     return 12;
-  if (s == symbols->isvoid_kw)
+  if (s == symbols.isvoid_kw)
     return 10;
-  if (s == symbols->mult_op || s == symbols->div_op)
+  if (s == symbols.mult_op || s == symbols.div_op)
     return 8;
-  if (s == symbols->add_op || s == symbols->sub_op)
+  if (s == symbols.add_op || s == symbols.sub_op)
     return 6;
-  if (s == symbols->leq_op || s == symbols->lt_op || s == symbols->eq_op)
+  if (s == symbols.leq_op || s == symbols.lt_op || s == symbols.eq_op)
     return 4;
-  if (s == symbols->not_kw)
+  if (s == symbols.not_kw)
     return 2;
-  if (s == symbols->assign_op)
+  if (s == symbols.assign_op)
     return 1;
 
   return 0;
