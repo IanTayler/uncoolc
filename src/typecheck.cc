@@ -13,8 +13,26 @@ bool ExpressionNode::typecheck(TypeContext context) {
   return false; // fool the linters
 }
 
-// TODO(IT) fill in
-bool AttributeNode::typecheck(TypeContext context) { return true; }
+bool AttributeNode::typecheck(TypeContext context) {
+  if (!initializer.has_value()) {
+    return true;
+  };
+
+  initializer.value()->typecheck(context);
+  if (!initializer.value()->static_type.has_value()) {
+    fatal("Expression static_type is not set after calling typecheck",
+          initializer.value()->start_token);
+    return false; // fool the linters
+  }
+
+  if (!context.match(initializer.value()->static_type.value(), declared_type)) {
+    error("Initializer type does not match declared type", start_token);
+    return false;
+  }
+
+  return true;
+}
+
 // TODO(IT) fill in
 bool ParameterNode::typecheck(TypeContext context) { return true; }
 // TODO(IT) fill in
