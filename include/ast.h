@@ -165,10 +165,12 @@ public:
 
 class BuiltinNode : public ExpressionNode {
 private:
-  Symbol name;
+  Symbol class_name;
+  Symbol method_name;
 
 public:
-  BuiltinNode(Symbol n) : name(n), ExpressionNode(Token{}) {}
+  BuiltinNode(Symbol cn, Symbol mn)
+      : class_name(cn), method_name(mn), ExpressionNode(Token{}) {}
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 

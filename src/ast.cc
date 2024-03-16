@@ -97,7 +97,8 @@ void ExpressionNode::print(AstPrinter printer, const SymbolTable &symbols) {
 }
 
 void BuiltinNode::print(AstPrinter printer, const SymbolTable &symbols) {
-  printer.print(std::format("Builtin: {}", symbols.get_string(name)));
+  printer.print(std::format("Builtin: {}.{}", symbols.get_string(class_name),
+                            symbols.get_string(method_name)));
 }
 
 void LiteralNode::print(AstPrinter printer, const SymbolTable &symbols) {

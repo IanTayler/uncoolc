@@ -89,8 +89,8 @@ bool ModuleNode::typecheck(TypeContext context) {
 
 bool BuiltinNode::typecheck(TypeContext context) {
   fatal(std::format(
-            "INTERNAL: Calling typecheck on BuiltinNode ({}) is not permitted",
-            context.symbols.get_string(name)),
+            "INTERNAL: Calling typecheck on BuiltinNode ({}.{}) is not permitted",
+            context.symbols.get_string(class_name), context.symbols.get_string(method_name)),
         start_token);
   return false; // fool the linters
 }
