@@ -22,9 +22,9 @@ public:
 
   void assign(Symbol name, Symbol type);
   /// Read the full scope to find the latest definition of a symbol
-  Symbol get(Symbol name);
+  Symbol get(Symbol name) const;
   /// Check the definition of a symbol in the outermost scope
-  Symbol lookup(Symbol name);
+  Symbol lookup(Symbol name) const;
 };
 
 /***********************
@@ -64,6 +64,7 @@ private:
   std::unordered_map<int, ClassIdx> classes_by_name;
 
 public:
+
   bool exists(Symbol name) const;
   bool exists(ClassIdx idx) const;
 
@@ -87,10 +88,10 @@ class TypeContext {
 public:
   Scopes scopes;
   Symbol current_class;
-  ClassTree tree;
+  const ClassTree &tree;
   const SymbolTable &symbols;
 
-  bool match(Symbol type_a, Symbol type_b);
+  bool match(Symbol type_a, Symbol type_b) const;
 };
 
 #endif

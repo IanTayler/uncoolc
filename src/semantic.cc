@@ -14,16 +14,22 @@ void Scopes::assign(Symbol name, Symbol type) {
   scopes.front()[name.id] = type;
 }
 
-Symbol Scopes::get(Symbol name) {
+Symbol Scopes::get(Symbol name) const {
   for (auto &scope : scopes) {
     if (scope.find(name.id) != scope.end()) {
-      return scope[name.id];
+      return scope.at(name.id);
     }
   }
   return Symbol{};
 }
 
-Symbol Scopes::lookup(Symbol name) { return scopes.front()[name.id]; }
+Symbol Scopes::lookup(Symbol name) const {
+  try {
+    return scopes.front().at(name.id);
+  } catch (const std::out_of_range &) {
+    return Symbol{};
+  }
+}
 
 /***********************
  *                     *
@@ -140,7 +146,7 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
  **********************/
 
 // TODO(IT) take class hierarchies into consideration
-bool TypeContext::match(Symbol type_a, Symbol type_b) {
+bool TypeContext::match(Symbol type_a, Symbol type_b) const {
   if (type_a == type_b)
     return true;
   if (type_a == symbols.self_type && type_b == current_class)

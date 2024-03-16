@@ -8,14 +8,14 @@
  *                     *
  **********************/
 
-bool ExpressionNode::typecheck(TypeContext context) {
+bool ExpressionNode::typecheck(const TypeContext &context) {
   fatal("INTERNAL: Calling typecheck on an abstract ExpressionNode is "
         "not permitted",
         start_token);
   return false; // fool the linters
 }
 
-bool AttributeNode::typecheck(TypeContext context) {
+bool AttributeNode::typecheck(const TypeContext &context) {
   if (!initializer.has_value()) {
     return true;
   };
@@ -36,13 +36,13 @@ bool AttributeNode::typecheck(TypeContext context) {
   return init_check;
 }
 
-bool ParameterNode::typecheck(TypeContext context) {
+bool ParameterNode::typecheck(const TypeContext &context) {
   warning("INTERNAL: Unnecessary call to typecheck for ParameterNode",
           start_token);
   return true;
 }
 
-bool MethodNode::typecheck(TypeContext context) {
+bool MethodNode::typecheck(const TypeContext &context) {
   bool body_check = body->typecheck(context);
 
   Symbol body_type = body->static_type.value();
@@ -57,7 +57,7 @@ bool MethodNode::typecheck(TypeContext context) {
   return body_check;
 }
 
-bool ClassNode::typecheck(TypeContext context) {
+bool ClassNode::typecheck(const TypeContext &context) {
   bool check = true;
   for (const auto &method : methods) {
     check = check && method->typecheck(context);
@@ -70,7 +70,7 @@ bool ClassNode::typecheck(TypeContext context) {
   return check;
 }
 
-bool ModuleNode::typecheck(TypeContext context) {
+bool ModuleNode::typecheck(const TypeContext &context) {
   bool check = true;
   for (const auto &class_node : classes) {
     TypeContext class_context = context;
@@ -87,15 +87,17 @@ bool ModuleNode::typecheck(TypeContext context) {
  *                     *
  **********************/
 
-bool BuiltinNode::typecheck(TypeContext context) {
-  fatal(std::format(
-            "INTERNAL: Calling typecheck on BuiltinNode ({}.{}) is not permitted",
-            context.symbols.get_string(class_name), context.symbols.get_string(method_name)),
-        start_token);
+bool BuiltinNode::typecheck(const TypeContext &context) {
+  fatal(
+      std::format(
+          "INTERNAL: Calling typecheck on BuiltinNode ({}.{}) is not permitted",
+          context.symbols.get_string(class_name),
+          context.symbols.get_string(method_name)),
+      start_token);
   return false; // fool the linters
 }
 
-bool LiteralNode::typecheck(TypeContext context) {
+bool LiteralNode::typecheck(const TypeContext &context) {
   switch (start_token.type()) {
   case TokenType::STRING:
     static_type = context.symbols.string_type;
@@ -116,7 +118,7 @@ bool LiteralNode::typecheck(TypeContext context) {
   return true;
 }
 
-bool VariableNode::typecheck(TypeContext context) {
+bool VariableNode::typecheck(const TypeContext &context) {
   Symbol variable_type = context.scopes.get(name);
 
   if (variable_type.is_empty()) {
@@ -136,15 +138,15 @@ bool VariableNode::typecheck(TypeContext context) {
  *                     *
  **********************/
 
-bool UnaryOpNode::typecheck(TypeContext context) { return true; }
+bool UnaryOpNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool BinaryOpNode::typecheck(TypeContext context) { return true; }
+bool BinaryOpNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool NewNode::typecheck(TypeContext context) { return true; }
+bool NewNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool AssignNode::typecheck(TypeContext context) { return true; }
+bool AssignNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool DispatchNode::typecheck(TypeContext context) { return true; }
+bool DispatchNode::typecheck(const TypeContext &context) { return true; }
 
 /***********************
  *                     *
@@ -153,14 +155,14 @@ bool DispatchNode::typecheck(TypeContext context) { return true; }
  **********************/
 
 // TODO(IT) fill in
-bool BlockNode::typecheck(TypeContext context) { return true; }
+bool BlockNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool IfNode::typecheck(TypeContext context) { return true; }
+bool IfNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool WhileNode::typecheck(TypeContext context) { return true; }
+bool WhileNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool LetNode::typecheck(TypeContext context) { return true; }
+bool LetNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool CaseBranchNode::typecheck(TypeContext context) { return true; }
+bool CaseBranchNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
-bool CaseNode::typecheck(TypeContext context) { return true; }
+bool CaseNode::typecheck(const TypeContext &context) { return true; }
