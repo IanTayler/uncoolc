@@ -105,9 +105,19 @@ bool LiteralNode::typecheck(TypeContext context) {
   return true;
 }
 
-// TODO(IT) fill in
-bool VariableNode::typecheck(TypeContext context) { return true; }
-// TODO(IT) fill in
+bool VariableNode::typecheck(TypeContext context) {
+  Symbol variable_type = context.scopes.get(name);
+
+  if (variable_type.is_empty()) {
+    error(
+        std::format("Undefined variable {}", context.symbols.get_string(name)),
+        start_token);
+    return false;
+  }
+
+  static_type = variable_type;
+  return true;
+}
 
 /***********************
  *                     *
