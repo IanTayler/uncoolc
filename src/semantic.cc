@@ -135,8 +135,14 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
  *     TypeContext     *
  *                     *
  **********************/
-// TODO(IT) fill in
-bool TypeContext::match(Symbol type_a, Symbol type_b) { return true; }
+bool TypeContext::match(Symbol type_a, Symbol type_b) {
+  if (type_a == type_b)
+    return true;
+  if (type_a == symbols.self_type && type_b == current_class)
+    return true;
+
+  return false;
+}
 
 /***********************
  *                     *
