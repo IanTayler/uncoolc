@@ -1,5 +1,6 @@
 #include "error.h"
 #include "semantic.h"
+#include <format>
 
 /***********************
  *                     *
@@ -38,8 +39,21 @@ bool ParameterNode::typecheck(TypeContext context) {
   return true;
 }
 
-// TODO(IT) fill in
-bool MethodNode::typecheck(TypeContext context) { return true; }
+bool MethodNode::typecheck(TypeContext context) {
+  bool body_check = body->typecheck(context);
+
+  Symbol body_type = body->static_type.value();
+  if (!context.match(body->static_type.value(), return_type)) {
+    error(std::format("Wrong body type {} in method {}, expected {}",
+                      context.symbols.get_string(body_type),
+                      context.symbols.get_string(name),
+                      context.symbols.get_string(return_type)),
+          start_token);
+    return false;
+  }
+  return body_check;
+}
+
 // TODO(IT) fill in
 bool ClassNode::typecheck(TypeContext context) { return true; }
 // TODO(IT) fill in
