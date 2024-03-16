@@ -4,6 +4,7 @@
  *        Scope        *
  *                     *
  **********************/
+
 Scopes::Scopes() {}
 
 void Scopes::enter() { scopes.push_front(std::unordered_map<int, Symbol>()); }
@@ -29,6 +30,7 @@ Symbol Scopes::lookup(Symbol name) { return scopes.front()[name.id]; }
  *      ClassInfo      *
  *                     *
  **********************/
+
 ClassInfo::ClassInfo(ClassNode *cn, int d)
     : class_node(cn), depth_(d),
       methods(std::unordered_map<int, MethodNode *>()),
@@ -61,6 +63,7 @@ AttributeNode *ClassInfo::attribute(Symbol name) { return attributes[name.id]; }
  *      ClassTree      *
  *                     *
  **********************/
+
 bool ClassTree::exists(Symbol name) const {
   if (classes_by_name.find(name.id) == classes_by_name.end())
     return false;
@@ -135,6 +138,7 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
  *     TypeContext     *
  *                     *
  **********************/
+
 bool TypeContext::match(Symbol type_a, Symbol type_b) {
   if (type_a == type_b)
     return true;
