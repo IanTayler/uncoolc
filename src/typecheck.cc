@@ -54,8 +54,19 @@ bool MethodNode::typecheck(TypeContext context) {
   return body_check;
 }
 
-// TODO(IT) fill in
-bool ClassNode::typecheck(TypeContext context) { return true; }
+bool ClassNode::typecheck(TypeContext context) {
+  bool check = true;
+  for (const auto &method : methods) {
+    check = check && method->typecheck(context);
+  }
+
+  for (const auto &attribute : attributes) {
+    check = check && attribute->typecheck(context);
+  }
+
+  return check;
+}
+
 // TODO(IT) fill in
 bool ModuleNode::typecheck(TypeContext context) { return true; }
 
