@@ -84,8 +84,27 @@ bool ModuleNode::typecheck(TypeContext context) {
  *                     *
  **********************/
 
-// TODO(IT) fill in
-bool LiteralNode::typecheck(TypeContext context) { return true; }
+bool LiteralNode::typecheck(TypeContext context) {
+  switch (start_token.type()) {
+  case TokenType::STRING:
+    static_type = context.symbols.string_type;
+    break;
+  case TokenType::NUMBER:
+    static_type = context.symbols.int_type;
+    break;
+  case TokenType::KW_TRUE:
+  case TokenType::KW_FALSE:
+    static_type = context.symbols.bool_type;
+    break;
+  default:
+    fatal(std::format("LiteralNode has unexpected token type {}",
+                      token_type_str(start_token.type())),
+          start_token);
+    return false;
+  }
+  return true;
+}
+
 // TODO(IT) fill in
 bool VariableNode::typecheck(TypeContext context) { return true; }
 // TODO(IT) fill in
