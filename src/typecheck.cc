@@ -67,8 +67,16 @@ bool ClassNode::typecheck(TypeContext context) {
   return check;
 }
 
-// TODO(IT) fill in
-bool ModuleNode::typecheck(TypeContext context) { return true; }
+bool ModuleNode::typecheck(TypeContext context) {
+  bool check = true;
+  for (const auto &class_node : classes) {
+    TypeContext class_context = context;
+    class_context.current_class = class_node->name;
+    check = check && class_node->typecheck(class_context);
+  }
+
+  return check;
+}
 
 /***********************
  *                     *
