@@ -33,8 +33,8 @@ bool AttributeNode::typecheck(TypeContext context) {
   return true;
 }
 
-// TODO(IT) fill in
 bool ParameterNode::typecheck(TypeContext context) { return true; }
+
 // TODO(IT) fill in
 bool MethodNode::typecheck(TypeContext context) { return true; }
 // TODO(IT) fill in
