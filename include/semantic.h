@@ -88,6 +88,7 @@ public:
   Scopes scopes;
   Symbol current_class;
   ClassTree tree;
+  const SymbolTable &symbols;
 
   bool match(Symbol type_a, Symbol type_b);
 };
