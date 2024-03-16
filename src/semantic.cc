@@ -54,6 +54,14 @@ ClassInfo::ClassInfo(ClassNode *cn, int d)
   }
 }
 
+unsigned int ClassInfo::start_line() const {
+  return class_node->start_token.line();
+}
+
+unsigned int ClassInfo::start_column() const {
+  return class_node->start_token.column();
+}
+
 int ClassInfo::depth() const { return depth_; }
 
 Symbol ClassInfo::name() const { return class_node->name; }

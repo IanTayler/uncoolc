@@ -45,9 +45,12 @@ private:
 public:
   ClassInfo(ClassNode *cn, int d);
 
+  unsigned int start_line() const;
+  unsigned int start_column() const;
   int depth() const;
   Symbol name() const;
   Symbol superclass() const;
+
   MethodNode *method(Symbol name);
   AttributeNode *attribute(Symbol name);
 };
