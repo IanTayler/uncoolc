@@ -32,6 +32,7 @@ public:
   Symbol false_const;
   Symbol self_var;
   Symbol self_type;
+  Symbol tree_root_type;
   Symbol object_type;
   Symbol io_type;
   Symbol bool_type;

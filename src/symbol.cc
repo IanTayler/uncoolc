@@ -36,6 +36,7 @@ SymbolTable::SymbolTable() {
   false_const = from("false");
   self_var = from("self");
   self_type = from("SELF_TYPE");
+  tree_root_type = from("__TREE_ROOT_TYPE__");
   object_type = from("Object");
   io_type = from("IO");
   bool_type = from("Bool");
