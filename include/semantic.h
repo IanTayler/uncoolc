@@ -65,8 +65,30 @@ class ClassTree {
 private:
   std::vector<ClassInfo> classes;
   std::unordered_map<int, ClassIdx> classes_by_name;
+  SymbolTable &symbols;
+
+  // Nodes for builtin classes
+  std::unique_ptr<ClassNode> objectClassNode;
+  std::unique_ptr<ClassNode> ioClassNode;
+  std::unique_ptr<ClassNode> stringClassNode;
+  std::unique_ptr<ClassNode> intClassNode;
+  std::unique_ptr<ClassNode> boolClassNode;
+
+  void check_class_hierarchy(const std::unordered_map<int, ClassNode *> &,
+                             ModuleNode *);
+
+  std::unique_ptr<MethodNode>
+  make_builtin_method(Symbol cls, Symbol name, Symbol return_type,
+                      std::vector<Symbol> parameter_names,
+                      std::vector<Symbol> parameter_types);
+
+  std::unordered_map<int, ClassNode *> get_class_node_map(ModuleNode *) const;
+  std::vector<Symbol> get_classes_by_depth(ModuleNode *) const;
+  void add_default_classes();
+  void add_class(ClassNode *, int depth);
 
 public:
+  ClassTree(ModuleNode *, SymbolTable &);
 
   bool exists(Symbol name) const;
   bool exists(ClassIdx idx) const;
@@ -79,6 +101,8 @@ public:
   std::optional<ClassInfo> common_ancestor(Symbol name_a, Symbol name_b) const;
   std::optional<ClassInfo> common_ancestor(const ClassInfo &class_a,
                                            const ClassInfo &class_b) const;
+
+  void print(std::ostream * out);
 };
 
 /***********************
@@ -92,7 +116,7 @@ public:
   Scopes scopes;
   Symbol current_class;
   const ClassTree &tree;
-  const SymbolTable &symbols;
+  SymbolTable &symbols;
 
   bool match(Symbol type_a, Symbol type_b) const;
 };
