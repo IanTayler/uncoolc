@@ -87,6 +87,7 @@ private:
 
   std::unordered_map<int, ClassNode *> get_class_node_map(ModuleNode *) const;
   std::vector<Symbol> get_classes_by_depth(ModuleNode *) const;
+
   void add_default_classes();
   void add_class(ClassNode *, int depth);
 
