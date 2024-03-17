@@ -37,8 +37,8 @@ typedef int ClassIdx;
 
 class ClassInfo {
 private:
-  std::unordered_map<int, MethodNode *> methods;
-  std::unordered_map<int, AttributeNode *> attributes;
+  std::unordered_map<int, MethodNode *> methods_;
+  std::unordered_map<int, AttributeNode *> attributes_;
   ClassNode *class_node;
   int depth_;
 
@@ -53,6 +53,9 @@ public:
 
   MethodNode *method(Symbol name);
   AttributeNode *attribute(Symbol name);
+
+  std::vector<Symbol> methods() const;
+  std::vector<Symbol> attributes() const;
 };
 
 /***********************

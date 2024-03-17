@@ -41,18 +41,18 @@ Symbol Scopes::lookup(Symbol name) const {
 
 ClassInfo::ClassInfo(ClassNode *cn, int d)
     : class_node(cn), depth_(d),
-      methods(std::unordered_map<int, MethodNode *>()),
-      attributes(std::unordered_map<int, AttributeNode *>()) {
+      methods_(std::unordered_map<int, MethodNode *>()),
+      attributes_(std::unordered_map<int, AttributeNode *>()) {
   for (const auto &method_ptr : cn->methods) {
     Symbol name = method_ptr->name;
     MethodNode *raw_method_ptr = method_ptr.get();
-    methods[name.id] = raw_method_ptr;
+    methods_[name.id] = raw_method_ptr;
   }
 
   for (const auto &attr_ptr : cn->attributes) {
     Symbol object_id = attr_ptr->object_id;
     AttributeNode *raw_attr_ptr = attr_ptr.get();
-    attributes[object_id.id] = raw_attr_ptr;
+    attributes_[object_id.id] = raw_attr_ptr;
   }
 }
 
@@ -70,9 +70,27 @@ Symbol ClassInfo::name() const { return class_node->name; }
 
 Symbol ClassInfo::superclass() const { return class_node->superclass; }
 
-MethodNode *ClassInfo::method(Symbol name) { return methods[name.id]; }
+MethodNode *ClassInfo::method(Symbol name) { return methods_[name.id]; }
 
-AttributeNode *ClassInfo::attribute(Symbol name) { return attributes[name.id]; }
+AttributeNode *ClassInfo::attribute(Symbol name) {
+  return attributes_[name.id];
+}
+
+std::vector<Symbol> ClassInfo::methods() const {
+  std::vector<Symbol> methods;
+  for (const auto &[_, mn] : methods_) {
+    methods.push_back(mn->name);
+  }
+  return methods;
+}
+
+std::vector<Symbol> ClassInfo::attributes() const {
+  std::vector<Symbol> attributes;
+  for (const auto &[_, an] : attributes_) {
+    attributes.push_back(an->object_id);
+  }
+  return attributes;
+}
 
 /***********************
  *                     *
