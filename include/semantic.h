@@ -105,7 +105,7 @@ public:
   std::optional<ClassInfo> common_ancestor(const ClassInfo &class_a,
                                            const ClassInfo &class_b) const;
 
-  void print(std::ostream * out);
+  void print(std::ostream *out);
 };
 
 /***********************

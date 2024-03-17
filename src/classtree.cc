@@ -274,3 +274,28 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
   }
   return *a_side;
 }
+
+void ClassTree::print(std::ostream *out) {
+  AstPrinter printer = AstPrinter(2, out);
+
+  printer.print("ClassTree");
+
+  printer.enter();
+  {
+    for (auto &cls : classes) {
+      printer.print(std::format(
+          "{} inherits {}; depth {}", symbols.get_string(cls.name()),
+          symbols.get_string(cls.superclass()), cls.depth()));
+      printer.enter();
+
+      for (const auto &attr : cls.attributes()) {
+        printer.print(std::format("attribute {}", symbols.get_string(attr)));
+      }
+
+      for (const auto &meth : cls.methods()) {
+        printer.print(std::format(" method {}: ", symbols.get_string(meth)));
+      }
+    }
+    printer.exit();
+  }
+}
