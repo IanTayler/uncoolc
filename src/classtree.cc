@@ -17,10 +17,14 @@ ClassTree::ClassTree(ModuleNode *module, SymbolTable &symbs) : symbols(symbs) {
   std::vector<Symbol> classes_by_depth = get_classes_by_depth(module);
 
   for (const auto &cls_name : classes_by_depth) {
+
+    if (class_node_map.find(cls_name.id) == class_node_map.end())
+      continue;
+
     ClassNode *class_node = class_node_map[cls_name.id];
 
     Token class_token = class_node->start_token;
-    std::optional<ClassInfo> stored_class = get(class_node->name);
+    std::optional<ClassInfo> stored_class = get(cls_name);
 
     if (stored_class.has_value()) {
       ClassInfo cls = stored_class.value();
@@ -92,7 +96,8 @@ void ClassTree::check_class_hierarchy(
     ModuleNode *module) {
   for (const auto &class_node : module->classes) {
     Symbol superclass_name = class_node->superclass;
-    if (class_node_map.find(superclass_name.id) == class_node_map.end()) {
+    if (!exists(superclass_name) &&
+        class_node_map.find(superclass_name.id) == class_node_map.end()) {
       fatal(std::format("Undefined superclass {} for class {}",
                         symbols.get_string(class_node->superclass),
                         symbols.get_string(class_node->name)),
