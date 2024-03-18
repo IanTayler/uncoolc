@@ -6,6 +6,7 @@
 
 #include "ast.h"
 #include "parser.h"
+#include "semantic.h"
 #include "symbol.h"
 #include "token.h"
 #include "tokenizer.h"
@@ -108,6 +109,34 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
 
 /**********************
  *                    *
+ *  Semantic Analysis *
+ *                    *
+ *********************/
+
+std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
+                                                 SymbolTable &symbols,
+                                                 const CliOptions &options) {
+  std::unique_ptr<ClassTree> class_tree =
+      std::make_unique<ClassTree>(module, symbols);
+
+  std::ostream *output = nullptr;
+  std::fstream out_file;
+
+  if (options.debug_output) {
+    std::filesystem::create_directories(options.debug_dir);
+    out_file.open(options.debug_dir / "class_tree.log", std::ios::out);
+    output = &out_file;
+  }
+
+  if (output != nullptr) {
+    class_tree->print(output);
+  }
+
+  return class_tree;
+}
+
+/**********************
+ *                    *
  *     Entrypoint     *
  *                    *
  *********************/
@@ -146,4 +175,7 @@ int main(int argc, char *argv[]) {
   TokenStream tokens = run_tokenizer(stream, *symbols, options);
 
   std::unique_ptr<ModuleNode> ast = run_parser(tokens, *symbols, options);
+
+  std::unique_ptr<ClassTree> class_tree =
+      run_semantic_analysis(ast.get(), *symbols, options);
 }
