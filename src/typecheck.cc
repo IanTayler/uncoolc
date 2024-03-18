@@ -144,7 +144,40 @@ bool VariableNode::typecheck(const TypeContext &context) {
  *                     *
  **********************/
 
-bool UnaryOpNode::typecheck(const TypeContext &context) { return true; }
+bool UnaryOpNode::typecheck(const TypeContext &context) {
+  child->typecheck(context);
+  if (!child->static_type.has_value())
+    fatal("INTERNAL: child of UnaryOpNode has unset type after checking",
+          start_token);
+
+  switch (start_token.type()) {
+  case TokenType::NEG_OP:
+    static_type = context.symbols.int_type;
+    if (child->static_type.value() == context.symbols.int_type)
+      return true;
+    break;
+  case TokenType::KW_NOT:
+    static_type = context.symbols.bool_type;
+    if (child->static_type.value() == context.symbols.bool_type)
+      return true;
+    break;
+  case TokenType::KW_ISVOID:
+    static_type = context.symbols.bool_type;
+    // Any type is good for isvoid
+    return true;
+  default:
+    fatal(std::format("INTERNAL: UnaryOpNode with unknown token type {}",
+                      token_type_str(start_token.type())),
+          start_token);
+    return false;
+  }
+
+  error(std::format("Unexpected type {} for child of UnaryOpNode with op {}",
+                    context.symbols.get_string(child->static_type.value()),
+                    context.symbols.get_string(op)),
+        start_token);
+  return false;
+}
 // TODO(IT) fill in
 bool BinaryOpNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
