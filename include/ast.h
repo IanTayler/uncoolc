@@ -71,6 +71,7 @@ public:
   std::optional<Symbol> static_type;
 
   virtual void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print_type(AstPrinter printer, const SymbolTable &symbols);
 
   virtual bool typecheck(const TypeContext &) override;
 

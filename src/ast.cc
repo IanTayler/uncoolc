@@ -94,15 +94,29 @@ void MethodNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void ExpressionNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("__EXPRESSION_PRINT_UNDEFINED__");
+  print_type(printer, symbols);
+}
+
+void ExpressionNode::print_type(AstPrinter printer,
+                                const SymbolTable &symbols) {
+  printer.enter();
+  if (static_type.has_value())
+    printer.print(
+        std::format("type: {}", symbols.get_string(static_type.value())));
+  else
+    printer.print("type: __unset__");
+  printer.exit();
 }
 
 void BuiltinNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("Builtin: {}.{}", symbols.get_string(class_name),
                             symbols.get_string(method_name)));
+  print_type(printer, symbols);
 }
 
 void LiteralNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("Literal {}", symbols.get_string(value)));
+  print_type(printer, symbols);
 }
 
 void VariableNode::print(AstPrinter printer, const SymbolTable &symbols) {
@@ -111,10 +125,13 @@ void VariableNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void NewNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("new {}", symbols.get_string(created_type)));
+  print_type(printer, symbols);
 }
 
 void UnaryOpNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("UnaryOp {}", symbols.get_string(op)));
+
+  print_type(printer, symbols);
 
   printer.enter();
   if (child)
@@ -126,6 +143,8 @@ void UnaryOpNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void BinaryOpNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("BinaryOp {}", symbols.get_string(op)));
+
+  print_type(printer, symbols);
 
   printer.enter();
   {
@@ -147,6 +166,8 @@ void AssignNode::print(AstPrinter printer, const SymbolTable &symbols) {
   else
     printer.print(std::format("{} <-", symbols.get_string(variable)));
 
+  print_type(printer, symbols);
+
   printer.enter();
   {
     if (expression)
@@ -159,6 +180,8 @@ void AssignNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void DispatchNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Dispatch");
+
+  print_type(printer, symbols);
 
   printer.enter();
   {
@@ -193,6 +216,8 @@ void DispatchNode::print(AstPrinter printer, const SymbolTable &symbols) {
 void BlockNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Block");
 
+  print_type(printer, symbols);
+
   printer.enter();
   {
     for (auto &expr : expressions) {
@@ -204,6 +229,8 @@ void BlockNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void IfNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("If");
+
+  print_type(printer, symbols);
 
   printer.enter();
   {
@@ -240,6 +267,8 @@ void IfNode::print(AstPrinter printer, const SymbolTable &symbols) {
 void WhileNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("While");
 
+  print_type(printer, symbols);
+
   printer.enter();
   {
     if (condition_expr) {
@@ -266,6 +295,8 @@ void WhileNode::print(AstPrinter printer, const SymbolTable &symbols) {
 void LetNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Let");
 
+  print_type(printer, symbols);
+
   printer.enter();
   {
     printer.print("Declarations");
@@ -289,6 +320,8 @@ void CaseBranchNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("{} : {}", symbols.get_string(object_id),
                             symbols.get_string(declared_type)));
 
+  print_type(printer, symbols);
+
   printer.enter();
   body_expr->print(printer, symbols);
   printer.exit();
@@ -296,6 +329,8 @@ void CaseBranchNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void CaseNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print("Case");
+
+  print_type(printer, symbols);
 
   printer.enter();
   {
