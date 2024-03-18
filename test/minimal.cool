@@ -1,0 +1,3 @@
+class Main inherits IO {
+  out_number : Int <- 12;
+};
