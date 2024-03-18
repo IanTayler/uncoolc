@@ -291,16 +291,18 @@ void ClassTree::print(std::ostream *out) {
       printer.print(std::format(
           "{} inherits {}; depth {}", symbols.get_string(cls.name()),
           symbols.get_string(cls.superclass()), cls.depth()));
+
       printer.enter();
+      {
 
-      for (const auto &attr : cls.attributes()) {
-        printer.print(std::format("attribute {}", symbols.get_string(attr)));
-      }
+        for (const auto &attr : cls.attributes())
+          printer.print(std::format("attribute {}", symbols.get_string(attr)));
 
-      for (const auto &meth : cls.methods()) {
-        printer.print(std::format(" method {}: ", symbols.get_string(meth)));
+        for (const auto &meth : cls.methods())
+          printer.print(std::format("method {} ", symbols.get_string(meth)));
       }
+      printer.exit();
     }
-    printer.exit();
   }
+  printer.exit();
 }
