@@ -114,22 +114,37 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
  *********************/
 
 std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
+                                                 Scopes &scopes,
                                                  SymbolTable &symbols,
                                                  const CliOptions &options) {
   std::unique_ptr<ClassTree> class_tree =
       std::make_unique<ClassTree>(module, symbols);
 
-  std::ostream *output = nullptr;
-  std::fstream out_file;
+  TypeContext context = TypeContext(scopes, Symbol{}, *class_tree, symbols);
+  module->typecheck(context);
+
+  std::ostream *tree_output = nullptr;
+  std::fstream tree_file;
+
+  std::ostream *type_output = nullptr;
+  std::fstream type_file;
 
   if (options.debug_output) {
     std::filesystem::create_directories(options.debug_dir);
-    out_file.open(options.debug_dir / "class_tree.log", std::ios::out);
-    output = &out_file;
+    tree_file.open(options.debug_dir / "class_tree.log", std::ios::out);
+    tree_output = &tree_file;
+
+    type_file.open(options.debug_dir / "typed_ast.log", std::ios::out);
+    type_output = &type_file;
   }
 
-  if (output != nullptr) {
-    class_tree->print(output);
+  if (tree_output != nullptr) {
+    class_tree->print(tree_output);
+  }
+
+  if (type_output != nullptr) {
+    AstPrinter printer{2, type_output};
+    module->print(printer, symbols);
   }
 
   return class_tree;
@@ -176,6 +191,8 @@ int main(int argc, char *argv[]) {
 
   std::unique_ptr<ModuleNode> ast = run_parser(tokens, *symbols, options);
 
+  Scopes scopes = Scopes();
+
   std::unique_ptr<ClassTree> class_tree =
-      run_semantic_analysis(ast.get(), *symbols, options);
+      run_semantic_analysis(ast.get(), scopes, *symbols, options);
 }
