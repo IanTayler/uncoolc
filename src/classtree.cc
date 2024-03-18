@@ -280,6 +280,55 @@ ClassTree::common_ancestor(const ClassInfo &class_a,
   return *a_side;
 }
 
+bool ClassTree::is_subclass(ClassIdx node_a, ClassIdx node_b) const {
+  if (node_a >= classes.size())
+    fatal(std::format("Running is_subclass for out of bounds node {}.", node_a),
+          Token{});
+
+  if (node_b >= classes.size())
+    fatal(std::format("Running is_subclass for out of bounds node {}.", node_a),
+          Token{});
+
+  return is_subclass(classes[node_a], classes[node_b]);
+}
+
+bool ClassTree::is_subclass(Symbol name_a, Symbol name_b) const {
+  auto opt_cls_a = get(name_a);
+  if (!opt_cls_a.has_value())
+    fatal(std::format(
+              "INTERNAL: unknown subclass {} in already-checked ClassTree",
+              symbols.get_string(name_a)),
+          Token{});
+
+  auto opt_cls_b = get(name_a);
+  if (!opt_cls_b.has_value())
+    fatal(std::format("INTERNAL: unknown subclass {} passed to is_subclass",
+                      symbols.get_string(name_a)),
+          Token{});
+
+  return is_subclass(opt_cls_a.value(), opt_cls_b.value());
+}
+
+bool ClassTree::is_subclass(const ClassInfo &class_a,
+                            const ClassInfo &class_b) const {
+  if (class_a.name() == class_b.name())
+    return true;
+
+  if (class_a.depth() <= class_b.depth()) {
+    return false;
+  } else {
+    auto opt_superclass_a = get(class_a.superclass());
+    if (!opt_superclass_a.has_value()) {
+      fatal(std::format("INTERNAL: is_subclass: unknown superclass {} in "
+                        "already-checked ClassTree",
+                        symbols.get_string(class_a.superclass())),
+            Token{});
+    }
+
+    return is_subclass(opt_superclass_a.value(), class_b);
+  }
+}
+
 void ClassTree::print(std::ostream *out) {
   AstPrinter printer = AstPrinter(2, out);
 

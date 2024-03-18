@@ -106,6 +106,10 @@ public:
   std::optional<ClassInfo> common_ancestor(const ClassInfo &class_a,
                                            const ClassInfo &class_b) const;
 
+  bool is_subclass(ClassIdx node_a, ClassIdx node_b) const;
+  bool is_subclass(Symbol name_a, Symbol name_b) const;
+  bool is_subclass(const ClassInfo &class_a, const ClassInfo &class_b) const;
+
   void print(std::ostream *out);
 };
 
