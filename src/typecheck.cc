@@ -178,8 +178,46 @@ bool UnaryOpNode::typecheck(const TypeContext &context) {
         start_token);
   return false;
 }
-// TODO(IT) fill in
-bool BinaryOpNode::typecheck(const TypeContext &context) { return true; }
+
+bool BinaryOpNode::typecheck(const TypeContext &context) {
+  const SymbolTable &symbols = context.symbols;
+
+  left->typecheck(context);
+  if (!left->static_type.has_value())
+    fatal("INTERNAL: left child of BinaryOpNode has type unset after checking",
+          start_token);
+
+  right->typecheck(context);
+  if (!right->static_type.has_value())
+    fatal("INTERNAL: right child of BinaryOpNode has type unset after checking",
+          start_token);
+
+  if (op == symbols.add_op || op == symbols.sub_op || op == symbols.mult_op ||
+      op == symbols.div_op) {
+    static_type = symbols.int_type;
+
+    if (left->static_type.value() == symbols.int_type &&
+        right->static_type.value() == symbols.int_type)
+      return true;
+  } else if (op == symbols.eq_op || op == symbols.lt_op ||
+             op == symbols.leq_op) {
+    static_type = symbols.bool_type;
+
+    if (left->static_type.value() == symbols.int_type &&
+        right->static_type.value() == symbols.int_type)
+      return true;
+  } else
+    fatal(std::format("INTERNAL: Unexpected op {} in BinaryOpNode",
+                      symbols.get_string(op)),
+          start_token);
+
+  error(std::format("Unexpected types {} and {} for sides of BinaryOpNode {}",
+                    symbols.get_string(left->static_type.value()),
+                    symbols.get_string(right->static_type.value()),
+                    symbols.get_string(op)),
+        start_token);
+  return false;
+}
 // TODO(IT) fill in
 bool NewNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
