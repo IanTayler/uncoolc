@@ -336,7 +336,7 @@ void ClassTree::print(std::ostream *out) {
 
   printer.enter();
   {
-    for (auto &cls : classes) {
+    for (const auto &cls : classes) {
       printer.print(std::format(
           "{} inherits {}; depth {}", symbols.get_string(cls.name()),
           symbols.get_string(cls.superclass()), cls.depth()));
