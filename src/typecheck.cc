@@ -45,6 +45,12 @@ bool ParameterNode::typecheck(const TypeContext &context) {
 bool MethodNode::typecheck(const TypeContext &context) {
   bool body_check = body->typecheck(context);
 
+  if (!body->static_type.has_value())
+    fatal(std::format(
+              "INTERNAL: method body of {} has unset type after typechecking",
+              context.symbols.get_string(name)),
+          start_token);
+
   Symbol body_type = body->static_type.value();
   if (!context.match(body->static_type.value(), return_type)) {
     error(std::format("Wrong body type {} in method {}, expected {}",
