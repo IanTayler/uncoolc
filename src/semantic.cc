@@ -98,15 +98,16 @@ std::vector<Symbol> ClassInfo::attributes() const {
  *                     *
  **********************/
 
-TypeContext::TypeContext(Scopes scps, Symbol cc, const ClassTree & ct,
-                         SymbolTable & st) : scopes(scps), current_class(cc), tree(ct), symbols(st){}
+TypeContext::TypeContext(Scopes scps, Symbol cc, const ClassTree &ct,
+                         SymbolTable &st)
+    : scopes(scps), current_class(cc), tree(ct), symbols(st) {}
 
-// TODO(IT) take class hierarchies into consideration
 bool TypeContext::match(Symbol type_a, Symbol type_b) const {
-  if (type_a == type_b)
-    return true;
-  if (type_a == symbols.self_type && type_b == current_class)
-    return true;
+  if (type_a == symbols.self_type)
+    type_a = current_class;
 
-  return false;
+  if (type_b == symbols.self_type)
+    type_b = current_class;
+
+  return tree.is_subclass(type_a, type_b);
 }
