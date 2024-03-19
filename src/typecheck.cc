@@ -199,12 +199,29 @@ bool BinaryOpNode::typecheck(const TypeContext &context) {
     if (left->static_type.value() == symbols.int_type &&
         right->static_type.value() == symbols.int_type)
       return true;
-  } else if (op == symbols.eq_op || op == symbols.lt_op ||
-             op == symbols.leq_op) {
+
+  } else if (op == symbols.lt_op || op == symbols.leq_op) {
     static_type = symbols.bool_type;
 
     if (left->static_type.value() == symbols.int_type &&
         right->static_type.value() == symbols.int_type)
+      return true;
+
+  } else if (op == symbols.eq_op) {
+    static_type = symbols.bool_type;
+
+    Symbol left_type = left->static_type.value();
+    Symbol right_type = right->static_type.value();
+
+    bool left_type_conforms =
+        (left_type == symbols.bool_type || left_type == symbols.int_type ||
+         left_type == symbols.string_type);
+
+    bool right_type_conforms =
+        (right_type == symbols.bool_type || right_type == symbols.int_type ||
+         right_type == symbols.string_type);
+
+    if (left_type_conforms && right_type_conforms)
       return true;
   } else
     fatal(std::format("INTERNAL: Unexpected op {} in BinaryOpNode",
@@ -238,8 +255,23 @@ bool DispatchNode::typecheck(const TypeContext &context) { return true; }
  *                     *
  **********************/
 
-// TODO(IT) fill in
-bool BlockNode::typecheck(const TypeContext &context) { return true; }
+bool BlockNode::typecheck(const TypeContext &context) {
+  Symbol last_type;
+  bool check = true;
+
+  for (const auto &expr : expressions) {
+    check = expr->typecheck(context) && check;
+    if (expr->static_type.has_value())
+      last_type = expr->static_type.value();
+    else
+      fatal("INTERNAL: expression in block lacking type after checking",
+            expr->start_token);
+  }
+
+  static_type = last_type;
+  return check;
+}
+
 // TODO(IT) fill in
 bool IfNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
