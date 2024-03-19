@@ -272,8 +272,48 @@ bool BlockNode::typecheck(const TypeContext &context) {
   return check;
 }
 
-// TODO(IT) fill in
-bool IfNode::typecheck(const TypeContext &context) { return true; }
+bool IfNode::typecheck(const TypeContext &context) {
+  condition_expr->typecheck(context);
+  if (!condition_expr->static_type.has_value())
+    fatal("INTERNAL: condition_expr in IfNode has unset type after checking",
+          start_token);
+
+  then_expr->typecheck(context);
+  if (!then_expr->static_type.has_value())
+    fatal("INTERNAL: then_expr in IfNode has unset type after checking",
+          start_token);
+
+  else_expr->typecheck(context);
+  if (!else_expr->static_type.has_value())
+    fatal("INTERNAL: else_expr in IfNode has unset type after checking",
+          start_token);
+
+  if (condition_expr->static_type.value() != context.symbols.bool_type) {
+    error(std::format(
+              "Unexpected type {} in condition for an if statement. "
+              "Conditions should evaluate to Bool",
+              context.symbols.get_string(condition_expr->static_type.value())),
+          condition_expr->start_token);
+    return false;
+  }
+
+  Symbol type_then = then_expr->static_type.value();
+  Symbol type_else = else_expr->static_type.value();
+
+  std::optional<ClassInfo> common_class =
+      context.tree.common_ancestor(type_then, type_else);
+
+  if (!common_class.has_value())
+    fatal(std::format("INTERNAL: failed to get common class for {} and {}: "
+                      "then and else clausses of an if statement respectively",
+                      context.symbols.get_string(type_then),
+                      context.symbols.get_string(type_else)),
+          start_token);
+
+  static_type = common_class.value().name();
+  return true;
+}
+
 // TODO(IT) fill in
 bool WhileNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
