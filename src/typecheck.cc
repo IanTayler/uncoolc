@@ -218,8 +218,15 @@ bool BinaryOpNode::typecheck(const TypeContext &context) {
         start_token);
   return false;
 }
-// TODO(IT) fill in
-bool NewNode::typecheck(const TypeContext &context) { return true; }
+
+bool NewNode::typecheck(const TypeContext &context) {
+  if (created_type == context.symbols.self_type)
+    static_type = context.current_class;
+  else
+    static_type = created_type;
+  return true;
+}
+
 // TODO(IT) fill in
 bool AssignNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
