@@ -379,8 +379,45 @@ bool WhileNode::typecheck(TypeContext &context) {
   return true;
 }
 
-// TODO(IT) fill in
-bool LetNode::typecheck(TypeContext &context) { return true; }
+bool LetNode::typecheck(TypeContext &context) {
+  bool check = true;
+
+  for (const auto &declaration : declarations) {
+
+    if (declaration->initializer.has_value()) {
+      auto &initializer = declaration->initializer.value();
+
+      check = check && initializer->typecheck(context);
+
+      if (!initializer->static_type.has_value())
+        fatal("INTERNAL: Initializer in LetNode has unset type after checking",
+              initializer->start_token);
+
+      if (!context.match(initializer->static_type.value(),
+                         declaration->declared_type)) {
+        error(std::format(
+                  "Unexpected type of initializer in let statement. {} does "
+                  "not match {}",
+                  context.symbols.get_string(initializer->static_type.value()),
+                  context.symbols.get_string(declaration->declared_type)),
+              initializer->start_token);
+        check = false;
+      }
+    }
+
+    context.scopes.assign(declaration->object_id, declaration->declared_type);
+  }
+
+  check = check && body_expr->typecheck(context);
+
+  if (!body_expr->static_type.has_value())
+    fatal("INTERNAL: Body in LetNode has unset type after checking",
+          body_expr->start_token);
+
+  static_type = body_expr->static_type;
+
+  return check;
+}
 // TODO(IT) fill in
 bool CaseBranchNode::typecheck(TypeContext &context) { return true; }
 // TODO(IT) fill in
