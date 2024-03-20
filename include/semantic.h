@@ -110,6 +110,9 @@ public:
   bool is_subclass(Symbol name_a, Symbol name_b) const;
   bool is_subclass(const ClassInfo &class_a, const ClassInfo &class_b) const;
 
+  MethodNode *get_method(Symbol class_name, Symbol method_name) const;
+  AttributeNode *get_attribute(Symbol class_name, Symbol attribute_name) const;
+
   void print(std::ostream *out);
 };
 

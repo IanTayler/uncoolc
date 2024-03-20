@@ -329,6 +329,49 @@ bool ClassTree::is_subclass(const ClassInfo &class_a,
   }
 }
 
+MethodNode *ClassTree::get_method(Symbol class_name, Symbol method_name) const {
+  while (class_name != symbols.tree_root_type) {
+    std::optional<ClassInfo> cls = get(class_name);
+
+    if (!cls.has_value())
+      fatal(std::format(
+                "INTERNAL: undefined class {} in hierarchy after checking",
+                symbols.get_string(class_name)),
+            Token{});
+
+    MethodNode *cls_method = cls.value().method(method_name);
+
+    if (cls_method)
+      return cls_method;
+
+    class_name = cls.value().superclass();
+  }
+
+  return nullptr;
+}
+
+AttributeNode *ClassTree::get_attribute(Symbol class_name,
+                                        Symbol attribute_name) const {
+  while (class_name != symbols.tree_root_type) {
+    std::optional<ClassInfo> cls = get(class_name);
+
+    if (!cls.has_value())
+      fatal(std::format(
+                "INTERNAL: undefined class {} in hierarchy after checking",
+                symbols.get_string(class_name)),
+            Token{});
+
+    AttributeNode *cls_attribute = cls.value().attribute(attribute_name);
+
+    if (cls_attribute)
+      return cls_attribute;
+
+    class_name = cls.value().superclass();
+  }
+
+  return nullptr;
+}
+
 void ClassTree::print(std::ostream *out) {
   AstPrinter printer = AstPrinter(2, out);
 
