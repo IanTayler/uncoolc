@@ -54,6 +54,17 @@ ClassTree::ClassTree(ModuleNode *module, SymbolTable &symbs) : symbols(symbs) {
 
     add_class(class_node, depth);
   }
+
+  // As a last step, check all classes were added. If not, this indicates
+  // a cycle in the graph
+  for (const auto &cls : module->classes) {
+
+    if (!exists(cls->name))
+      fatal(std::format("Defined class {} is unreachable from Object. This "
+                        "indicates a cycle in the inheritance graph.",
+                        symbols.get_string(cls->name)),
+            cls->start_token);
+  }
 }
 
 std::unordered_map<int, ClassNode *>
