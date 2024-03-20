@@ -160,10 +160,10 @@ bool VariableNode::typecheck(TypeContext &context) {
   Symbol variable_type = context.scopes.get(name);
 
   if (variable_type.is_empty()) {
-    error(
-        std::format("Undefined variable {}", context.symbols.get_string(name)),
-        start_token);
-    return false;
+    fatal(std::format("Undefined variable {}. Cannot set type",
+                      context.symbols.get_string(name)),
+          start_token);
+    return false; // fool linter
   }
 
   static_type = variable_type;
