@@ -83,8 +83,9 @@ public:
 typedef std::unique_ptr<ExpressionNode> ExpressionPtr;
 
 class AttributeNode : public AstNode {
-  private:
+private:
   bool typecheck_inheritance(const TypeContext &) const;
+
 public:
   AttributeNode(Symbol v, Symbol ty, Token st)
       : object_id(v), declared_type(ty), AstNode(st) {}
@@ -390,12 +391,11 @@ public:
 };
 
 class CaseBranchNode : public ExpressionNode {
-private:
+public:
   Symbol object_id;
   Symbol declared_type;
   ExpressionPtr body_expr;
 
-public:
   CaseBranchNode(Symbol o, Symbol t, ExpressionPtr b, Token s)
       : object_id(o), declared_type(t), body_expr(std::move(b)),
         ExpressionNode(s) {}
