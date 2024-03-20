@@ -300,7 +300,7 @@ bool ClassTree::is_subclass(Symbol name_a, Symbol name_b) const {
               symbols.get_string(name_a)),
           Token{});
 
-  auto opt_cls_b = get(name_a);
+  auto opt_cls_b = get(name_b);
   if (!opt_cls_b.has_value())
     fatal(std::format("INTERNAL: unknown subclass {} passed to is_subclass",
                       symbols.get_string(name_a)),
