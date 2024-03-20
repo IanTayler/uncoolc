@@ -293,8 +293,11 @@ bool DispatchNode::typecheck(TypeContext &context) {
 
     target_type = target->static_type.value();
   } else {
-    target_type = context.current_class;
+    target_type = symbols.self_type;
   }
+
+  if (dispatch_type.has_value())
+    target_type = dispatch_type.value();
 
   MethodNode *method_ptr = context.tree.get_method(target_type, method);
 
