@@ -287,8 +287,71 @@ bool AssignNode::typecheck(TypeContext &context) {
   return true;
 }
 
-// TODO(IT) fill in
-bool DispatchNode::typecheck(TypeContext &context) { return true; }
+bool DispatchNode::typecheck(TypeContext &context) {
+  const auto &symbols = context.symbols;
+
+  Symbol target_type;
+  if (target) {
+    target->typecheck(context);
+
+    if (!target->static_type.has_value())
+      fatal("INTERNAL: target in dispatch has unset type after checking",
+            start_token);
+
+    target_type = target->static_type.value();
+  } else {
+    target_type = context.current_class;
+  }
+
+  MethodNode *method_ptr = context.tree.get_method(target_type, method);
+
+  if (!method_ptr) {
+    error(std::format("Call to undefined method {}.{}",
+                      symbols.get_string(target_type),
+                      symbols.get_string(method)),
+          start_token);
+    return false;
+  }
+
+  static_type = method_ptr->return_type;
+
+  if (method_ptr->parameters.size() != arguments.size()) {
+    error(std::format("Wrong number of arguments in dispatch to {}.{}: "
+                      "expected {} but got {}",
+                      symbols.get_string(target_type),
+                      symbols.get_string(method), method_ptr->parameters.size(),
+                      arguments.size()),
+          start_token);
+
+    return false;
+  }
+
+  bool check = true;
+
+  for (int i = 0; i < arguments.size(); i++) {
+    auto &arg = arguments[i];
+    auto &param = method_ptr->parameters[i];
+
+    check = check && arg->typecheck(context);
+
+    if (!arg->static_type.has_value())
+      fatal("INTERNAL: argument in dispatch has unset type after checking",
+            arg->start_token);
+
+    if (!context.match(arg->static_type.value(), param->declared_type)) {
+      error(std::format("Argument type {} does not match parameter declared "
+                        "type {} in method {}.{}",
+                        symbols.get_string(arg->static_type.value()),
+                        symbols.get_string(param->declared_type),
+                        symbols.get_string(target_type),
+                        symbols.get_string(method)),
+            arg->start_token);
+      check = false;
+    }
+  }
+
+  return check;
+}
 
 /***********************
  *                     *
