@@ -121,6 +121,7 @@ void LiteralNode::print(AstPrinter printer, const SymbolTable &symbols) {
 
 void VariableNode::print(AstPrinter printer, const SymbolTable &symbols) {
   printer.print(std::format("Variable {}", symbols.get_string(name)));
+  print_type(printer, symbols);
 }
 
 void NewNode::print(AstPrinter printer, const SymbolTable &symbols) {
