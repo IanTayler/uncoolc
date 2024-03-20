@@ -98,7 +98,7 @@ std::vector<Symbol> ClassInfo::attributes() const {
  *                     *
  **********************/
 
-TypeContext::TypeContext(Scopes scps, Symbol cc, const ClassTree &ct,
+TypeContext::TypeContext(Scopes &scps, Symbol cc, const ClassTree &ct,
                          SymbolTable &st)
     : scopes(scps), current_class(cc), tree(ct), symbols(st) {}
 

@@ -124,9 +124,9 @@ public:
 
 class TypeContext {
 public:
-  TypeContext(Scopes, Symbol current_class, const ClassTree &, SymbolTable &);
+  TypeContext(Scopes &, Symbol current_class, const ClassTree &, SymbolTable &);
 
-  Scopes scopes;
+  Scopes &scopes;
   Symbol current_class;
   const ClassTree &tree;
   SymbolTable &symbols;
