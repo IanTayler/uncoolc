@@ -314,8 +314,30 @@ bool IfNode::typecheck(const TypeContext &context) {
   return true;
 }
 
-// TODO(IT) fill in
-bool WhileNode::typecheck(const TypeContext &context) { return true; }
+bool WhileNode::typecheck(const TypeContext &context) {
+  static_type = context.symbols.object_type;
+
+  condition_expr->typecheck(context);
+  if (!condition_expr->static_type.has_value())
+    fatal("INTERNAL: condition_expr in IfNode has unset type after checking",
+          start_token);
+
+  body_expr->typecheck(context);
+  if (!body_expr->static_type.has_value())
+    fatal("INTERNAL: body_expr in IfNode has unset type after checking",
+          start_token);
+
+  if (condition_expr->static_type.value() != context.symbols.bool_type) {
+    error(std::format(
+              "Unexpected type {} in condition for a while statement. "
+              "Conditions should evaluate to Bool",
+              context.symbols.get_string(condition_expr->static_type.value())),
+          condition_expr->start_token);
+    return false;
+  }
+  return true;
+}
+
 // TODO(IT) fill in
 bool LetNode::typecheck(const TypeContext &context) { return true; }
 // TODO(IT) fill in
