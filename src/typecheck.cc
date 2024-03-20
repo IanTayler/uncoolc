@@ -489,10 +489,67 @@ bool LetNode::typecheck(TypeContext &context) {
 
   return check;
 }
-// TODO(IT) fill in
-bool CaseBranchNode::typecheck(TypeContext &context) { return true; }
-// TODO(IT) fill in
-bool CaseNode::typecheck(TypeContext &context) { return true; }
+
+bool CaseBranchNode::typecheck(TypeContext &context) {
+  context.scopes.enter();
+  context.scopes.assign(object_id, declared_type);
+
+  bool check = body_expr->typecheck(context);
+  context.scopes.exit();
+
+  if (!body_expr->static_type.has_value())
+    fatal("INTERNAL: Case branch body static_type is not set after calling "
+          "typecheck",
+          start_token);
+
+  static_type = body_expr->static_type.value();
+  return check;
+}
+
+bool CaseNode::typecheck(TypeContext &context) {
+  bool check = true;
+
+  std::unordered_set<int> seen_types;
+  Symbol common_type;
+
+  for (const auto &branch : branches) {
+    if (seen_types.count(branch->declared_type.id) > 0) {
+      error(std::format("Repeated type {} in case statement. Each type should "
+                        "only be in one branch",
+                        context.symbols.get_string(branch->declared_type)),
+            branch->start_token);
+      check = false;
+    }
+
+    seen_types.insert(branch->declared_type.id);
+
+    check = branch->typecheck(context) && check;
+
+    if (!branch->static_type.has_value())
+      fatal("INTERNAL: Case branch static_type is not set after calling "
+            "typecheck",
+            branch->start_token);
+
+    if (common_type.is_empty()) {
+      common_type = branch->static_type.value();
+
+    } else {
+      std::optional<ClassInfo> opt_common_type = context.tree.common_ancestor(
+          branch->static_type.value(), common_type);
+
+      if (!opt_common_type.has_value())
+        fatal("INTERNAL: failed to find ancestor for branch cases after "
+              "hierarchy has been checked ",
+              start_token);
+
+      common_type = opt_common_type.value().name();
+    }
+  }
+
+  static_type = common_type;
+
+  return check;
+}
 
 /***********************
  *                     *
