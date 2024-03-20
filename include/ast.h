@@ -61,7 +61,7 @@ public:
   virtual void print(AstPrinter printer, const SymbolTable &symbols);
   /// Will typecheck and annotate the type of Expressions. Returns whether types
   /// are consistent.
-  virtual bool typecheck(const TypeContext &) = 0;
+  virtual bool typecheck(TypeContext &) = 0;
   // TODO(IT): will need to add generate_ir as a virtual method
 };
 
@@ -73,7 +73,7 @@ public:
   virtual void print(AstPrinter printer, const SymbolTable &symbols) override;
   void print_type(AstPrinter printer, const SymbolTable &symbols);
 
-  virtual bool typecheck(const TypeContext &) override;
+  virtual bool typecheck(TypeContext &) override;
 
   virtual int arity();
   virtual ChildSide child_side();
@@ -97,7 +97,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class ParameterNode : public AstNode {
@@ -110,7 +110,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class MethodNode : public AstNode {
@@ -129,7 +129,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class ClassNode : public AstNode {
@@ -144,7 +144,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class ModuleNode : public AstNode {
@@ -155,7 +155,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 /***********************
@@ -175,7 +175,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class LiteralNode : public ExpressionNode {
@@ -187,7 +187,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class VariableNode : public ExpressionNode {
@@ -199,7 +199,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 /***********************
@@ -217,7 +217,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
@@ -239,7 +239,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
@@ -260,7 +260,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class AssignNode : public ExpressionNode {
@@ -277,7 +277,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class DispatchNode : public ExpressionNode {
@@ -309,7 +309,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 /***********************
@@ -327,7 +327,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 
   void add_expression(ExpressionPtr expr) {
     expressions.push_back(std::move(expr));
@@ -347,7 +347,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class WhileNode : public ExpressionNode {
@@ -362,7 +362,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class LetNode : public ExpressionNode {
@@ -375,7 +375,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 
   void add_declaration(std::unique_ptr<AttributeNode> attr) {
     declarations.push_back(std::move(attr));
@@ -397,7 +397,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 };
 
 class CaseNode : public ExpressionNode {
@@ -411,7 +411,7 @@ public:
 
   void print(AstPrinter printer, const SymbolTable &symbols) override;
 
-  bool typecheck(const TypeContext &) override;
+  bool typecheck(TypeContext &) override;
 
   void add_branch(std::unique_ptr<CaseBranchNode> branch) {
     branches.push_back(std::move(branch));
