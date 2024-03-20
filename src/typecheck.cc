@@ -43,7 +43,31 @@ bool ParameterNode::typecheck(TypeContext &context) {
 }
 
 bool MethodNode::typecheck(TypeContext &context) {
+  std::optional<ClassInfo> cls = context.tree.get(context.current_class);
+  if (!cls.has_value())
+    fatal(
+        std::format("INTERNAL: clould not find class marked as current_class {}"
+                    "in class tree inside MethodNode",
+                    context.symbols.get_string(context.current_class)),
+        start_token);
+
+  MethodNode *method = cls->method(name);
+  if (method == nullptr)
+    fatal(std::format("INTERNAL: clould not find method {} in class {}"
+                      "inside MethodNode.",
+                      context.symbols.get_string(name),
+                      context.symbols.get_string(context.current_class)),
+          start_token);
+
+  context.scopes.enter();
+
+  for (const auto &param : method->parameters) {
+    context.scopes.assign(param->object_id, param->declared_type);
+  }
+
   bool body_check = body->typecheck(context);
+
+  context.scopes.exit();
 
   if (!body->static_type.has_value())
     fatal(std::format(
@@ -65,13 +89,19 @@ bool MethodNode::typecheck(TypeContext &context) {
 
 bool ClassNode::typecheck(TypeContext &context) {
   bool check = true;
+
+  context.scopes.enter();
+
+  for (const auto &attribute : attributes) {
+    check = check && attribute->typecheck(context);
+    context.scopes.assign(attribute->object_id, attribute->declared_type);
+  }
+
   for (const auto &method : methods) {
     check = check && method->typecheck(context);
   }
 
-  for (const auto &attribute : attributes) {
-    check = check && attribute->typecheck(context);
-  }
+  context.scopes.exit();
 
   return check;
 }
