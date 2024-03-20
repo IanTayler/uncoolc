@@ -274,8 +274,19 @@ bool NewNode::typecheck(TypeContext &context) {
   return true;
 }
 
-// TODO(IT) fill in
-bool AssignNode::typecheck(TypeContext &context) { return true; }
+bool AssignNode::typecheck(TypeContext &context) {
+  Symbol variable_type = context.scopes.get(variable);
+  if (variable_type.is_empty()) {
+    error(std::format("Undefined variable {}",
+                      context.symbols.get_string(variable)),
+          start_token);
+    return false;
+  }
+
+  static_type = variable_type;
+  return true;
+}
+
 // TODO(IT) fill in
 bool DispatchNode::typecheck(TypeContext &context) { return true; }
 
