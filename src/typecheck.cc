@@ -16,11 +16,13 @@ bool ExpressionNode::typecheck(TypeContext &context) {
 }
 
 bool AttributeNode::typecheck(TypeContext &context) {
+  bool check = typecheck_inheritance(context);
+
   if (!initializer.has_value()) {
-    return true;
+    return check;
   };
 
-  bool init_check = initializer.value()->typecheck(context);
+  check = initializer.value()->typecheck(context) && check;
   if (!initializer.value()->static_type.has_value()) {
     fatal("INTERNAL: Expression static_type is not set after calling "
           "typecheck",
@@ -30,10 +32,10 @@ bool AttributeNode::typecheck(TypeContext &context) {
 
   if (!context.match(initializer.value()->static_type.value(), declared_type)) {
     error("Initializer type does not match declared type", start_token);
-    return false;
+    check = false;
   }
 
-  return init_check;
+  return check;
 }
 
 bool ParameterNode::typecheck(TypeContext &context) {
@@ -43,29 +45,17 @@ bool ParameterNode::typecheck(TypeContext &context) {
 }
 
 bool MethodNode::typecheck(TypeContext &context) {
-  std::optional<ClassInfo> cls = context.tree.get(context.current_class);
-  if (!cls.has_value())
-    fatal(
-        std::format("INTERNAL: clould not find class marked as current_class {}"
-                    "in class tree inside MethodNode",
-                    context.symbols.get_string(context.current_class)),
-        start_token);
-
-  MethodNode *method = cls->method(name);
-  if (method == nullptr)
-    fatal(std::format("INTERNAL: clould not find method {} in class {}"
-                      "inside MethodNode.",
-                      context.symbols.get_string(name),
-                      context.symbols.get_string(context.current_class)),
-          start_token);
+  // Check we have not already defined this method in a superclass with a
+  // different signature
+  bool check = typecheck_inheritance(context);
 
   context.scopes.enter();
 
-  for (const auto &param : method->parameters) {
+  for (const auto &param : parameters) {
     context.scopes.assign(param->object_id, param->declared_type);
   }
 
-  bool body_check = body->typecheck(context);
+  check = body->typecheck(context) && check;
 
   context.scopes.exit();
 
@@ -84,7 +74,8 @@ bool MethodNode::typecheck(TypeContext &context) {
           start_token);
     return false;
   }
-  return body_check;
+
+  return check;
 }
 
 bool ClassNode::typecheck(TypeContext &context) {
@@ -487,3 +478,95 @@ bool LetNode::typecheck(TypeContext &context) {
 bool CaseBranchNode::typecheck(TypeContext &context) { return true; }
 // TODO(IT) fill in
 bool CaseNode::typecheck(TypeContext &context) { return true; }
+
+/***********************
+ *                     *
+ * Inheritance Checks  *
+ *                     *
+ **********************/
+
+bool MethodNode::typecheck_inheritance(const TypeContext &context) const {
+  std::optional<ClassInfo> cls = context.tree.get(context.current_class);
+  if (!cls.has_value())
+    fatal(
+        std::format("INTERNAL: clould not find class marked as current_class {}"
+                    "in class tree inside MethodNode",
+                    context.symbols.get_string(context.current_class)),
+        start_token);
+
+  const SymbolTable &symbols = context.symbols;
+
+  bool check = true;
+
+  Symbol superclass_name = cls->superclass();
+  MethodNode *inherited_method = context.tree.get_method(superclass_name, name);
+  if (inherited_method) {
+    if (inherited_method->return_type != return_type) {
+      error(std::format("Method {}.{} has return type {} but redefines an "
+                        "inherited method with return type {}",
+                        symbols.get_string(context.current_class),
+                        symbols.get_string(name),
+                        symbols.get_string(return_type),
+                        symbols.get_string(inherited_method->return_type)),
+            start_token);
+      check = false;
+    }
+
+    else if (parameters.size() != inherited_method->parameters.size()) {
+      error(std::format("Method {}.{} has {} parameters but redefines an "
+                        "inherited method with {} parameters",
+                        symbols.get_string(context.current_class),
+                        symbols.get_string(name), parameters.size(),
+                        inherited_method->parameters.size()),
+            start_token);
+      check = false;
+    } else {
+      for (int i = 0; i < parameters.size(); i++) {
+        const auto &param = parameters[i];
+        const auto &inherited_param = inherited_method->parameters[i];
+        if (param->declared_type != inherited_param->declared_type) {
+          error(std::format("Method {}.{}'s parameter number {} is declared as "
+                            "{} but it redefines an inherited method in which "
+                            "that parameter is declared as {} ",
+                            symbols.get_string(context.current_class),
+                            symbols.get_string(name), i,
+                            symbols.get_string(param->declared_type),
+                            symbols.get_string(inherited_param->declared_type)),
+                start_token);
+          check = false;
+        }
+      }
+    }
+  }
+
+  return check;
+}
+
+bool AttributeNode::typecheck_inheritance(const TypeContext &context) const {
+  std::optional<ClassInfo> cls = context.tree.get(context.current_class);
+  if (!cls.has_value())
+    fatal(
+        std::format("INTERNAL: clould not find class marked as current_class {}"
+                    "in class tree inside MethodNode",
+                    context.symbols.get_string(context.current_class)),
+        start_token);
+
+  const SymbolTable &symbols = context.symbols;
+
+  Symbol superclass_name = cls->superclass();
+  AttributeNode *inherited_attribute =
+      context.tree.get_attribute(superclass_name, object_id);
+
+  if (inherited_attribute &&
+      inherited_attribute->declared_type != declared_type) {
+    error(std::format("Attribute {}.{} is declared type {} but inherits from a "
+                      "class that declared it as {}",
+                      symbols.get_string(cls->name()),
+                      symbols.get_string(object_id),
+                      symbols.get_string(declared_type),
+                      symbols.get_string(inherited_attribute->declared_type)),
+          start_token);
+    return false;
+  }
+  return true;
+}

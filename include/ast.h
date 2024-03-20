@@ -83,6 +83,8 @@ public:
 typedef std::unique_ptr<ExpressionNode> ExpressionPtr;
 
 class AttributeNode : public AstNode {
+  private:
+  bool typecheck_inheritance(const TypeContext &) const;
 public:
   AttributeNode(Symbol v, Symbol ty, Token st)
       : object_id(v), declared_type(ty), AstNode(st) {}
@@ -114,6 +116,9 @@ public:
 };
 
 class MethodNode : public AstNode {
+private:
+  bool typecheck_inheritance(const TypeContext &) const;
+
 public:
   MethodNode(Symbol n, Symbol rt,
              std::vector<std::unique_ptr<ParameterNode>> ps, ExpressionPtr b,
