@@ -5,6 +5,7 @@
 #include <string>
 
 #include "ast.h"
+#include "error.h"
 #include "parser.h"
 #include "semantic.h"
 #include "symbol.h"
@@ -121,7 +122,7 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
       std::make_unique<ClassTree>(module, symbols);
 
   TypeContext context = TypeContext(scopes, Symbol{}, *class_tree, symbols);
-  module->typecheck(context);
+  bool check = module->typecheck(context);
 
   std::ostream *tree_output = nullptr;
   std::fstream tree_file;
@@ -146,6 +147,9 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
     AstPrinter printer{2, type_output};
     module->print(printer, symbols);
   }
+
+  if (!check)
+    fatal("Semantic analysis failed. Aborting compilation.", Token{});
 
   return class_tree;
 }
