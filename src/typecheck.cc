@@ -92,6 +92,8 @@ bool ClassNode::typecheck(TypeContext &context) {
 
   context.scopes.enter();
 
+  context.assign_attributes(superclass);
+
   for (const auto &attribute : attributes) {
     check = check && attribute->typecheck(context);
     context.scopes.assign(attribute->object_id, attribute->declared_type);
