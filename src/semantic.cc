@@ -1,4 +1,6 @@
 #include "semantic.h"
+#include "error.h"
+#include <format>
 #include <stdexcept>
 
 /***********************
@@ -110,4 +112,30 @@ bool TypeContext::match(Symbol type_a, Symbol type_b) const {
     type_b = current_class;
 
   return tree.is_subclass(type_a, type_b);
+}
+void TypeContext::assign_attributes(Symbol class_name) {
+  while (class_name != symbols.tree_root_type) {
+    std::optional<ClassInfo> cls = tree.get(class_name);
+    if (!cls.has_value())
+      fatal(
+          std::format(
+              "INTERNAL: class {} could not be found in ClassTree after checks",
+              symbols.get_string(class_name)),
+          Token{});
+
+    for (const Symbol attr : cls->attributes()) {
+      AttributeNode *attr_ptr = cls->attribute(attr);
+
+      if (!attr_ptr)
+        fatal(std::format("INTERNAL: attribute {}.{} could not be found but it "
+                          "is declared in the AST",
+                          symbols.get_string(class_name),
+                          symbols.get_string(attr)),
+              Token{});
+
+      scopes.assign(attr, attr_ptr->declared_type);
+    }
+
+    class_name = cls->superclass();
+  }
 }

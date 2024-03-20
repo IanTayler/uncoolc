@@ -132,6 +132,8 @@ public:
   SymbolTable &symbols;
 
   bool match(Symbol type_a, Symbol type_b) const;
+
+  void assign_attributes(Symbol class_name);
 };
 
 #endif
