@@ -86,12 +86,12 @@ bool ClassNode::typecheck(TypeContext &context) {
   context.assign_attributes(superclass);
 
   for (const auto &attribute : attributes) {
-    check = check && attribute->typecheck(context);
+    check = attribute->typecheck(context) && check;
     context.scopes.assign(attribute->object_id, attribute->declared_type);
   }
 
   for (const auto &method : methods) {
-    check = check && method->typecheck(context);
+    check = method->typecheck(context) && check;
   }
 
   context.scopes.exit();
@@ -104,7 +104,7 @@ bool ModuleNode::typecheck(TypeContext &context) {
   for (const auto &class_node : classes) {
     TypeContext class_context = context;
     class_context.current_class = class_node->name;
-    check = check && class_node->typecheck(class_context);
+    check = class_node->typecheck(class_context) && check;
   }
 
   return check;
@@ -325,7 +325,7 @@ bool DispatchNode::typecheck(TypeContext &context) {
     auto &arg = arguments[i];
     auto &param = method_ptr->parameters[i];
 
-    check = check && arg->typecheck(context);
+    check = arg->typecheck(context) && check;
 
     if (!arg->static_type.has_value())
       fatal("INTERNAL: argument in dispatch has unset type after checking",
@@ -443,7 +443,7 @@ bool LetNode::typecheck(TypeContext &context) {
     if (declaration->initializer.has_value()) {
       auto &initializer = declaration->initializer.value();
 
-      check = check && initializer->typecheck(context);
+      check = initializer->typecheck(context) && check;
 
       if (!initializer->static_type.has_value())
         fatal("INTERNAL: Initializer in LetNode has unset type after checking",
@@ -464,7 +464,7 @@ bool LetNode::typecheck(TypeContext &context) {
     context.scopes.assign(declaration->object_id, declaration->declared_type);
   }
 
-  check = check && body_expr->typecheck(context);
+  check = body_expr->typecheck(context) && check;
 
   if (!body_expr->static_type.has_value())
     fatal("INTERNAL: Body in LetNode has unset type after checking",
