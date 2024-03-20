@@ -1,6 +1,7 @@
 #include "error.h"
 #include "semantic.h"
 #include <format>
+#include <unordered_set>
 
 /***********************
  *                     *
@@ -268,16 +269,24 @@ bool NewNode::typecheck(TypeContext &context) {
 }
 
 bool AssignNode::typecheck(TypeContext &context) {
+
+  bool check = expression->typecheck(context);
+  if (!expression->static_type.has_value())
+    fatal("INTERNAL: expression in assignment has unset type after checking",
+          start_token);
+
+  static_type = expression->static_type.value();
+
   Symbol variable_type = context.scopes.get(variable);
+
   if (variable_type.is_empty()) {
     error(std::format("Undefined variable {}",
                       context.symbols.get_string(variable)),
           start_token);
-    return false;
+    check = false;
   }
 
-  static_type = variable_type;
-  return true;
+  return check;
 }
 
 bool DispatchNode::typecheck(TypeContext &context) {
