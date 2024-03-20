@@ -345,10 +345,7 @@ MethodNode *ClassTree::get_method(Symbol class_name, Symbol method_name) const {
     std::optional<ClassInfo> cls = get(class_name);
 
     if (!cls.has_value())
-      fatal(std::format(
-                "INTERNAL: undefined class {} in hierarchy after checking",
-                symbols.get_string(class_name)),
-            Token{});
+      return nullptr;
 
     MethodNode *cls_method = cls.value().method(method_name);
 
@@ -367,10 +364,7 @@ AttributeNode *ClassTree::get_attribute(Symbol class_name,
     std::optional<ClassInfo> cls = get(class_name);
 
     if (!cls.has_value())
-      fatal(std::format(
-                "INTERNAL: undefined class {} in hierarchy after checking",
-                symbols.get_string(class_name)),
-            Token{});
+      return nullptr;
 
     AttributeNode *cls_attribute = cls.value().attribute(attribute_name);
 
