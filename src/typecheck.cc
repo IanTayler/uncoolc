@@ -308,7 +308,10 @@ bool DispatchNode::typecheck(TypeContext &context) {
   if (dispatch_type.has_value())
     target_type = dispatch_type.value();
 
-  MethodNode *method_ptr = context.tree.get_method(target_type, method);
+  Symbol parsed_target_type =
+      target_type == symbols.self_type ? context.current_class : target_type;
+
+  MethodNode *method_ptr = context.tree.get_method(parsed_target_type, method);
 
   if (!method_ptr) {
     error(std::format("Call to undefined method {}.{}",
