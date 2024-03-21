@@ -179,7 +179,8 @@ int main(int argc, char *argv[]) {
 
     else if (arg != "-") {
       input_file.open(arg, std::ios::in);
-      debug_dir /= arg;
+
+      debug_dir /= std::filesystem::path(arg).filename();
       stream = &input_file;
     }
 
