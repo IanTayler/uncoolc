@@ -101,7 +101,7 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
   }
 
   if (output != nullptr) {
-    AstPrinter printer{2, output};
+    Printer printer{2, output};
     node->print(printer, symbols);
   }
 
@@ -144,7 +144,7 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
   }
 
   if (type_output != nullptr) {
-    AstPrinter printer{2, type_output};
+    Printer printer{2, type_output};
     module->print(printer, symbols);
   }
 

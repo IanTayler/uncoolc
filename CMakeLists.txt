@@ -18,6 +18,7 @@ add_executable(coolc
   src/semantic.cc
   src/typecheck.cc
   src/classtree.cc
+  src/printer.cc
 )
 target_include_directories(coolc
   PUBLIC
@@ -37,6 +38,7 @@ add_executable(tests
   src/semantic.cc
   src/typecheck.cc
   src/classtree.cc
+  src/printer.cc
 )
 target_include_directories(tests
   PUBLIC

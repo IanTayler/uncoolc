@@ -378,7 +378,7 @@ AttributeNode *ClassTree::get_attribute(Symbol class_name,
 }
 
 void ClassTree::print(std::ostream *out) {
-  AstPrinter printer = AstPrinter(2, out);
+  Printer printer = Printer(2, out);
 
   printer.print("ClassTree");
 

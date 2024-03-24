@@ -1,36 +1,11 @@
 #ifndef _AST_H
 #define _AST_H
 
+#include "printer.h"
 #include "symbol.h"
 #include "token.h"
-#include <iostream>
 #include <optional>
 #include <vector>
-
-/***********************
- *                     *
- *     PrettyPrint     *
- *                     *
- **********************/
-
-class AstPrinter {
-private:
-  int current_depth;
-  unsigned int indent;
-  std::ostream *out;
-
-public:
-  AstPrinter() : AstPrinter(2, &std::cout){};
-
-  AstPrinter(unsigned int i, std::ostream *o)
-      : current_depth(0), indent(i), out(o){};
-
-  void print(std::string str);
-
-  void enter();
-
-  void exit();
-};
 
 /***********************
  *                     *
@@ -58,7 +33,7 @@ public:
   AstNode(Token st) : start_token(st) {}
   Token start_token;
 
-  virtual void print(AstPrinter printer, const SymbolTable &symbols);
+  virtual void print(Printer printer, const SymbolTable &symbols);
   /// Will typecheck and annotate the type of Expressions. Returns whether types
   /// are consistent.
   virtual bool typecheck(TypeContext &) = 0;
@@ -70,8 +45,8 @@ public:
   ExpressionNode(Token st) : AstNode(st) {}
   std::optional<Symbol> static_type;
 
-  virtual void print(AstPrinter printer, const SymbolTable &symbols) override;
-  void print_type(AstPrinter printer, const SymbolTable &symbols);
+  virtual void print(Printer printer, const SymbolTable &symbols) override;
+  void print_type(Printer printer, const SymbolTable &symbols);
 
   virtual bool typecheck(TypeContext &) override;
 
@@ -98,7 +73,7 @@ public:
   Symbol declared_type;
   std::optional<ExpressionPtr> initializer;
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -111,7 +86,7 @@ public:
   Symbol object_id;
   Symbol declared_type;
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -133,7 +108,7 @@ public:
   std::vector<std::unique_ptr<ParameterNode>> parameters;
   ExpressionPtr body;
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -148,7 +123,7 @@ public:
   std::vector<std::unique_ptr<AttributeNode>> attributes;
   std::vector<std::unique_ptr<MethodNode>> methods;
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -159,7 +134,7 @@ public:
 
   std::vector<std::unique_ptr<ClassNode>> classes;
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -179,7 +154,7 @@ public:
   BuiltinNode(Symbol cn, Symbol mn)
       : class_name(cn), method_name(mn), ExpressionNode(Token{}) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -191,7 +166,7 @@ private:
 public:
   LiteralNode(Token t) : value(t.symbol()), ExpressionNode(t) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -203,7 +178,7 @@ private:
 public:
   VariableNode(Token t) : name(t.symbol()), ExpressionNode(t) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -221,7 +196,7 @@ public:
   UnaryOpNode(ExpressionPtr ch, Token st)
       : op(st.symbol()), child(std::move(ch)), ExpressionNode(st) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 
@@ -243,7 +218,7 @@ public:
       : left(std::move(l)), op(st.symbol()), right(std::move(r)),
         ExpressionNode(st) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 
@@ -264,7 +239,7 @@ private:
 public:
   NewNode(Symbol c, Token s) : created_type(c), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -281,7 +256,7 @@ public:
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
   virtual ChildSide child_side() override;
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -313,7 +288,7 @@ public:
   void set_target_to_self() { target_self = true; }
   bool has_self_target() { return target_self; }
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -331,7 +306,7 @@ private:
 public:
   BlockNode(Token s) : ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 
@@ -351,7 +326,7 @@ public:
       : condition_expr(std::move(c)), then_expr(std::move(t)),
         else_expr(std::move(e)), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -366,7 +341,7 @@ public:
       : condition_expr(std::move(c)), body_expr(std::move(b)),
         ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -379,7 +354,7 @@ private:
 public:
   LetNode(Token s) : body_expr(nullptr), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 
@@ -400,7 +375,7 @@ public:
       : object_id(o), declared_type(t), body_expr(std::move(b)),
         ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 };
@@ -414,7 +389,7 @@ public:
   CaseNode(ExpressionPtr e, Token s)
       : eval_expr(std::move(e)), ExpressionNode(s) {}
 
-  void print(AstPrinter printer, const SymbolTable &symbols) override;
+  void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
 

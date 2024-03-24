@@ -75,7 +75,7 @@ bool is_expression_end(TokenType type) {
 
 void dump_node_stack(std::vector<ExpressionPtr> &node_stack,
                      const SymbolTable &symbols) {
-  AstPrinter printer{2, &std::cerr};
+  Printer printer{2, &std::cerr};
   printer.print("-- node_stack dump --");
 
   for (auto &node : node_stack) {
