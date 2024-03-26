@@ -69,7 +69,7 @@ enum class TokenType {
 const TokenType TOKENTYPE_SYMBOLS_FIRST = TokenType::L_BRACKET;
 const TokenType TOKENTYPE_SYMBOLS_LAST = TokenType::SEMICOLON;
 
-std::string token_type_str(TokenType t);
+std::string to_string(TokenType t);
 TokenType token_type_from_start(char start);
 
 class Token {

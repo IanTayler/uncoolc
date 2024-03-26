@@ -10,7 +10,7 @@
  *                    *
  *********************/
 
-std::string token_type_str(TokenType t) {
+std::string to_string(TokenType t) {
   switch (t) {
   // Symbols
   case TokenType::L_PAREN:
@@ -227,7 +227,7 @@ bool Token::operator==(const Token &other) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Token &tok) {
-  os << "Token('" << token_type_str(tok.type()) << "', " << tok.symbol().id
+  os << "Token('" << to_string(tok.type()) << "', " << tok.symbol().id
      << ")";
   return os;
 }

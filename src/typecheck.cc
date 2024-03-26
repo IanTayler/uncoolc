@@ -141,7 +141,7 @@ bool LiteralNode::typecheck(TypeContext &context) {
     break;
   default:
     fatal(std::format("LiteralNode has unexpected token type {}",
-                      token_type_str(start_token.type())),
+                      to_string(start_token.type())),
           start_token);
     return false;
   }
@@ -191,7 +191,7 @@ bool UnaryOpNode::typecheck(TypeContext &context) {
     return true;
   default:
     fatal(std::format("INTERNAL: UnaryOpNode with unknown token type {}",
-                      token_type_str(start_token.type())),
+                      to_string(start_token.type())),
           start_token);
     return false;
   }

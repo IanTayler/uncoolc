@@ -27,8 +27,8 @@ bool Parser::expect(TokenType type) {
 /// Check that a token matches some type and log an error if it doesn't.
 bool Parser::expect(Token token, TokenType type) {
   if (token.type() != type) {
-    error(std::format("Expected {}, but got {} {}", token_type_str(type),
-                      token_type_str(token.type()),
+    error(std::format("Expected {}, but got {} {}", to_string(type),
+                      to_string(token.type()),
                       symbols.get_string(token.symbol())),
           token);
     return false;

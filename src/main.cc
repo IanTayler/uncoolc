@@ -70,7 +70,7 @@ TokenStream run_tokenizer(std::istream *input, SymbolTable &symbols,
 
       *output << std::setw(position_width)
               << std::format("{}:{}", token.line(), token.column()) << " | "
-              << std::setw(token_width) << token_type_str(type) << " | "
+              << std::setw(token_width) << to_string(type) << " | "
               << symbols.get_string(token.symbol()) << std::endl;
     }
 
