@@ -121,6 +121,12 @@ hlir::InstructionList BinaryOpNode::to_hlir(hlir::Context &context) const {
     hlir_op = hlir::Op::Mult;
   } else if (op == context.symbols.div_op) {
     hlir_op = hlir::Op::Div;
+  } else if (op == context.symbols.eq_op) {
+    hlir_op = hlir::Op::Equal;
+  } else if (op == context.symbols.lt_op) {
+    hlir_op = hlir::Op::LessThan;
+  } else if (op == context.symbols.leq_op) {
+    hlir_op = hlir::Op::LessEqual;
   } else {
     fatal(std::format(
         "INTERNAL: unsupported op {} in BinaryOpNode when translating to hlir.",
