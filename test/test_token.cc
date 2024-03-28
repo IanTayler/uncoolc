@@ -2,12 +2,12 @@
 #include "token.h"
 
 TEST_SUITE("TokenType") {
-  TEST_CASE("token_type_str has correct values") {
-    CHECK(token_type_str(TokenType::ARROW) == "=>");
-    CHECK(token_type_str(TokenType::NEW_LINE) == "NEW_LINE");
-    CHECK(token_type_str(TokenType::KW_LET) == "LET");
-    CHECK(token_type_str(TokenType::OBJECT_NAME) == "OBJECT_NAME");
-    CHECK(token_type_str(TokenType::TYPE_NAME) == "TYPE_NAME");
+  TEST_CASE("to_string(TokenType) has correct values") {
+    CHECK(to_string(TokenType::ARROW) == "=>");
+    CHECK(to_string(TokenType::NEW_LINE) == "NEW_LINE");
+    CHECK(to_string(TokenType::KW_LET) == "LET");
+    CHECK(to_string(TokenType::OBJECT_NAME) == "OBJECT_NAME");
+    CHECK(to_string(TokenType::TYPE_NAME) == "TYPE_NAME");
   }
 
   TEST_CASE("token_type_from_start gets correct TokenType") {
