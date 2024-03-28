@@ -250,10 +250,10 @@ void Branch::print(Printer printer, const SymbolTable &symbols) const {
 // Label
 //
 
-Label::Label(int i) : idx(i), Instruction(Op::Label) {}
+Label::Label(int i, Symbol n) : idx(i), name(n), Instruction(Op::Label) {}
 
 void Label::print(Printer printer, const SymbolTable &symbols) const {
-  printer.print(std::format("{}:", idx));
+  printer.print(std::format("{}: // {}", idx, symbols.get_string(name)));
 }
 
 //

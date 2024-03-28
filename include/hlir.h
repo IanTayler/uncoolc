@@ -192,9 +192,10 @@ public:
 class Label : public Instruction {
 private:
   int idx;
+  Symbol name;
 
 public:
-  Label(int);
+  Label(int, Symbol);
 
   void print(Printer, const SymbolTable &) const override;
 };
