@@ -99,8 +99,8 @@ typedef std::list<std::unique_ptr<Instruction>> InstructionList;
 
 class Position {
 public:
-  int idx;
-  InstructionList::iterator it;
+  int label_idx;
+  InstructionList::iterator label;
 
   Position(int, InstructionList::iterator);
 };

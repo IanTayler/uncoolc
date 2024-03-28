@@ -235,17 +235,18 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
       hlir::Position{exit_label_idx, --instructions.end()};
 
   // Insert the branch before the exit label
-  instructions.insert(exit_position.it, std::make_unique<hlir::Branch>(
-                                            hlir::BranchCondition::False,
-                                            hlir::Value::acc(), exit_position));
+  instructions.insert(
+      exit_position.label,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::False,
+                                     hlir::Value::acc(), exit_position));
 
   // Now put the while body before the exit label as well
-  instructions.splice(exit_position.it, body_expr->to_hlir(context));
+  instructions.splice(exit_position.label, body_expr->to_hlir(context));
 
   // Finally, at the end of the while, we unconditionally return to the
   // condition evaluation
   instructions.insert(
-      exit_position.it,
+      exit_position.label,
       std::make_unique<hlir::Branch>(hlir::BranchCondition::Always,
                                      hlir::Value::acc(), condition_position));
 
