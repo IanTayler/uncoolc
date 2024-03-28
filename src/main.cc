@@ -24,6 +24,7 @@ struct CliOptions {
   bool debug_output;
   std::filesystem::path debug_dir;
   bool verbose;
+  unsigned int indent;
 };
 
 /**********************
@@ -101,7 +102,7 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
   }
 
   if (output != nullptr) {
-    Printer printer{2, output};
+    Printer printer{options.indent, output};
     node->print(printer, symbols);
   }
 
@@ -144,7 +145,7 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
   }
 
   if (type_output != nullptr) {
-    Printer printer{2, type_output};
+    Printer printer{options.indent, type_output};
     module->print(printer, symbols);
   }
 
@@ -189,8 +190,10 @@ int main(int argc, char *argv[]) {
 
   std::unique_ptr<SymbolTable> symbols = std::make_unique<SymbolTable>();
 
-  CliOptions options = {
-      .debug_output = debug, .debug_dir = debug_dir, .verbose = verbose};
+  CliOptions options = {.debug_output = debug,
+                        .debug_dir = debug_dir,
+                        .verbose = verbose,
+                        .indent = 2};
 
   TokenStream tokens = run_tokenizer(stream, *symbols, options);
 
