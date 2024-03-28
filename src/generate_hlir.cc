@@ -183,9 +183,22 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   return hlir::InstructionList();
 }
 
-// TODO(IT) fill in
 hlir::InstructionList LetNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  auto instructions = hlir::InstructionList();
+
+  for (const auto &declaration : declarations) {
+    if (declaration->initializer.has_value())
+      instructions.splice(instructions.end(),
+                          declaration->initializer.value()->to_hlir(context));
+    // TODO(IT) handle the else case: default initializer
+
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::var(declaration->object_id), hlir::Value::acc()));
+  }
+
+  instructions.splice(instructions.end(), body_expr->to_hlir(context));
+
+  return instructions;
 }
 
 // TODO(IT) fill in
