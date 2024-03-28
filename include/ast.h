@@ -1,6 +1,7 @@
 #ifndef _AST_H
 #define _AST_H
 
+#include "hlir.h"
 #include "printer.h"
 #include "symbol.h"
 #include "token.h"
@@ -37,7 +38,6 @@ public:
   /// Will typecheck and annotate the type of Expressions. Returns whether types
   /// are consistent.
   virtual bool typecheck(TypeContext &) = 0;
-  // TODO(IT): will need to add generate_ir as a virtual method
 };
 
 class ExpressionNode : public AstNode {
@@ -49,6 +49,8 @@ public:
   void print_type(Printer printer, const SymbolTable &symbols);
 
   virtual bool typecheck(TypeContext &) override;
+
+  virtual hlir::InstructionList to_hlir(hlir::Context &) const;
 
   virtual int arity();
   virtual ChildSide child_side();
@@ -111,6 +113,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::Method to_hlir_method(const SymbolTable &) const;
 };
 
 class ClassNode : public AstNode {
@@ -126,6 +130,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::Class to_hlir_class(const SymbolTable &) const;
 };
 
 class ModuleNode : public AstNode {
@@ -137,6 +143,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::Universe to_hlir_universe(const SymbolTable &) const;
 };
 
 /***********************
@@ -157,6 +165,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class LiteralNode : public ExpressionNode {
@@ -169,6 +179,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class VariableNode : public ExpressionNode {
@@ -181,6 +193,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 /***********************
@@ -199,6 +213,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
@@ -222,6 +238,8 @@ public:
 
   bool typecheck(TypeContext &) override;
 
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
+
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
   virtual ChildSide child_side() override;
@@ -242,6 +260,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class AssignNode : public ExpressionNode {
@@ -259,6 +279,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class DispatchNode : public ExpressionNode {
@@ -291,6 +313,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 /***********************
@@ -309,6 +333,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 
   void add_expression(ExpressionPtr expr) {
     expressions.push_back(std::move(expr));
@@ -329,6 +355,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class WhileNode : public ExpressionNode {
@@ -344,6 +372,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class LetNode : public ExpressionNode {
@@ -357,6 +387,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 
   void add_declaration(std::unique_ptr<AttributeNode> attr) {
     declarations.push_back(std::move(attr));
@@ -378,6 +410,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 };
 
 class CaseNode : public ExpressionNode {
@@ -392,6 +426,8 @@ public:
   void print(Printer printer, const SymbolTable &symbols) override;
 
   bool typecheck(TypeContext &) override;
+
+  hlir::InstructionList to_hlir(hlir::Context &) const override;
 
   void add_branch(std::unique_ptr<CaseBranchNode> branch) {
     branches.push_back(std::move(branch));
