@@ -184,9 +184,42 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
   return hlir::InstructionList();
 }
 
-// TODO(IT) fill in
 hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  auto instructions = hlir::InstructionList();
+
+  int condition_label_idx = context.create_label_idx();
+  int exit_label_idx = context.create_label_idx();
+
+  instructions.push_back(std::make_unique<hlir::Label>(
+      condition_label_idx, context.symbols.while_kw));
+
+  hlir::Position condition_position =
+      hlir::Position{condition_label_idx, --instructions.end()};
+
+  instructions.splice(instructions.end(), condition_expr->to_hlir(context));
+
+  instructions.push_back(
+      std::make_unique<hlir::Label>(exit_label_idx, context.symbols.pool_kw));
+
+  hlir::Position exit_position =
+      hlir::Position{exit_label_idx, --instructions.end()};
+
+  // Insert the branch before the exit label
+  instructions.insert(exit_position.it, std::make_unique<hlir::Branch>(
+                                            hlir::BranchCondition::False,
+                                            hlir::Value::acc(), exit_position));
+
+  // Now put the while body before the exit label as well
+  instructions.splice(exit_position.it, body_expr->to_hlir(context));
+
+  // Finally, at the end of the while, we unconditionally return to the
+  // condition evaluation
+  instructions.insert(
+      exit_position.it,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::Always,
+                                     hlir::Value::acc(), condition_position));
+
+  return instructions;
 }
 
 hlir::InstructionList LetNode::to_hlir(hlir::Context &context) const {
