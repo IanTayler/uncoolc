@@ -57,11 +57,13 @@ enum class Op {
   Sub,
   Mult,
   Div,
+  Equal,
+  LessThan,
+  LessEqual,
   Neg,
   Not,
   IsVoid,
   New,
-  Comparison,
   AddArg,
   Call,
   Branch,
@@ -78,19 +80,16 @@ std::string to_string(Op op);
  **********************/
 
 enum class BranchCondition {
-  Equal,
-  NotEqual,
-  LessThan,
-  LessThanEqual,
-  GreaterThan,
-  GreaterThanEqual,
+  Always,
+  True,
+  False,
 };
 
 std::string to_string(BranchCondition);
 
 /***********************
  *                     *
- *        Label        *
+ *       Position      *
  *                     *
  **********************/
 
@@ -102,6 +101,8 @@ class Position {
 public:
   int idx;
   InstructionList::iterator it;
+
+  Position(int, InstructionList::iterator);
 };
 
 std::string to_string(Position);
@@ -155,17 +156,6 @@ public:
   void print(Printer, const SymbolTable &) const override;
 };
 
-class Comparison : public Instruction {
-private:
-  Value left;
-  Value right;
-
-public:
-  Comparison(Op o, Value, Value);
-
-  void print(Printer, const SymbolTable &) const override;
-};
-
 class AddArg : public Instruction {
 private:
   Value arg;
@@ -189,11 +179,12 @@ public:
 
 class Branch : public Instruction {
 private:
+  Value value;
   BranchCondition condition;
   Position target;
 
 public:
-  Branch(BranchCondition, Position);
+  Branch(BranchCondition, Value, Position);
 
   void print(Printer, const SymbolTable &) const override;
 };

@@ -86,6 +86,12 @@ std::string to_string(Op op) {
     return "mult";
   case Op::Div:
     return "div";
+  case Op::Equal:
+    return "eq";
+  case Op::LessEqual:
+    return "leq";
+  case Op::LessThan:
+    return "lt";
   case Op::Neg:
     return "neg";
   case Op::Not:
@@ -94,8 +100,6 @@ std::string to_string(Op op) {
     return "isvoid";
   case Op::New:
     return "new";
-  case Op::Comparison:
-    return "comparison";
   case Op::AddArg:
     return "add_arg";
   case Op::Call:
@@ -115,28 +119,24 @@ std::string to_string(Op op) {
  *                     *
  **********************/
 
-std::string to_string(BranchCondition condition) {
+std::string to_string(const BranchCondition condition) {
   switch (condition) {
-  case BranchCondition::Equal:
-    return "eq";
-  case BranchCondition::NotEqual:
-    return "neq";
-  case BranchCondition::LessThan:
-    return "lt";
-  case BranchCondition::LessThanEqual:
-    return "leq";
-  case BranchCondition::GreaterThan:
-    return "gt";
-  case BranchCondition::GreaterThanEqual:
-    return "gte";
+  case BranchCondition::Always:
+    return "always";
+  case BranchCondition::True:
+    return "True";
+  case BranchCondition::False:
+    return "False";
   }
 }
 
 /***********************
  *                     *
- *        Label        *
+ *       Position      *
  *                     *
  **********************/
+
+Position::Position(int i, InstructionList::iterator ili) : idx(i), it(ili) {}
 
 std::string to_string(Position position) {
   return std::format("[label {}]", position.idx);
@@ -204,21 +204,6 @@ void Binary::print(Printer printer, const SymbolTable &symbols) const {
 }
 
 //
-// Comparison
-//
-
-Comparison::Comparison(Op o, Value l, Value r)
-    : left(l), right(r), Instruction(o) {}
-
-void Comparison::print(Printer printer, const SymbolTable &symbols) const {
-  printer.enter();
-  printer.print(std::format("{} {}, {}", hlir::to_string(op),
-                            hlir::to_string(left, symbols),
-                            hlir::to_string(right, symbols)));
-  printer.exit();
-}
-
-//
 // AddArg
 //
 
@@ -250,14 +235,14 @@ void Call::print(Printer printer, const SymbolTable &symbols) const {
 // Branch
 //
 
-Branch::Branch(BranchCondition bc, Position l)
-    : condition(bc), target(l), Instruction(Op::Branch) {}
+Branch::Branch(BranchCondition bc, Value v, Position l)
+    : value(v), condition(bc), target(l), Instruction(Op::Branch) {}
 
 void Branch::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format("{} {} {}", hlir::to_string(op),
-                            hlir::to_string(condition),
-                            hlir::to_string(target)));
+  printer.print(std::format(
+      "{}.{} {} {}", hlir::to_string(op), hlir::to_string(condition),
+      hlir::to_string(value, symbols), hlir::to_string(target)));
   printer.exit();
 }
 
