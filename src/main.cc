@@ -35,7 +35,7 @@ struct CliOptions {
  *********************/
 
 TokenStream run_tokenizer(std::istream *input, SymbolTable &symbols,
-                          const CliOptions &options) {
+                          const CliOptions &options, int &steps) {
   TokenStream tokens = tokenize(input, symbols);
 
   std::ostream *output = nullptr;
@@ -43,9 +43,12 @@ TokenStream run_tokenizer(std::istream *input, SymbolTable &symbols,
 
   if (options.debug_output) {
     std::filesystem::create_directories(options.debug_dir);
-    out_file.open(options.debug_dir / "tokenizer.log", std::ios::out);
+    out_file.open(options.debug_dir / std::format("{:03}_tokenizer.log", steps),
+                  std::ios::out);
     output = &out_file;
   }
+
+  steps++;
 
   if (output != nullptr) {
 
@@ -89,7 +92,7 @@ TokenStream run_tokenizer(std::istream *input, SymbolTable &symbols,
 
 std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
                                        const SymbolTable &symbols,
-                                       const CliOptions &options) {
+                                       const CliOptions &options, int &steps) {
 
   std::unique_ptr<ModuleNode> node = Parser(tokens, symbols).parse();
 
@@ -98,9 +101,12 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
 
   if (options.debug_output) {
     std::filesystem::create_directories(options.debug_dir);
-    out_file.open(options.debug_dir / "parser.log", std::ios::out);
+    out_file.open(options.debug_dir / std::format("{:03}_parser.log", steps),
+                  std::ios::out);
     output = &out_file;
   }
+
+  steps++;
 
   if (output != nullptr) {
     Printer printer{options.indent, output};
@@ -116,10 +122,9 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
  *                    *
  *********************/
 
-std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
-                                                 Scopes &scopes,
-                                                 SymbolTable &symbols,
-                                                 const CliOptions &options) {
+std::unique_ptr<ClassTree>
+run_semantic_analysis(ModuleNode *module, Scopes &scopes, SymbolTable &symbols,
+                      const CliOptions &options, int &steps) {
   std::unique_ptr<ClassTree> class_tree =
       std::make_unique<ClassTree>(module, symbols);
 
@@ -134,16 +139,26 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
 
   if (options.debug_output) {
     std::filesystem::create_directories(options.debug_dir);
-    tree_file.open(options.debug_dir / "class_tree.log", std::ios::out);
+    tree_file.open(options.debug_dir /
+                       std::format("{:03}_class_tree.log", steps),
+                   std::ios::out);
     tree_output = &tree_file;
-
-    type_file.open(options.debug_dir / "typed_ast.log", std::ios::out);
-    type_output = &type_file;
   }
+
+  steps++;
 
   if (tree_output != nullptr) {
     class_tree->print(tree_output);
   }
+
+  if (options.debug_output) {
+    type_file.open(options.debug_dir /
+                       std::format("{:03}_typed_ast.log", steps),
+                   std::ios::out);
+    type_output = &type_file;
+  }
+
+  steps++;
 
   if (type_output != nullptr) {
     Printer printer{options.indent, type_output};
@@ -164,7 +179,7 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
 
 hlir::Universe run_hlir_generation(ModuleNode *module,
                                    const SymbolTable &symbols,
-                                   const CliOptions &options) {
+                                   const CliOptions &options, int &steps) {
   hlir::Universe universe = module->to_hlir_universe(symbols);
 
   std::ostream *output = nullptr;
@@ -172,9 +187,12 @@ hlir::Universe run_hlir_generation(ModuleNode *module,
 
   if (options.debug_output) {
     std::filesystem::create_directories(options.debug_dir);
-    out_file.open(options.debug_dir / "hlir.log", std::ios::out);
+    out_file.open(options.debug_dir / std::format("{:03}_hlir.log", steps),
+                  std::ios::out);
     output = &out_file;
   }
+
+  steps++;
 
   if (output != nullptr) {
     Printer printer{options.indent, output};
@@ -216,6 +234,8 @@ int main(int argc, char *argv[]) {
     arg_pos++;
   }
 
+  int steps = 0;
+
   SymbolTable symbols = SymbolTable();
 
   CliOptions options = {.debug_output = debug,
@@ -223,14 +243,15 @@ int main(int argc, char *argv[]) {
                         .verbose = verbose,
                         .indent = 2};
 
-  TokenStream tokens = run_tokenizer(stream, symbols, options);
+  TokenStream tokens = run_tokenizer(stream, symbols, options, steps);
 
-  std::unique_ptr<ModuleNode> ast = run_parser(tokens, symbols, options);
+  std::unique_ptr<ModuleNode> ast = run_parser(tokens, symbols, options, steps);
 
   Scopes scopes = Scopes();
 
   std::unique_ptr<ClassTree> class_tree =
-      run_semantic_analysis(ast.get(), scopes, symbols, options);
+      run_semantic_analysis(ast.get(), scopes, symbols, options, steps);
 
-  hlir::Universe universe = run_hlir_generation(ast.get(), symbols, options);
+  hlir::Universe universe =
+      run_hlir_generation(ast.get(), symbols, options, steps);
 }
