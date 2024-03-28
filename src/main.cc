@@ -188,19 +188,19 @@ int main(int argc, char *argv[]) {
     arg_pos++;
   }
 
-  std::unique_ptr<SymbolTable> symbols = std::make_unique<SymbolTable>();
+  SymbolTable symbols = SymbolTable();
 
   CliOptions options = {.debug_output = debug,
                         .debug_dir = debug_dir,
                         .verbose = verbose,
                         .indent = 2};
 
-  TokenStream tokens = run_tokenizer(stream, *symbols, options);
+  TokenStream tokens = run_tokenizer(stream, symbols, options);
 
-  std::unique_ptr<ModuleNode> ast = run_parser(tokens, *symbols, options);
+  std::unique_ptr<ModuleNode> ast = run_parser(tokens, symbols, options);
 
   Scopes scopes = Scopes();
 
   std::unique_ptr<ClassTree> class_tree =
-      run_semantic_analysis(ast.get(), scopes, *symbols, options);
+      run_semantic_analysis(ast.get(), scopes, symbols, options);
 }
