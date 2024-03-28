@@ -44,3 +44,9 @@ void fatal(std::string message, Token token, int errorcode) {
 }
 
 void fatal(std::string message, Token token) { fatal(message, token, 1); }
+
+void fatal(std::string message, int errorcode) {
+  fatal(message, Token{}, errorcode);
+}
+
+void fatal(std::string message) { fatal(message, 1); }

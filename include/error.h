@@ -9,6 +9,8 @@ void warning(std::string, Token);
 void error(std::string, Token);
 
 void fatal(std::string, Token, int);
+void fatal(std::string, int);
+void fatal(std::string);
 
 void fatal(std::string, Token);
 
