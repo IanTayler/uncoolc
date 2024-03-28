@@ -253,7 +253,7 @@ void Branch::print(Printer printer, const SymbolTable &symbols) const {
 Label::Label(int i) : idx(i), Instruction(Op::Label) {}
 
 void Label::print(Printer printer, const SymbolTable &symbols) const {
-  printer.print(std::format("label {}:", hlir::to_string(op), idx));
+  printer.print(std::format("{}:", idx));
 }
 
 //
