@@ -152,9 +152,12 @@ hlir::InstructionList DispatchNode::to_hlir(hlir::Context &context) const {
  *                     *
  **********************/
 
-// TODO(IT) fill in
 hlir::InstructionList BlockNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  auto instructions = hlir::InstructionList();
+  for (const auto &expression : expressions) {
+    instructions.splice(instructions.end(), expression->to_hlir(context));
+  }
+  return instructions;
 }
 
 // TODO(IT) fill in
