@@ -163,9 +163,36 @@ hlir::InstructionList AssignNode::to_hlir(hlir::Context &context) const {
   return instructions;
 }
 
-// TODO(IT) fill in
 hlir::InstructionList DispatchNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  auto instructions = hlir::InstructionList();
+  std::vector<hlir::Value> argument_temporaries;
+
+  for (const auto &argument : arguments) {
+    instructions.splice(instructions.end(), argument->to_hlir(context));
+
+    hlir::Value temporary = context.create_temporary();
+    argument_temporaries.push_back(temporary);
+
+    instructions.push_back(
+        std::make_unique<hlir::Mov>(temporary, hlir::Value::acc()));
+  }
+
+  if (target)
+    instructions.splice(instructions.end(), target->to_hlir(context));
+  else
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::acc(), hlir::Value::var(context.symbols.self_var)));
+
+  hlir::Value target_temp = context.create_temporary();
+
+  // Add all the arguments before the call
+  for (const auto &temporary : argument_temporaries) {
+    instructions.push_back(std::make_unique<hlir::AddArg>(temporary));
+  }
+
+  instructions.push_back(std::make_unique<hlir::Call>(target_temp, method));
+
+  return instructions;
 }
 
 /***********************
