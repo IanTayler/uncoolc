@@ -155,9 +155,12 @@ hlir::InstructionList NewNode::to_hlir(hlir::Context &context) const {
   return instructions;
 }
 
-// TODO(IT) fill in
 hlir::InstructionList AssignNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  auto instructions = expression->to_hlir(context);
+
+  instructions.push_back(std::make_unique<hlir::Mov>(hlir::Value::var(variable),
+                                                     hlir::Value::acc()));
+  return instructions;
 }
 
 // TODO(IT) fill in
