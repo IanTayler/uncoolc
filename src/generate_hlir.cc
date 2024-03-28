@@ -21,6 +21,19 @@ hlir::Universe ModuleNode::to_hlir_universe(const SymbolTable &symbols) const {
 hlir::Class ClassNode::to_hlir_class(const SymbolTable &symbols) const {
   auto cls = hlir::Class(name);
 
+  auto initializer_context = hlir::Context(symbols);
+
+  for (const auto &attribute : attributes) {
+    if (attribute->initializer.has_value())
+      cls.initializer.splice(
+          cls.initializer.end(),
+          attribute->initializer.value()->to_hlir(initializer_context));
+    // TODO(IT) default initializers in the else case
+
+    cls.initializer.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::var(attribute->object_id), hlir::Value::acc()));
+  }
+
   for (const auto &method : methods) {
     cls.methods.emplace(method->name.id, method->to_hlir_method(symbols));
   }
