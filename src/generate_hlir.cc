@@ -209,9 +209,46 @@ hlir::InstructionList BlockNode::to_hlir(hlir::Context &context) const {
   return instructions;
 }
 
-// TODO(IT) fill in
 hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  int else_label_idx = context.create_label_idx();
+  int exit_label_idx = context.create_label_idx();
+
+  auto instructions = condition_expr->to_hlir(context);
+
+  // else goes before the exit, we need to create it now to point to it from the
+  // condition
+  instructions.push_back(
+      std::make_unique<hlir::Label>(else_label_idx, context.symbols.else_kw));
+
+  hlir::Position else_position =
+      hlir::Position(else_label_idx, --instructions.end());
+
+  // Insert the jump to the else block
+  instructions.insert(
+      else_position.label,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::False,
+                                     hlir::Value::acc(), else_position));
+
+  // Add the then part right after the check
+  instructions.splice(else_position.label, then_expr->to_hlir(context));
+
+  // Now add the else part after the else label
+  instructions.splice(instructions.end(), else_expr->to_hlir(context));
+
+  // Put an exit label right at the end
+  instructions.push_back(
+      std::make_unique<hlir::Label>(exit_label_idx, context.symbols.fi_kw));
+
+  hlir::Position exit_position =
+      hlir::Position(exit_label_idx, --instructions.end());
+
+  // Add a jump to the exit after the then, skipping the else section
+  instructions.insert(
+      else_position.label,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::Always,
+                                     hlir::Value::acc(), exit_position));
+
+  return instructions;
 }
 
 hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
