@@ -6,6 +6,7 @@
 
 #include "ast.h"
 #include "error.h"
+#include "hlir.h"
 #include "parser.h"
 #include "semantic.h"
 #include "symbol.h"
@@ -157,6 +158,33 @@ std::unique_ptr<ClassTree> run_semantic_analysis(ModuleNode *module,
 
 /**********************
  *                    *
+ *    High-level IR   *
+ *                    *
+ *********************/
+
+hlir::Universe run_hlir_generation(ModuleNode *module,
+                                   const SymbolTable &symbols,
+                                   const CliOptions &options) {
+  hlir::Universe universe = module->to_hlir_universe(symbols);
+
+  std::ostream *output = nullptr;
+  std::fstream out_file;
+
+  if (options.debug_output) {
+    std::filesystem::create_directories(options.debug_dir);
+    out_file.open(options.debug_dir / "hlir.log", std::ios::out);
+    output = &out_file;
+  }
+
+  if (output != nullptr) {
+    Printer printer{options.indent, output};
+    universe.print(printer, symbols);
+  }
+  return universe;
+}
+
+/**********************
+ *                    *
  *     Entrypoint     *
  *                    *
  *********************/
@@ -203,4 +231,6 @@ int main(int argc, char *argv[]) {
 
   std::unique_ptr<ClassTree> class_tree =
       run_semantic_analysis(ast.get(), scopes, symbols, options);
+
+  hlir::Universe universe = run_hlir_generation(ast.get(), symbols, options);
 }

@@ -19,6 +19,8 @@ add_executable(coolc
   src/typecheck.cc
   src/classtree.cc
   src/printer.cc
+  src/hlir.cc
+  src/generate_hlir.cc
 )
 target_include_directories(coolc
   PUBLIC
@@ -39,6 +41,8 @@ add_executable(tests
   src/typecheck.cc
   src/classtree.cc
   src/printer.cc
+  src/hlir.cc
+  src/generate_hlir.cc
 )
 target_include_directories(tests
   PUBLIC
