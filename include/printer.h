@@ -1,3 +1,6 @@
+#ifndef _PRINTER_H
+#define _PRINTER_H
+
 #include <iostream>
 
 class Printer {
@@ -18,3 +21,5 @@ public:
 
   void exit();
 };
+
+#endif

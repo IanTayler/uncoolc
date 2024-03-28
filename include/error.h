@@ -15,4 +15,3 @@ void fatal(std::string);
 void fatal(std::string, Token);
 
 #endif // !_ERROR_H
-
