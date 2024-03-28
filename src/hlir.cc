@@ -327,6 +327,13 @@ void Class::print(Printer printer, const SymbolTable &symbols) const {
   printer.print("{");
 
   printer.enter();
+
+  printer.print("__initializer__ {");
+  for (const auto &instruction : initializer) {
+    instruction->print(printer, symbols);
+  }
+  printer.print("}");
+
   for (const auto &[_, method] : methods) {
     method.print(printer, symbols);
   }
