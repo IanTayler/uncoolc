@@ -19,6 +19,7 @@ enum class ValueType {
   Temp,
   Acc,
   Literal,
+  TypeId,
 };
 
 std::string to_string(ValueType);
@@ -33,8 +34,7 @@ public:
   ValueType type;
   union {
     int id;
-    Symbol name;
-    Symbol value;
+    Symbol symbol;
   };
 
   static Value self();
@@ -42,6 +42,7 @@ public:
   static Value temp(int);
   static Value acc();
   static Value literal(Symbol);
+  static Value type_id(Symbol);
 };
 
 std::string to_string(Value, const SymbolTable &);
@@ -69,6 +70,8 @@ enum class Op {
   Branch,
   Label,
   Mov,
+  TypeIdOf,
+  Superclass,
 };
 
 std::string to_string(Op op);
@@ -125,7 +128,7 @@ public:
 class Unary : public Instruction {
 private:
   Value dest;
-  Value child;
+  Value arg;
 
 public:
   Unary(Op o, Value, Value);

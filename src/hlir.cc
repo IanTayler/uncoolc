@@ -26,6 +26,8 @@ std::string to_string(ValueType type) {
     return "acc";
   case ValueType::Literal:
     return "literal";
+  case ValueType::TypeId:
+    return "type";
   }
 }
 
@@ -36,13 +38,15 @@ std::string to_string(Value value, const SymbolTable &symbols) {
   case ValueType::Self:
     return "[self]";
   case ValueType::Var:
-    return std::format("[var: {}]", symbols.get_string(value.name));
+    return std::format("[var: {}]", symbols.get_string(value.symbol));
   case ValueType::Temp:
     return std::format("[temp: {}]", value.id);
   case ValueType::Acc:
     return "[acc]";
   case ValueType::Literal:
-    return std::format("{}", symbols.get_string(value.value));
+    return std::format("{}", symbols.get_string(value.symbol));
+  case ValueType::TypeId:
+    return std::format("[type: {}]", symbols.get_string(value.symbol));
   }
 }
 
@@ -52,9 +56,9 @@ std::string to_string(Value value, const SymbolTable &symbols) {
 
 Value::Value(ValueType t, int i) : type(t), id(i) {}
 
-Value::Value(ValueType t, Symbol n) : type(t), name(n) {}
+Value::Value(ValueType t, Symbol n) : type(t), symbol(n) {}
 
-Value::Value(ValueType t) : type(t), name(Symbol{}) {}
+Value::Value(ValueType t) : type(t), symbol(Symbol{}) {}
 
 //
 // Public constructors
@@ -69,6 +73,10 @@ Value Value::temp(int id) { return Value(ValueType::Temp, id); }
 Value Value::acc() { return Value(ValueType::Acc); }
 
 Value Value::literal(Symbol value) { return Value(ValueType::Literal, value); }
+
+Value Value::type_id(Symbol type_name) {
+  return Value(ValueType::TypeId, type_name);
+}
 
 /***********************
  *                     *
@@ -110,6 +118,10 @@ std::string to_string(Op op) {
     return "label";
   case Op::Mov:
     return "mov";
+  case Op::TypeIdOf:
+    return "typeof";
+  case Op::Superclass:
+    return "superclass";
   }
 }
 
@@ -136,7 +148,8 @@ std::string to_string(const BranchCondition condition) {
  *                     *
  **********************/
 
-Position::Position(int i, InstructionList::iterator ili) : label_idx(i), label(ili) {}
+Position::Position(int i, InstructionList::iterator ili)
+    : label_idx(i), label(ili) {}
 
 std::string to_string(Position position) {
   return std::format("[label {}]", position.label_idx);
@@ -164,13 +177,13 @@ void Instruction::print(Printer printer, const SymbolTable &symbols) const {
 // Unary
 //
 
-Unary::Unary(Op o, Value d, Value c) : dest(d), child(c), Instruction(o) {}
+Unary::Unary(Op o, Value d, Value c) : dest(d), arg(c), Instruction(o) {}
 
 void Unary::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
   printer.print(std::format("{} {}, {}", hlir::to_string(op),
                             hlir::to_string(dest, symbols),
-                            hlir::to_string(child, symbols)));
+                            hlir::to_string(arg, symbols)));
   printer.exit();
 }
 
