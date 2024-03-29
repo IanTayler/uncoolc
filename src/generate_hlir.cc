@@ -18,20 +18,50 @@ hlir::Universe ModuleNode::to_hlir_universe(const SymbolTable &symbols) const {
   return universe;
 }
 
+hlir::InstructionList default_initialize(Symbol object_id, Symbol type,
+                                         const SymbolTable &symbols) {
+  hlir::InstructionList instructions;
+
+  if (type == symbols.int_type) {
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::var(object_id), hlir::Value::literal(symbols.int_zero)));
+
+  } else if (type == symbols.bool_type) {
+    instructions.push_back(
+        std::make_unique<hlir::Mov>(hlir::Value::var(object_id),
+                                    hlir::Value::literal(symbols.false_const)));
+
+  } else if (type == symbols.string_type) {
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::var(object_id),
+        hlir::Value::literal(symbols.string_empty)));
+
+  } else {
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::var(object_id), hlir::Value::literal(symbols.void_value)));
+  }
+
+  return instructions;
+}
+
 hlir::Class ClassNode::to_hlir_class(const SymbolTable &symbols) const {
   auto cls = hlir::Class(name);
 
   auto initializer_context = hlir::Context(symbols);
 
   for (const auto &attribute : attributes) {
-    if (attribute->initializer.has_value())
+    if (attribute->initializer.has_value()) {
       cls.initializer.splice(
           cls.initializer.end(),
           attribute->initializer.value()->to_hlir(initializer_context));
-    // TODO(IT) default initializers in the else case
-
-    cls.initializer.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(attribute->object_id), hlir::Value::acc()));
+      cls.initializer.push_back(std::make_unique<hlir::Mov>(
+          hlir::Value::var(attribute->object_id), hlir::Value::acc()));
+    } else {
+      cls.initializer.splice(cls.initializer.end(),
+                             default_initialize(attribute->object_id,
+                                                attribute->declared_type,
+                                                symbols));
+    }
   }
 
   for (const auto &method : methods) {
@@ -294,13 +324,19 @@ hlir::InstructionList LetNode::to_hlir(hlir::Context &context) const {
   auto instructions = hlir::InstructionList();
 
   for (const auto &declaration : declarations) {
-    if (declaration->initializer.has_value())
+    if (declaration->initializer.has_value()) {
       instructions.splice(instructions.end(),
                           declaration->initializer.value()->to_hlir(context));
-    // TODO(IT) handle the else case: default initializer
 
-    instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(declaration->object_id), hlir::Value::acc()));
+      instructions.push_back(std::make_unique<hlir::Mov>(
+          hlir::Value::var(declaration->object_id), hlir::Value::acc()));
+
+    } else {
+      instructions.splice(instructions.end(),
+                          default_initialize(declaration->object_id,
+                                             declaration->declared_type,
+                                             context.symbols));
+    }
   }
 
   instructions.splice(instructions.end(), body_expr->to_hlir(context));

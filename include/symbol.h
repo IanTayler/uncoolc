@@ -64,6 +64,9 @@ public:
   Symbol class_kw;
   Symbol isvoid_kw;
   Symbol inherits_kw;
+  Symbol int_zero;
+  Symbol string_empty;
+  Symbol void_value;
 };
 
 #endif

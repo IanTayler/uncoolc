@@ -68,6 +68,9 @@ SymbolTable::SymbolTable() {
   class_kw = from("class");
   isvoid_kw = from("isvoid");
   inherits_kw = from("inherits");
+  int_zero = from("0");
+  string_empty = from("\"\"");
+  void_value = from("__void__");
 }
 
 Symbol SymbolTable::from(const std::string &str) {
