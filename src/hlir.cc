@@ -318,6 +318,7 @@ void Method::print(Printer printer, const SymbolTable &symbols) const {
  *        Class        *
  *                     *
  **********************/
+
 Class::Class(Symbol n) : name(n) {}
 
 void Class::print(Printer printer, const SymbolTable &symbols) const {
