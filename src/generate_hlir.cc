@@ -288,7 +288,7 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   int exit_label_idx = context.create_label_idx();
 
   instructions.push_back(std::make_unique<hlir::Label>(
-      condition_label_idx, context.symbols.while_kw));
+      condition_label_idx, context.symbols.loop_kw));
 
   hlir::Position condition_position =
       hlir::Position{condition_label_idx, --instructions.end()};
