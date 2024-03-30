@@ -16,17 +16,17 @@ namespace hlir {
 
 std::string to_string(ValueType type) {
   switch (type) {
-  case ValueType::Self:
+  case ValueType::SELF:
     return "self";
-  case ValueType::Var:
+  case ValueType::VAR:
     return "var";
-  case ValueType::Temp:
+  case ValueType::TEMP:
     return "temp";
-  case ValueType::Acc:
+  case ValueType::ACC:
     return "acc";
-  case ValueType::Literal:
+  case ValueType::LITERAL:
     return "literal";
-  case ValueType::TypeId:
+  case ValueType::TYPE_ID:
     return "type";
   }
 }
@@ -35,17 +35,17 @@ std::string to_string(Value value, const SymbolTable &symbols) {
   ValueType type = value.type;
 
   switch (type) {
-  case ValueType::Self:
+  case ValueType::SELF:
     return "[self]";
-  case ValueType::Var:
+  case ValueType::VAR:
     return std::format("[var: {}]", symbols.get_string(value.symbol));
-  case ValueType::Temp:
+  case ValueType::TEMP:
     return std::format("[temp: {}]", value.id);
-  case ValueType::Acc:
+  case ValueType::ACC:
     return "[acc]";
-  case ValueType::Literal:
+  case ValueType::LITERAL:
     return std::format("{}", symbols.get_string(value.symbol));
-  case ValueType::TypeId:
+  case ValueType::TYPE_ID:
     return std::format("[type: {}]", symbols.get_string(value.symbol));
   }
 }
@@ -64,18 +64,18 @@ Value::Value(ValueType t) : type(t), symbol(Symbol{}) {}
 // Public constructors
 //
 
-Value Value::self() { return Value(ValueType::Self); }
+Value Value::self() { return Value(ValueType::SELF); }
 
-Value Value::var(Symbol name) { return Value(ValueType::Var, name); }
+Value Value::var(Symbol name) { return Value(ValueType::VAR, name); }
 
-Value Value::temp(int id) { return Value(ValueType::Temp, id); }
+Value Value::temp(int id) { return Value(ValueType::TEMP, id); }
 
-Value Value::acc() { return Value(ValueType::Acc); }
+Value Value::acc() { return Value(ValueType::ACC); }
 
-Value Value::literal(Symbol value) { return Value(ValueType::Literal, value); }
+Value Value::literal(Symbol value) { return Value(ValueType::LITERAL, value); }
 
 Value Value::type_id(Symbol type_name) {
-  return Value(ValueType::TypeId, type_name);
+  return Value(ValueType::TYPE_ID, type_name);
 }
 
 /***********************
@@ -86,41 +86,41 @@ Value Value::type_id(Symbol type_name) {
 
 std::string to_string(Op op) {
   switch (op) {
-  case Op::Add:
+  case Op::ADD:
     return "add";
-  case Op::Sub:
+  case Op::SUB:
     return "sub";
-  case Op::Mult:
+  case Op::MULT:
     return "mult";
-  case Op::Div:
+  case Op::DIV:
     return "div";
-  case Op::Equal:
+  case Op::EQUAL:
     return "eq";
-  case Op::LessEqual:
+  case Op::LESS_EQUAL:
     return "leq";
-  case Op::LessThan:
+  case Op::LESS_THAN:
     return "lt";
-  case Op::Neg:
+  case Op::NEG:
     return "neg";
-  case Op::Not:
+  case Op::NOT:
     return "not";
-  case Op::IsVoid:
+  case Op::IS_VOID:
     return "isvoid";
-  case Op::New:
+  case Op::NEW:
     return "new";
-  case Op::AddArg:
+  case Op::ADD_ARG:
     return "add_arg";
-  case Op::Call:
+  case Op::CALL:
     return "call";
-  case Op::Branch:
+  case Op::BRANCH:
     return "branch";
-  case Op::Label:
+  case Op::LABEL:
     return "label";
-  case Op::Mov:
+  case Op::MOV:
     return "mov";
-  case Op::TypeIdOf:
+  case Op::TYPE_ID_OF:
     return "typeof";
-  case Op::Superclass:
+  case Op::SUPERCLASS:
     return "superclass";
   }
 }
@@ -133,11 +133,11 @@ std::string to_string(Op op) {
 
 std::string to_string(const BranchCondition condition) {
   switch (condition) {
-  case BranchCondition::Always:
+  case BranchCondition::ALWAYS:
     return "always";
-  case BranchCondition::True:
+  case BranchCondition::TRUE:
     return "True";
-  case BranchCondition::False:
+  case BranchCondition::FALSE:
     return "False";
   }
 }
@@ -220,7 +220,7 @@ void Binary::print(Printer printer, const SymbolTable &symbols) const {
 // AddArg
 //
 
-AddArg::AddArg(Value a) : arg(a), Instruction(Op::AddArg) {}
+AddArg::AddArg(Value a) : arg(a), Instruction(Op::ADD_ARG) {}
 
 void AddArg::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -234,7 +234,7 @@ void AddArg::print(Printer printer, const SymbolTable &symbols) const {
 //
 
 Call::Call(Value t, Symbol n)
-    : target(t), method_name(n), Instruction(Op::Call) {}
+    : target(t), method_name(n), Instruction(Op::CALL) {}
 
 void Call::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -249,7 +249,7 @@ void Call::print(Printer printer, const SymbolTable &symbols) const {
 //
 
 Branch::Branch(BranchCondition bc, Value v, Position l)
-    : value(v), condition(bc), target(l), Instruction(Op::Branch) {}
+    : value(v), condition(bc), target(l), Instruction(Op::BRANCH) {}
 
 void Branch::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -263,7 +263,7 @@ void Branch::print(Printer printer, const SymbolTable &symbols) const {
 // Label
 //
 
-Label::Label(int i, Symbol n) : idx(i), name(n), Instruction(Op::Label) {}
+Label::Label(int i, Symbol n) : idx(i), name(n), Instruction(Op::LABEL) {}
 
 void Label::print(Printer printer, const SymbolTable &symbols) const {
   printer.print(std::format("{}: // {}", idx, symbols.get_string(name)));
@@ -273,7 +273,7 @@ void Label::print(Printer printer, const SymbolTable &symbols) const {
 // Mov
 //
 
-Mov::Mov(Value d, Value s) : dest(d), src(s), Instruction(Op::Mov) {}
+Mov::Mov(Value d, Value s) : dest(d), src(s), Instruction(Op::MOV) {}
 
 void Mov::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();

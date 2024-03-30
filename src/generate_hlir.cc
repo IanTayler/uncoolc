@@ -122,13 +122,13 @@ hlir::InstructionList UnaryOpNode::to_hlir(hlir::Context &context) const {
   hlir::Op hlir_op;
   switch (start_token.type()) {
   case TokenType::NEG_OP:
-    hlir_op = hlir::Op::Neg;
+    hlir_op = hlir::Op::NEG;
     break;
   case TokenType::KW_NOT:
-    hlir_op = hlir::Op::Not;
+    hlir_op = hlir::Op::NOT;
     break;
   case TokenType::KW_ISVOID:
-    hlir_op = hlir::Op::IsVoid;
+    hlir_op = hlir::Op::IS_VOID;
     break;
   default:
     fatal("INTERNAL: unsupported token type {} in UnaryOpNode when translating "
@@ -144,19 +144,19 @@ hlir::InstructionList UnaryOpNode::to_hlir(hlir::Context &context) const {
 hlir::InstructionList BinaryOpNode::to_hlir(hlir::Context &context) const {
   hlir::Op hlir_op;
   if (op == context.symbols.add_op) {
-    hlir_op = hlir::Op::Add;
+    hlir_op = hlir::Op::ADD;
   } else if (op == context.symbols.sub_op) {
-    hlir_op = hlir::Op::Sub;
+    hlir_op = hlir::Op::SUB;
   } else if (op == context.symbols.mult_op) {
-    hlir_op = hlir::Op::Mult;
+    hlir_op = hlir::Op::MULT;
   } else if (op == context.symbols.div_op) {
-    hlir_op = hlir::Op::Div;
+    hlir_op = hlir::Op::DIV;
   } else if (op == context.symbols.eq_op) {
-    hlir_op = hlir::Op::Equal;
+    hlir_op = hlir::Op::EQUAL;
   } else if (op == context.symbols.lt_op) {
-    hlir_op = hlir::Op::LessThan;
+    hlir_op = hlir::Op::LESS_THAN;
   } else if (op == context.symbols.leq_op) {
-    hlir_op = hlir::Op::LessEqual;
+    hlir_op = hlir::Op::LESS_EQUAL;
   } else {
     fatal(std::format(
         "INTERNAL: unsupported op {} in BinaryOpNode when translating to hlir.",
@@ -181,7 +181,7 @@ hlir::InstructionList BinaryOpNode::to_hlir(hlir::Context &context) const {
 hlir::InstructionList NewNode::to_hlir(hlir::Context &context) const {
   auto instructions = hlir::InstructionList();
   instructions.push_back(std::make_unique<hlir::New>(
-      hlir::Op::New, hlir::Value::acc(), created_type));
+      hlir::Op::NEW, hlir::Value::acc(), created_type));
   return instructions;
 }
 
@@ -256,7 +256,7 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
   // Insert the jump to the else block
   instructions.insert(
       else_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::False,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::FALSE,
                                      hlir::Value::acc(), else_position));
 
   // Add the then part right after the check
@@ -275,7 +275,7 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
   // Add a jump to the exit after the then, skipping the else section
   instructions.insert(
       else_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::Always,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::ALWAYS,
                                      hlir::Value::acc(), exit_position));
 
   return instructions;
@@ -304,7 +304,7 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   // Insert the branch before the exit label
   instructions.insert(
       exit_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::False,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::FALSE,
                                      hlir::Value::acc(), exit_position));
 
   // Now put the while body before the exit label as well
@@ -314,7 +314,7 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   // condition evaluation
   instructions.insert(
       exit_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::Always,
+      std::make_unique<hlir::Branch>(hlir::BranchCondition::ALWAYS,
                                      hlir::Value::acc(), condition_position));
 
   return instructions;

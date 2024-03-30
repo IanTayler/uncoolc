@@ -14,12 +14,12 @@ namespace hlir {
  **********************/
 
 enum class ValueType {
-  Self,
-  Var,
-  Temp,
-  Acc,
-  Literal,
-  TypeId,
+  SELF,
+  VAR,
+  TEMP,
+  ACC,
+  LITERAL,
+  TYPE_ID,
 };
 
 std::string to_string(ValueType);
@@ -54,24 +54,24 @@ std::string to_string(Value, const SymbolTable &);
  **********************/
 
 enum class Op {
-  Add,
-  Sub,
-  Mult,
-  Div,
-  Equal,
-  LessThan,
-  LessEqual,
-  Neg,
-  Not,
-  IsVoid,
-  New,
-  AddArg,
-  Call,
-  Branch,
-  Label,
-  Mov,
-  TypeIdOf,
-  Superclass,
+  ADD,
+  SUB,
+  MULT,
+  DIV,
+  EQUAL,
+  LESS_THAN,
+  LESS_EQUAL,
+  NEG,
+  NOT,
+  IS_VOID,
+  NEW,
+  ADD_ARG,
+  CALL,
+  BRANCH,
+  LABEL,
+  MOV,
+  TYPE_ID_OF,
+  SUPERCLASS,
 };
 
 std::string to_string(Op op);
@@ -83,9 +83,9 @@ std::string to_string(Op op);
  **********************/
 
 enum class BranchCondition {
-  Always,
-  True,
-  False,
+  ALWAYS,
+  TRUE,
+  FALSE,
 };
 
 std::string to_string(BranchCondition);
