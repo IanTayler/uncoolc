@@ -14,36 +14,48 @@ namespace hlir {
  *                     *
  **********************/
 
-enum class ValueType {
+enum class ValueKind {
   SELF,
   VAR,
   TEMP,
   ACC,
-  LITERAL,
+  CONSTANT,
   TYPE_ID,
 };
 
-std::string to_string(ValueType);
+std::string to_string(ValueKind);
 
 class Value {
 private:
-  Value(ValueType, int);
-  Value(ValueType, Symbol);
-  Value(ValueType);
+  Value(ValueKind, int, Symbol);
+  Value(ValueKind, Symbol, Symbol);
+  Value(ValueKind, Symbol);
 
 public:
-  ValueType type;
+  ValueKind kind;
+  Symbol static_type;
+
+  // Which of these fields is used depends on the kind and static_type
+  // - SELF ignores these values
+  // - VAR uses symbol, for the variable name.
+  // - TEMP uses num as the temp id
+  // - ACC ignores these values
+  // - CONSTANT uses the field matching their type, with strings using Symbol
+  // - TYPE_ID uses symbol for the type name
   union {
     int num;
     Symbol symbol;
+    bool boolean;
   };
 
-  static Value self();
-  static Value var(Symbol);
-  static Value temp(int);
-  static Value acc();
-  static Value literal(Symbol);
-  static Value type_id(Symbol);
+  static Value self(Symbol);
+  static Value var(Symbol, Symbol);
+  static Value temp(int, Symbol);
+  static Value acc(Symbol);
+  static Value literal(int, Symbol);
+  static Value literal(bool, Symbol);
+  static Value literal(Symbol, Symbol);
+  static Value type_id(Symbol, Symbol);
 };
 
 std::string to_string(Value, const SymbolTable &);
@@ -228,11 +240,11 @@ private:
   int labels;
 
 public:
-  const SymbolTable &symbols;
+  SymbolTable &symbols;
 
-  Context(const SymbolTable &);
+  Context(SymbolTable &);
 
-  Value create_temporary();
+  Value create_temporary(Symbol);
   int create_label_idx();
 };
 
