@@ -34,7 +34,7 @@ private:
 public:
   ValueType type;
   union {
-    int id;
+    int num;
     Symbol symbol;
   };
 

@@ -40,7 +40,7 @@ std::string to_string(Value value, const SymbolTable &symbols) {
   case ValueType::VAR:
     return std::format("[var: {}]", symbols.get_string(value.symbol));
   case ValueType::TEMP:
-    return std::format("[temp: {}]", value.id);
+    return std::format("[temp: {}]", value.num);
   case ValueType::ACC:
     return "[acc]";
   case ValueType::LITERAL:
@@ -54,7 +54,7 @@ std::string to_string(Value value, const SymbolTable &symbols) {
 // Private constructors
 //
 
-Value::Value(ValueType t, int i) : type(t), id(i) {}
+Value::Value(ValueType t, int i) : type(t), num(i) {}
 
 Value::Value(ValueType t, Symbol n) : type(t), symbol(n) {}
 
