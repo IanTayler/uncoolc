@@ -165,7 +165,7 @@ std::string to_string(Position position) {
 // Base Instruction
 //
 
-Instruction::Instruction(Op o) : op(o) {}
+Instruction::Instruction(Op o, Token t) : op(o), token(t) {}
 
 void Instruction::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -177,7 +177,8 @@ void Instruction::print(Printer printer, const SymbolTable &symbols) const {
 // Unary
 //
 
-Unary::Unary(Op o, Value d, Value c) : dest(d), arg(c), Instruction(o) {}
+Unary::Unary(Op o, Value d, Value c, Token t)
+    : dest(d), arg(c), Instruction(o, t) {}
 
 void Unary::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -191,7 +192,8 @@ void Unary::print(Printer printer, const SymbolTable &symbols) const {
 // New
 //
 
-New::New(Op o, Value d, Symbol t) : dest(d), type(t), Instruction(o) {}
+New::New(Op o, Value d, Symbol ty, Token to)
+    : dest(d), type(ty), Instruction(o, to) {}
 
 void New::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -205,8 +207,8 @@ void New::print(Printer printer, const SymbolTable &symbols) const {
 // Binary
 //
 
-Binary::Binary(Op o, Value d, Value l, Value r)
-    : dest(d), left(l), right(r), Instruction(o) {}
+Binary::Binary(Op o, Value d, Value l, Value r, Token t)
+    : dest(d), left(l), right(r), Instruction(o, t) {}
 
 void Binary::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -220,7 +222,7 @@ void Binary::print(Printer printer, const SymbolTable &symbols) const {
 // AddArg
 //
 
-AddArg::AddArg(Value a) : arg(a), Instruction(Op::ADD_ARG) {}
+AddArg::AddArg(Value a, Token t) : arg(a), Instruction(Op::ADD_ARG, t) {}
 
 void AddArg::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -233,8 +235,8 @@ void AddArg::print(Printer printer, const SymbolTable &symbols) const {
 // Call
 //
 
-Call::Call(Value t, Symbol n)
-    : target(t), method_name(n), Instruction(Op::CALL) {}
+Call::Call(Value ta, Symbol n, Token to)
+    : target(ta), method_name(n), Instruction(Op::CALL, to) {}
 
 void Call::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -248,8 +250,8 @@ void Call::print(Printer printer, const SymbolTable &symbols) const {
 // Branch
 //
 
-Branch::Branch(BranchCondition bc, Value v, Position l)
-    : value(v), condition(bc), target(l), Instruction(Op::BRANCH) {}
+Branch::Branch(BranchCondition bc, Value v, Position l, Token t)
+    : value(v), condition(bc), target(l), Instruction(Op::BRANCH, t) {}
 
 void Branch::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
@@ -263,7 +265,8 @@ void Branch::print(Printer printer, const SymbolTable &symbols) const {
 // Label
 //
 
-Label::Label(int i, Symbol n) : idx(i), name(n), Instruction(Op::LABEL) {}
+Label::Label(int i, Symbol n, Token t)
+    : idx(i), name(n), Instruction(Op::LABEL, t) {}
 
 void Label::print(Printer printer, const SymbolTable &symbols) const {
   printer.print(std::format("{}: // {}", idx, symbols.get_string(name)));
@@ -273,7 +276,8 @@ void Label::print(Printer printer, const SymbolTable &symbols) const {
 // Mov
 //
 
-Mov::Mov(Value d, Value s) : dest(d), src(s), Instruction(Op::MOV) {}
+Mov::Mov(Value d, Value s, Token t)
+    : dest(d), src(s), Instruction(Op::MOV, t) {}
 
 void Mov::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();

@@ -19,26 +19,29 @@ hlir::Universe ModuleNode::to_hlir_universe(const SymbolTable &symbols) const {
 }
 
 hlir::InstructionList default_initialize(Symbol object_id, Symbol type,
-                                         const SymbolTable &symbols) {
+                                         const SymbolTable &symbols,
+                                         Token token) {
   hlir::InstructionList instructions;
 
   if (type == symbols.int_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(object_id), hlir::Value::literal(symbols.int_zero)));
+        hlir::Value::var(object_id), hlir::Value::literal(symbols.int_zero),
+        token));
 
   } else if (type == symbols.bool_type) {
-    instructions.push_back(
-        std::make_unique<hlir::Mov>(hlir::Value::var(object_id),
-                                    hlir::Value::literal(symbols.false_const)));
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::var(object_id), hlir::Value::literal(symbols.false_const),
+        token));
 
   } else if (type == symbols.string_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(object_id),
-        hlir::Value::literal(symbols.string_empty)));
+        hlir::Value::var(object_id), hlir::Value::literal(symbols.string_empty),
+        token));
 
   } else {
     instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(object_id), hlir::Value::literal(symbols.void_value)));
+        hlir::Value::var(object_id), hlir::Value::literal(symbols.void_value),
+        token));
   }
 
   return instructions;
@@ -54,13 +57,14 @@ hlir::Class ClassNode::to_hlir_class(const SymbolTable &symbols) const {
       cls.initializer.splice(
           cls.initializer.end(),
           attribute->initializer.value()->to_hlir(initializer_context));
-      cls.initializer.push_back(std::make_unique<hlir::Mov>(
-          hlir::Value::var(attribute->object_id), hlir::Value::acc()));
+      cls.initializer.push_back(
+          std::make_unique<hlir::Mov>(hlir::Value::var(attribute->object_id),
+                                      hlir::Value::acc(), start_token));
     } else {
       cls.initializer.splice(cls.initializer.end(),
                              default_initialize(attribute->object_id,
                                                 attribute->declared_type,
-                                                symbols));
+                                                symbols, start_token));
     }
   }
 
@@ -97,15 +101,15 @@ hlir::InstructionList BuiltinNode::to_hlir(hlir::Context &context) const {
 hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
   auto instructions = hlir::InstructionList();
   instructions.push_back(std::make_unique<hlir::Mov>(
-      hlir::Value::acc(), hlir::Value::literal(value)));
+      hlir::Value::acc(), hlir::Value::literal(value), start_token));
 
   return instructions;
 }
 
 hlir::InstructionList VariableNode::to_hlir(hlir::Context &context) const {
   auto instructions = hlir::InstructionList();
-  instructions.push_back(
-      std::make_unique<hlir::Mov>(hlir::Value::acc(), hlir::Value::var(name)));
+  instructions.push_back(std::make_unique<hlir::Mov>(
+      hlir::Value::acc(), hlir::Value::var(name), start_token));
 
   return instructions;
 }
@@ -136,7 +140,7 @@ hlir::InstructionList UnaryOpNode::to_hlir(hlir::Context &context) const {
   }
 
   instructions.push_back(std::make_unique<hlir::Unary>(
-      hlir_op, hlir::Value::acc(), hlir::Value::acc()));
+      hlir_op, hlir::Value::acc(), hlir::Value::acc(), start_token));
 
   return instructions;
 }
@@ -168,12 +172,12 @@ hlir::InstructionList BinaryOpNode::to_hlir(hlir::Context &context) const {
   hlir::Value left_temp = context.create_temporary();
 
   instructions.push_back(
-      std::make_unique<hlir::Mov>(left_temp, hlir::Value::acc()));
+      std::make_unique<hlir::Mov>(left_temp, hlir::Value::acc(), start_token));
 
   instructions.splice(instructions.end(), right->to_hlir(context));
 
   instructions.push_back(std::make_unique<hlir::Binary>(
-      hlir_op, hlir::Value::acc(), left_temp, hlir::Value::acc()));
+      hlir_op, hlir::Value::acc(), left_temp, hlir::Value::acc(), start_token));
 
   return instructions;
 }
@@ -181,15 +185,15 @@ hlir::InstructionList BinaryOpNode::to_hlir(hlir::Context &context) const {
 hlir::InstructionList NewNode::to_hlir(hlir::Context &context) const {
   auto instructions = hlir::InstructionList();
   instructions.push_back(std::make_unique<hlir::New>(
-      hlir::Op::NEW, hlir::Value::acc(), created_type));
+      hlir::Op::NEW, hlir::Value::acc(), created_type, start_token));
   return instructions;
 }
 
 hlir::InstructionList AssignNode::to_hlir(hlir::Context &context) const {
   auto instructions = expression->to_hlir(context);
 
-  instructions.push_back(std::make_unique<hlir::Mov>(hlir::Value::var(variable),
-                                                     hlir::Value::acc()));
+  instructions.push_back(std::make_unique<hlir::Mov>(
+      hlir::Value::var(variable), hlir::Value::acc(), start_token));
   return instructions;
 }
 
@@ -203,24 +207,27 @@ hlir::InstructionList DispatchNode::to_hlir(hlir::Context &context) const {
     hlir::Value temporary = context.create_temporary();
     argument_temporaries.push_back(temporary);
 
-    instructions.push_back(
-        std::make_unique<hlir::Mov>(temporary, hlir::Value::acc()));
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        temporary, hlir::Value::acc(), start_token));
   }
 
   if (target)
     instructions.splice(instructions.end(), target->to_hlir(context));
   else
     instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::acc(), hlir::Value::var(context.symbols.self_var)));
+        hlir::Value::acc(), hlir::Value::var(context.symbols.self_var),
+        start_token));
 
   hlir::Value target_temp = context.create_temporary();
 
   // Add all the arguments before the call
   for (const auto &temporary : argument_temporaries) {
-    instructions.push_back(std::make_unique<hlir::AddArg>(temporary));
+    instructions.push_back(
+        std::make_unique<hlir::AddArg>(temporary, start_token));
   }
 
-  instructions.push_back(std::make_unique<hlir::Call>(target_temp, method));
+  instructions.push_back(
+      std::make_unique<hlir::Call>(target_temp, method, start_token));
 
   return instructions;
 }
@@ -247,17 +254,17 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
 
   // else goes before the exit, we need to create it now to point to it from the
   // condition
-  instructions.push_back(
-      std::make_unique<hlir::Label>(else_label_idx, context.symbols.else_kw));
+  instructions.push_back(std::make_unique<hlir::Label>(
+      else_label_idx, context.symbols.else_kw, else_expr->start_token));
 
   hlir::Position else_position =
       hlir::Position(else_label_idx, --instructions.end());
 
   // Insert the jump to the else block
-  instructions.insert(
-      else_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::FALSE,
-                                     hlir::Value::acc(), else_position));
+  instructions.insert(else_position.label,
+                      std::make_unique<hlir::Branch>(
+                          hlir::BranchCondition::FALSE, hlir::Value::acc(),
+                          else_position, condition_expr->start_token));
 
   // Add the then part right after the check
   instructions.splice(else_position.label, then_expr->to_hlir(context));
@@ -266,17 +273,17 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
   instructions.splice(instructions.end(), else_expr->to_hlir(context));
 
   // Put an exit label right at the end
-  instructions.push_back(
-      std::make_unique<hlir::Label>(exit_label_idx, context.symbols.fi_kw));
+  instructions.push_back(std::make_unique<hlir::Label>(
+      exit_label_idx, context.symbols.fi_kw, start_token));
 
   hlir::Position exit_position =
       hlir::Position(exit_label_idx, --instructions.end());
 
   // Add a jump to the exit after the then, skipping the else section
-  instructions.insert(
-      else_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::ALWAYS,
-                                     hlir::Value::acc(), exit_position));
+  instructions.insert(else_position.label,
+                      std::make_unique<hlir::Branch>(
+                          hlir::BranchCondition::ALWAYS, hlir::Value::acc(),
+                          exit_position, then_expr->start_token));
 
   return instructions;
 }
@@ -288,34 +295,34 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   int exit_label_idx = context.create_label_idx();
 
   instructions.push_back(std::make_unique<hlir::Label>(
-      condition_label_idx, context.symbols.loop_kw));
+      condition_label_idx, context.symbols.loop_kw, start_token));
 
   hlir::Position condition_position =
       hlir::Position{condition_label_idx, --instructions.end()};
 
   instructions.splice(instructions.end(), condition_expr->to_hlir(context));
 
-  instructions.push_back(
-      std::make_unique<hlir::Label>(exit_label_idx, context.symbols.pool_kw));
+  instructions.push_back(std::make_unique<hlir::Label>(
+      exit_label_idx, context.symbols.pool_kw, start_token));
 
   hlir::Position exit_position =
       hlir::Position{exit_label_idx, --instructions.end()};
 
-  // Insert the branch before the exit label
-  instructions.insert(
-      exit_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::FALSE,
-                                     hlir::Value::acc(), exit_position));
+  // Insert the branch after the condition evaluation
+  instructions.insert(exit_position.label,
+                      std::make_unique<hlir::Branch>(
+                          hlir::BranchCondition::FALSE, hlir::Value::acc(),
+                          exit_position, body_expr->start_token));
 
-  // Now put the while body before the exit label as well
+  // Now put the while body right after that
   instructions.splice(exit_position.label, body_expr->to_hlir(context));
 
   // Finally, at the end of the while, we unconditionally return to the
   // condition evaluation
-  instructions.insert(
-      exit_position.label,
-      std::make_unique<hlir::Branch>(hlir::BranchCondition::ALWAYS,
-                                     hlir::Value::acc(), condition_position));
+  instructions.insert(exit_position.label,
+                      std::make_unique<hlir::Branch>(
+                          hlir::BranchCondition::ALWAYS, hlir::Value::acc(),
+                          condition_position, body_expr->start_token));
 
   return instructions;
 }
@@ -329,13 +336,14 @@ hlir::InstructionList LetNode::to_hlir(hlir::Context &context) const {
                           declaration->initializer.value()->to_hlir(context));
 
       instructions.push_back(std::make_unique<hlir::Mov>(
-          hlir::Value::var(declaration->object_id), hlir::Value::acc()));
+          hlir::Value::var(declaration->object_id), hlir::Value::acc(),
+          declaration->start_token));
 
     } else {
-      instructions.splice(instructions.end(),
-                          default_initialize(declaration->object_id,
-                                             declaration->declared_type,
-                                             context.symbols));
+      instructions.splice(
+          instructions.end(),
+          default_initialize(declaration->object_id, declaration->declared_type,
+                             context.symbols, declaration->start_token));
     }
   }
 

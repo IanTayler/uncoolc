@@ -3,6 +3,7 @@
 
 #include "printer.h"
 #include "symbol.h"
+#include "token.h"
 #include <list>
 
 namespace hlir {
@@ -119,8 +120,9 @@ std::string to_string(Position);
 class Instruction {
 public:
   Op op;
+  Token token;
 
-  Instruction(Op o);
+  Instruction(Op o, Token t);
 
   virtual void print(Printer, const SymbolTable &) const;
 };
@@ -131,7 +133,7 @@ private:
   Value arg;
 
 public:
-  Unary(Op o, Value, Value);
+  Unary(Op o, Value, Value, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -142,7 +144,7 @@ private:
   Symbol type;
 
 public:
-  New(Op o, Value, Symbol);
+  New(Op o, Value, Symbol, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -154,7 +156,7 @@ private:
   Value right;
 
 public:
-  Binary(Op o, Value, Value, Value);
+  Binary(Op o, Value, Value, Value, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -164,7 +166,7 @@ private:
   Value arg;
 
 public:
-  AddArg(Value);
+  AddArg(Value, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -175,7 +177,7 @@ private:
   Symbol method_name;
 
 public:
-  Call(Value, Symbol);
+  Call(Value, Symbol, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -187,7 +189,7 @@ private:
   Position target;
 
 public:
-  Branch(BranchCondition, Value, Position);
+  Branch(BranchCondition, Value, Position, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -198,7 +200,7 @@ private:
   Symbol name;
 
 public:
-  Label(int, Symbol);
+  Label(int, Symbol, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -209,7 +211,7 @@ private:
   Value src;
 
 public:
-  Mov(Value, Value);
+  Mov(Value, Value, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
