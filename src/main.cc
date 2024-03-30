@@ -177,8 +177,7 @@ run_semantic_analysis(ModuleNode *module, Scopes &scopes, SymbolTable &symbols,
  *                    *
  *********************/
 
-hlir::Universe run_hlir_generation(ModuleNode *module,
-                                   const SymbolTable &symbols,
+hlir::Universe run_hlir_generation(ModuleNode *module, SymbolTable &symbols,
                                    const CliOptions &options, int &steps) {
   hlir::Universe universe = module->to_hlir_universe(symbols);
 

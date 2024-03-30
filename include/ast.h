@@ -114,7 +114,7 @@ public:
 
   bool typecheck(TypeContext &) override;
 
-  hlir::Method to_hlir_method(const SymbolTable &) const;
+  hlir::Method to_hlir_method(SymbolTable &) const;
 };
 
 class ClassNode : public AstNode {
@@ -131,7 +131,7 @@ public:
 
   bool typecheck(TypeContext &) override;
 
-  hlir::Class to_hlir_class(const SymbolTable &) const;
+  hlir::Class to_hlir_class(SymbolTable &) const;
 };
 
 class ModuleNode : public AstNode {
@@ -144,7 +144,7 @@ public:
 
   bool typecheck(TypeContext &) override;
 
-  hlir::Universe to_hlir_universe(const SymbolTable &) const;
+  hlir::Universe to_hlir_universe(SymbolTable &) const;
 };
 
 /***********************

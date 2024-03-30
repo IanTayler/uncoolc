@@ -9,7 +9,7 @@
  *                     *
  **********************/
 
-hlir::Universe ModuleNode::to_hlir_universe(const SymbolTable &symbols) const {
+hlir::Universe ModuleNode::to_hlir_universe(SymbolTable &symbols) const {
   auto universe = hlir::Universe();
   for (const auto &cls : classes) {
     universe.classes.emplace(cls->name.id, cls->to_hlir_class(symbols));
@@ -47,7 +47,7 @@ hlir::InstructionList default_initialize(Symbol object_id, Symbol type,
   return instructions;
 }
 
-hlir::Class ClassNode::to_hlir_class(const SymbolTable &symbols) const {
+hlir::Class ClassNode::to_hlir_class(SymbolTable &symbols) const {
   auto cls = hlir::Class(name);
 
   auto initializer_context = hlir::Context(symbols);
@@ -74,7 +74,7 @@ hlir::Class ClassNode::to_hlir_class(const SymbolTable &symbols) const {
   return cls;
 }
 
-hlir::Method MethodNode::to_hlir_method(const SymbolTable &symbols) const {
+hlir::Method MethodNode::to_hlir_method(SymbolTable &symbols) const {
   auto method = hlir::Method(name);
   auto context = hlir::Context(symbols);
 

@@ -14,38 +14,38 @@ namespace hlir {
 // String representation
 //
 
-std::string to_string(ValueType type) {
+std::string to_string(ValueKind type) {
   switch (type) {
-  case ValueType::SELF:
+  case ValueKind::SELF:
     return "self";
-  case ValueType::VAR:
+  case ValueKind::VAR:
     return "var";
-  case ValueType::TEMP:
+  case ValueKind::TEMP:
     return "temp";
-  case ValueType::ACC:
+  case ValueKind::ACC:
     return "acc";
-  case ValueType::LITERAL:
+  case ValueKind::LITERAL:
     return "literal";
-  case ValueType::TYPE_ID:
+  case ValueKind::TYPE_ID:
     return "type";
   }
 }
 
 std::string to_string(Value value, const SymbolTable &symbols) {
-  ValueType type = value.type;
+  ValueKind type = value.type;
 
   switch (type) {
-  case ValueType::SELF:
+  case ValueKind::SELF:
     return "[self]";
-  case ValueType::VAR:
+  case ValueKind::VAR:
     return std::format("[var: {}]", symbols.get_string(value.symbol));
-  case ValueType::TEMP:
+  case ValueKind::TEMP:
     return std::format("[temp: {}]", value.num);
-  case ValueType::ACC:
+  case ValueKind::ACC:
     return "[acc]";
-  case ValueType::LITERAL:
+  case ValueKind::LITERAL:
     return std::format("{}", symbols.get_string(value.symbol));
-  case ValueType::TYPE_ID:
+  case ValueKind::TYPE_ID:
     return std::format("[type: {}]", symbols.get_string(value.symbol));
   }
 }
@@ -54,28 +54,28 @@ std::string to_string(Value value, const SymbolTable &symbols) {
 // Private constructors
 //
 
-Value::Value(ValueType t, int i) : type(t), num(i) {}
+Value::Value(ValueKind t, int i) : kind(t), num(i) {}
 
-Value::Value(ValueType t, Symbol n) : type(t), symbol(n) {}
+Value::Value(ValueKind t, Symbol n) : kind(t), symbol(n) {}
 
-Value::Value(ValueType t) : type(t), symbol(Symbol{}) {}
+Value::Value(ValueKind t) : kind(t), symbol(Symbol{}) {}
 
 //
 // Public constructors
 //
 
-Value Value::self() { return Value(ValueType::SELF); }
+Value Value::self() { return Value(ValueKind::SELF); }
 
-Value Value::var(Symbol name) { return Value(ValueType::VAR, name); }
+Value Value::var(Symbol name) { return Value(ValueKind::VAR, name); }
 
-Value Value::temp(int id) { return Value(ValueType::TEMP, id); }
+Value Value::temp(int id) { return Value(ValueKind::TEMP, id); }
 
-Value Value::acc() { return Value(ValueType::ACC); }
+Value Value::acc() { return Value(ValueKind::ACC); }
 
-Value Value::literal(Symbol value) { return Value(ValueType::LITERAL, value); }
+Value Value::literal(Symbol value) { return Value(ValueKind::LITERAL, value); }
 
 Value Value::type_id(Symbol type_name) {
-  return Value(ValueType::TYPE_ID, type_name);
+  return Value(ValueKind::TYPE_ID, type_name);
 }
 
 /***********************
@@ -293,8 +293,7 @@ void Mov::print(Printer printer, const SymbolTable &symbols) const {
  *                     *
  **********************/
 
-Context::Context(const SymbolTable &s)
-    : temporaries(0), labels(0), symbols(s) {}
+Context::Context(SymbolTable &s) : temporaries(0), labels(0), symbols(s) {}
 
 Value Context::create_temporary() { return Value::temp(temporaries++); }
 
