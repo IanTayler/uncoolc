@@ -106,7 +106,8 @@ hlir::InstructionList BuiltinNode::to_hlir(hlir::Context &context) const {
 hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
   Symbol literal_type = static_type.value();
   auto instructions = hlir::InstructionList();
-  if (literal_type == context.symbols.int_zero) {
+
+  if (literal_type == context.symbols.int_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
         hlir::Value::literal(int_eval(value, context.symbols), literal_type),
@@ -123,6 +124,11 @@ hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
         hlir::Value::acc(literal_type),
         hlir::Value::literal(string_eval(value, context.symbols), literal_type),
         start_token));
+
+  } else {
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::acc(literal_type),
+        hlir::Value::literal(value, literal_type), start_token));
   }
 
   return instructions;
