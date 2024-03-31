@@ -111,10 +111,17 @@ hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
         hlir::Value::acc(literal_type),
         hlir::Value::literal(int_eval(value, context.symbols), literal_type),
         start_token));
+
   } else if (literal_type == context.symbols.bool_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
         hlir::Value::literal(bool_eval(value, context.symbols), literal_type),
+        start_token));
+
+  } else if (literal_type == context.symbols.bool_type) {
+    instructions.push_back(std::make_unique<hlir::Mov>(
+        hlir::Value::acc(literal_type),
+        hlir::Value::literal(string_eval(value, context.symbols), literal_type),
         start_token));
   }
 

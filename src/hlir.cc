@@ -37,22 +37,32 @@ std::string to_string(Value value, const SymbolTable &symbols) {
   switch (kind) {
   case ValueKind::SELF:
     return "[self]";
+
   case ValueKind::VAR:
     return std::format("[var: {}]", symbols.get_string(value.symbol));
+
   case ValueKind::TEMP:
     return std::format("[temp: {}]", value.num);
+
   case ValueKind::ACC:
     return "[acc]";
+
   case ValueKind::CONSTANT:
-    if (value.static_type == symbols.bool_type ||
-        value.static_type == symbols.int_type) {
+    if (value.static_type == symbols.bool_type)
       return std::format("{}", value.boolean);
 
-      return std::format("{}", symbols.get_string(value.symbol));
-    case ValueKind::TYPE_ID:
-      return std::format("[type: {}]", symbols.get_string(value.symbol));
-    }
+    if (value.static_type == symbols.int_type)
+      return std::format("{}", value.num);
+
+    if (value.static_type == symbols.string_type)
+      return std::format("\"{}\"", value.num);
+
+    return std::format("{}", symbols.get_string(value.symbol));
+
+  case ValueKind::TYPE_ID:
+    return std::format("[type: {}]", symbols.get_string(value.symbol));
   }
+
   return "__unknown_value_kind__";
 }
 
@@ -382,5 +392,4 @@ void Universe::print(Printer printer, const SymbolTable &symbols) const {
     cls.print(printer, symbols);
   }
 }
-
 }; // namespace hlir
