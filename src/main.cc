@@ -94,7 +94,8 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
                                        const SymbolTable &symbols,
                                        const CliOptions &options, int &steps) {
 
-  std::unique_ptr<ModuleNode> node = Parser(tokens, symbols).parse();
+  Parser parser = Parser(tokens, symbols);
+  std::unique_ptr<ModuleNode> node = parser.parse();
 
   std::ostream *output = nullptr;
   std::fstream out_file;
@@ -112,6 +113,9 @@ std::unique_ptr<ModuleNode> run_parser(TokenStream &tokens,
     Printer printer{options.indent, output};
     node->print(printer, symbols);
   }
+
+  if (parser.get_error())
+    fatal("Syntax errors found. Aborting compilation.");
 
   return node;
 }

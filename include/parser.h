@@ -10,6 +10,8 @@ enum class Associativity {
 
 class Parser {
 private:
+  bool has_error_;
+
   TokenStream &tokens;
   const SymbolTable &symbols;
 
@@ -46,9 +48,13 @@ private:
   // Reducers
   bool reduce_stack(std::vector<ExpressionPtr> &node_stack, Token lookahead);
 
+  void parser_error(std::string, Token);
+
 public:
-  Parser(TokenStream &ts, const SymbolTable& ss)
-      : tokens(ts), symbols(ss) {}
+  Parser(TokenStream &ts, const SymbolTable &ss)
+      : tokens(ts), symbols(ss), has_error_(false) {}
+
+  bool get_error();
 
   std::unique_ptr<ModuleNode> parse();
 };

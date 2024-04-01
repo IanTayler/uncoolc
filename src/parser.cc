@@ -9,6 +9,12 @@
  *                     *
  **********************/
 
+bool Parser::get_error() { return has_error_; }
+void Parser::parser_error(std::string message, Token token) {
+  error(message, token);
+  has_error_ = true;
+}
+
 /// Skip Tokens until we find one of the appropriate type
 void Parser::skip_until(TokenType type) {
   Token next_token = tokens.lookahead();
@@ -27,10 +33,11 @@ bool Parser::expect(TokenType type) {
 /// Check that a token matches some type and log an error if it doesn't.
 bool Parser::expect(Token token, TokenType type) {
   if (token.type() != type) {
-    error(std::format("Expected {}, but got {} {}", to_string(type),
-                      to_string(token.type()),
-                      symbols.get_string(token.symbol())),
-          token);
+    parser_error(std::format("Expected {}, but got {} {}", to_string(type),
+                             to_string(token.type()),
+                             symbols.get_string(token.symbol())),
+                 token);
+
     return false;
   }
   return true;
@@ -144,6 +151,13 @@ std::unique_ptr<ClassNode> Parser::parse_class() {
   // Get attributes and methods in a loop;
   Token lookahead, next_up;
   do {
+    lookahead = tokens.lookahead(0);
+    if (!expect(lookahead, TokenType::OBJECT_NAME)) {
+      parser_error("Expected an attribute or method definition", lookahead);
+      skip_until(TokenType::OBJECT_NAME);
+      continue;
+    }
+
     next_up = tokens.lookahead(1);
 
     switch (next_up.type()) {
@@ -154,7 +168,7 @@ std::unique_ptr<ClassNode> Parser::parse_class() {
       class_->methods.push_back(parse_method());
       break;
     default:
-      error("Expected : in attribute definition", next_up);
+      parser_error("Expected : in attribute definition", next_up);
       skip_until(TokenType::SEMICOLON);
       tokens.next();
     }
@@ -268,7 +282,7 @@ std::unique_ptr<AttributeNode> Parser::parse_attribute() {
                                            type_token.symbol(), std::move(expr),
                                            start_token);
   default:
-    error("Expected ';', ',' 'in' or '<-'", lookahead);
+    parser_error("Expected ';', ',' 'in' or '<-'", lookahead);
     skip_until(TokenType::SEMICOLON);
   }
   return nullptr;
@@ -366,7 +380,7 @@ ExpressionPtr Parser::parse_expression_atom() {
   case TokenType::AT:
     return parse_static_dispatch();
   default:
-    error("Could not parse expression", token);
+    parser_error("Could not parse expression", token);
     return nullptr;
   }
 }
@@ -391,7 +405,7 @@ ExpressionPtr Parser::parse_expression() {
     }
   }
   if (node_stack.size() != 1) {
-    error("could not parse expression nearby", lookahead);
+    parser_error("could not parse expression nearby", lookahead);
   }
   return std::move(node_stack.back());
 }
