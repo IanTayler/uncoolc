@@ -274,16 +274,14 @@ hlir::InstructionList DispatchNode::to_hlir(hlir::Context &context) const {
     target_type = context.symbols.self_type;
   }
 
-  hlir::Value target_temp = context.create_temporary(target_type);
+  auto call = hlir::Call(hlir::Value::acc(target_type), method, start_token);
 
   // Add all the arguments before the call
   for (const auto &temporary : argument_temporaries) {
-    instructions.push_back(
-        std::make_unique<hlir::AddArg>(temporary, start_token));
+    call.add_arg(temporary);
   }
 
-  instructions.push_back(
-      std::make_unique<hlir::Call>(target_temp, method, start_token));
+  instructions.push_back(std::make_unique<hlir::Call>(call));
 
   return instructions;
 }
