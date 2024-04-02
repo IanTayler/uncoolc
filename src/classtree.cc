@@ -380,12 +380,12 @@ AttributeNode *ClassTree::get_attribute(Symbol class_name,
 void ClassTree::print(std::ostream *out) {
   Printer printer = Printer(2, out);
 
-  printer.print("ClassTree");
+  printer.println("ClassTree");
 
   printer.enter();
   {
     for (const auto &cls : classes) {
-      printer.print(std::format(
+      printer.println(std::format(
           "{} inherits {}; depth {}", symbols.get_string(cls.name()),
           symbols.get_string(cls.superclass()), cls.depth()));
 
@@ -393,10 +393,10 @@ void ClassTree::print(std::ostream *out) {
       {
 
         for (const auto &attr : cls.attributes())
-          printer.print(std::format("attribute {}", symbols.get_string(attr)));
+          printer.println(std::format("attribute {}", symbols.get_string(attr)));
 
         for (const auto &meth : cls.methods())
-          printer.print(std::format("method {} ", symbols.get_string(meth)));
+          printer.println(std::format("method {} ", symbols.get_string(meth)));
       }
       printer.exit();
     }

@@ -15,7 +15,10 @@ public:
   Printer(unsigned int i, std::ostream *o)
       : current_depth(0), indent(i), out(o){};
 
+  void println(std::string str);
   void print(std::string str);
+  void beginln();
+  void endln();
 
   void enter();
 

@@ -205,7 +205,7 @@ Instruction::Instruction(Op o, Token t) : op(o), token(t) {}
 
 void Instruction::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print("__undefined_instruction_print__");
+  printer.println("__undefined_instruction_print__");
   printer.exit();
 }
 
@@ -218,9 +218,9 @@ Unary::Unary(Op o, Value d, Value c, Token t)
 
 void Unary::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format("{} {}, {}", hlir::to_string(op),
-                            hlir::to_string(dest, symbols),
-                            hlir::to_string(arg, symbols)));
+  printer.println(std::format("{} {}, {}", hlir::to_string(op),
+                              hlir::to_string(dest, symbols),
+                              hlir::to_string(arg, symbols)));
   printer.exit();
 }
 
@@ -233,9 +233,9 @@ New::New(Op o, Value d, Symbol ty, Token to)
 
 void New::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format("{} {}, {}", hlir::to_string(op),
-                            hlir::to_string(dest, symbols),
-                            symbols.get_string((type))));
+  printer.println(std::format("{} {}, {}", hlir::to_string(op),
+                              hlir::to_string(dest, symbols),
+                              symbols.get_string((type))));
   printer.exit();
 }
 
@@ -248,7 +248,7 @@ Binary::Binary(Op o, Value d, Value l, Value r, Token t)
 
 void Binary::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format(
+  printer.println(std::format(
       "{} {}, {}, {}", hlir::to_string(op), hlir::to_string(dest, symbols),
       hlir::to_string(left, symbols), hlir::to_string(right, symbols)));
   printer.exit();
@@ -263,9 +263,25 @@ Call::Call(Value ta, Symbol n, Token to)
 
 void Call::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format("{} {}, {}", hlir::to_string(op),
+
+  // We will form this line out of several parts
+  printer.beginln();
+  printer.print(std::format("{} {}, {}, (", hlir::to_string(op),
                             hlir::to_string(target, symbols),
                             symbols.get_string(method_name)));
+
+  for (int i = 0; i < args.size(); i++) {
+    const auto &arg = args[i];
+
+    if (i > 0)
+      printer.print(" ");
+
+    printer.print(hlir::to_string(arg, symbols));
+  }
+
+  printer.print(")");
+  printer.endln();
+
   printer.exit();
 }
 
@@ -280,7 +296,7 @@ Branch::Branch(BranchCondition bc, Value v, Position l, Token t)
 
 void Branch::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format(
+  printer.println(std::format(
       "{}.{} {} {}", hlir::to_string(op), hlir::to_string(condition),
       hlir::to_string(value, symbols), hlir::to_string(target)));
   printer.exit();
@@ -294,7 +310,7 @@ Label::Label(int i, Symbol n, Token t)
     : idx(i), name(n), Instruction(Op::LABEL, t) {}
 
 void Label::print(Printer printer, const SymbolTable &symbols) const {
-  printer.print(std::format("{}: // {}", idx, symbols.get_string(name)));
+  printer.println(std::format("{}: // {}", idx, symbols.get_string(name)));
 }
 
 //
@@ -306,9 +322,9 @@ Mov::Mov(Value d, Value s, Token t)
 
 void Mov::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
-  printer.print(std::format("{} {}, {}", hlir::to_string(op),
-                            hlir::to_string(dest, symbols),
-                            hlir::to_string(src, symbols)));
+  printer.println(std::format("{} {}, {}", hlir::to_string(op),
+                              hlir::to_string(dest, symbols),
+                              hlir::to_string(src, symbols)));
   printer.exit();
 }
 
@@ -334,13 +350,13 @@ int Context::create_label_idx() { return labels++; }
 Method::Method(Symbol n) : name(n) {}
 
 void Method::print(Printer printer, const SymbolTable &symbols) const {
-  printer.print(std::format("{} {{", symbols.get_string(name)));
+  printer.println(std::format("{} {{", symbols.get_string(name)));
 
   for (const auto &instruction : instructions) {
     instruction->print(printer, symbols);
   }
 
-  printer.print("}");
+  printer.println("}");
 }
 
 /***********************
@@ -352,23 +368,23 @@ void Method::print(Printer printer, const SymbolTable &symbols) const {
 Class::Class(Symbol n) : name(n) {}
 
 void Class::print(Printer printer, const SymbolTable &symbols) const {
-  printer.print(symbols.get_string(name));
-  printer.print("{");
+  printer.println(symbols.get_string(name));
+  printer.println("{");
 
   printer.enter();
 
-  printer.print("__initializer__ {");
+  printer.println("__initializer__ {");
   for (const auto &instruction : initializer) {
     instruction->print(printer, symbols);
   }
-  printer.print("}");
+  printer.println("}");
 
   for (const auto &[_, method] : methods) {
     method.print(printer, symbols);
   }
   printer.exit();
-  printer.print("}");
-  printer.print("");
+  printer.println("}");
+  printer.println("");
 }
 
 /***********************
