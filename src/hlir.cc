@@ -255,19 +255,6 @@ void Binary::print(Printer printer, const SymbolTable &symbols) const {
 }
 
 //
-// AddArg
-//
-
-AddArg::AddArg(Value a, Token t) : arg(a), Instruction(Op::ADD_ARG, t) {}
-
-void AddArg::print(Printer printer, const SymbolTable &symbols) const {
-  printer.enter();
-  printer.print(
-      std::format("{} {}", hlir::to_string(op), hlir::to_string(arg, symbols)));
-  printer.exit();
-}
-
-//
 // Call
 //
 
@@ -281,6 +268,8 @@ void Call::print(Printer printer, const SymbolTable &symbols) const {
                             symbols.get_string(method_name)));
   printer.exit();
 }
+
+void Call::add_arg(const Value &arg) { args.push_back(arg); }
 
 //
 // Branch

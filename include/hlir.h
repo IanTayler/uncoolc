@@ -173,25 +173,17 @@ public:
   void print(Printer, const SymbolTable &) const override;
 };
 
-class AddArg : public Instruction {
-private:
-  Value arg;
-
-public:
-  AddArg(Value, Token t);
-
-  void print(Printer, const SymbolTable &) const override;
-};
-
 class Call : public Instruction {
 private:
   Value target;
   Symbol method_name;
+  std::vector<Value> args;
 
 public:
   Call(Value, Symbol, Token t);
 
   void print(Printer, const SymbolTable &) const override;
+  void add_arg(const Value &);
 };
 
 class Branch : public Instruction {
