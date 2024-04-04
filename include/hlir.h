@@ -116,9 +116,8 @@ typedef std::list<std::unique_ptr<Instruction>> InstructionList;
 class Position {
 public:
   int label_idx;
-  InstructionList::iterator label;
 
-  Position(int, InstructionList::iterator);
+  Position(int);
 };
 
 std::string to_string(Position);

@@ -184,8 +184,7 @@ std::string to_string(const BranchCondition condition) {
  *                     *
  **********************/
 
-Position::Position(int i, InstructionList::iterator ili)
-    : label_idx(i), label(ili) {}
+Position::Position(int i) : label_idx(i) {}
 
 std::string to_string(Position position) {
   return std::format("[label {}]", position.label_idx);

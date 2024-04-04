@@ -306,40 +306,33 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
 
   auto instructions = condition_expr->to_hlir(context);
 
-  // else goes before the exit, we need to create it now to point to it from the
-  // condition
+  hlir::Position else_position = hlir::Position(else_label_idx);
+  hlir::Position exit_position = hlir::Position(exit_label_idx);
+
+  // Insert the jump to the else block
+  instructions.push_back(std::make_unique<hlir::Branch>(
+      hlir::BranchCondition::FALSE,
+      hlir::Value::acc(condition_expr->static_type.value()), else_position,
+      condition_expr->start_token));
+
+  // Add the then part right after the check
+  instructions.splice(instructions.end(), then_expr->to_hlir(context));
+
+  // Add a jump to the exit after the then, skipping the else section
+  instructions.push_back(std::make_unique<hlir::Branch>(
+      hlir::BranchCondition::ALWAYS,
+      hlir::Value::literal(true, context.symbols.bool_type), exit_position,
+      then_expr->start_token));
+
+  // Now add the else label and body
   instructions.push_back(std::make_unique<hlir::Label>(
       else_label_idx, context.symbols.else_kw, else_expr->start_token));
 
-  hlir::Position else_position =
-      hlir::Position(else_label_idx, --instructions.end());
-
-  // Insert the jump to the else block
-  instructions.insert(else_position.label,
-                      std::make_unique<hlir::Branch>(
-                          hlir::BranchCondition::FALSE,
-                          hlir::Value::acc(condition_expr->static_type.value()),
-                          else_position, condition_expr->start_token));
-
-  // Add the then part right after the check
-  instructions.splice(else_position.label, then_expr->to_hlir(context));
-
-  // Now add the else part after the else label
   instructions.splice(instructions.end(), else_expr->to_hlir(context));
 
   // Put an exit label right at the end
   instructions.push_back(std::make_unique<hlir::Label>(
       exit_label_idx, context.symbols.fi_kw, start_token));
-
-  hlir::Position exit_position =
-      hlir::Position(exit_label_idx, --instructions.end());
-
-  // Add a jump to the exit after the then, skipping the else section
-  instructions.insert(else_position.label,
-                      std::make_unique<hlir::Branch>(
-                          hlir::BranchCondition::ALWAYS,
-                          hlir::Value::literal(true, context.symbols.bool_type),
-                          exit_position, then_expr->start_token));
 
   return instructions;
 }
@@ -350,37 +343,33 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   int condition_label_idx = context.create_label_idx();
   int exit_label_idx = context.create_label_idx();
 
+  hlir::Position condition_position = hlir::Position(condition_label_idx);
+  hlir::Position exit_position = hlir::Position(exit_label_idx);
+
   instructions.push_back(std::make_unique<hlir::Label>(
       condition_label_idx, context.symbols.loop_kw, start_token));
 
-  hlir::Position condition_position =
-      hlir::Position{condition_label_idx, --instructions.end()};
-
   instructions.splice(instructions.end(), condition_expr->to_hlir(context));
 
-  instructions.push_back(std::make_unique<hlir::Label>(
-      exit_label_idx, context.symbols.pool_kw, start_token));
-
-  hlir::Position exit_position =
-      hlir::Position{exit_label_idx, --instructions.end()};
-
   // Insert the branch after the condition evaluation
-  instructions.insert(exit_position.label,
-                      std::make_unique<hlir::Branch>(
-                          hlir::BranchCondition::FALSE,
-                          hlir::Value::acc(condition_expr->static_type.value()),
-                          exit_position, body_expr->start_token));
+  instructions.push_back(std::make_unique<hlir::Branch>(
+      hlir::BranchCondition::FALSE,
+      hlir::Value::acc(condition_expr->static_type.value()), exit_position,
+      body_expr->start_token));
 
   // Now put the while body right after that
-  instructions.splice(exit_position.label, body_expr->to_hlir(context));
+  instructions.splice(instructions.end(), body_expr->to_hlir(context));
 
-  // Finally, at the end of the while, we unconditionally return to the
+  // At the end of the while, we unconditionally return to the
   // condition evaluation
-  instructions.insert(exit_position.label,
-                      std::make_unique<hlir::Branch>(
-                          hlir::BranchCondition::ALWAYS,
-                          hlir::Value::literal(true, context.symbols.bool_type),
-                          condition_position, body_expr->start_token));
+  instructions.push_back(std::make_unique<hlir::Branch>(
+      hlir::BranchCondition::ALWAYS,
+      hlir::Value::literal(true, context.symbols.bool_type), condition_position,
+      body_expr->start_token));
+
+  // This is the exit from the while loop
+  instructions.push_back(std::make_unique<hlir::Label>(
+      exit_label_idx, context.symbols.pool_kw, start_token));
 
   return instructions;
 }
