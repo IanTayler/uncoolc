@@ -512,6 +512,8 @@ bool CaseNode::typecheck(TypeContext &context) {
   std::unordered_set<int> seen_types;
   Symbol common_type;
 
+  eval_expr->typecheck(context);
+
   for (const auto &branch : branches) {
     if (seen_types.count(branch->declared_type.id) > 0) {
       error(std::format("Repeated type {} in case statement. Each type should "
