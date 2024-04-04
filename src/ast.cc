@@ -43,7 +43,7 @@ void AttributeNode::print(Printer printer, const SymbolTable &symbols) {
     (*initializer)->print(printer, symbols);
     printer.exit();
   } else {
-    printer.print(std::format("attr {} : {}", symbols.get_string(object_id),
+    printer.println(std::format("attr {} : {}", symbols.get_string(object_id),
                               symbols.get_string(declared_type)));
   }
 }
