@@ -27,8 +27,6 @@ std::string to_string(ValueKind kind) {
     return "acc";
   case ValueKind::CONSTANT:
     return "literal";
-  case ValueKind::TYPE_ID:
-    return "type";
   }
 }
 
@@ -59,9 +57,6 @@ std::string to_string(Value value, const SymbolTable &symbols) {
       return std::format("\"{}\"", value.num);
 
     return std::format("{}", symbols.get_string(value.symbol));
-
-  case ValueKind::TYPE_ID:
-    return std::format("[type: {}]", symbols.get_string(value.symbol));
   }
 
   return "__unknown_value_kind__";
@@ -109,10 +104,6 @@ Value Value::literal(bool value, Symbol static_type) {
 
 Value Value::literal(Symbol value, Symbol static_type) {
   return Value(ValueKind::CONSTANT, value, static_type);
-}
-
-Value Value::type_id(Symbol type_name, Symbol static_type) {
-  return Value(ValueKind::TYPE_ID, type_name, static_type);
 }
 
 /***********************

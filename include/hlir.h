@@ -21,7 +21,6 @@ enum class ValueKind {
   TEMP,
   ACC,
   CONSTANT,
-  TYPE_ID,
 };
 
 std::string to_string(ValueKind);
@@ -42,7 +41,6 @@ public:
   // - TEMP uses num as the temp id
   // - ACC ignores these values
   // - CONSTANT uses the field matching their type, with strings using Symbol
-  // - TYPE_ID uses symbol for the type name
   union {
     int num;
     Symbol symbol;
@@ -56,7 +54,6 @@ public:
   static Value literal(int, Symbol);
   static Value literal(bool, Symbol);
   static Value literal(Symbol, Symbol);
-  static Value type_id(Symbol, Symbol);
 };
 
 std::string to_string(Value, const SymbolTable &);
