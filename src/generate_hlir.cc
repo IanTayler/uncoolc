@@ -405,7 +405,103 @@ hlir::InstructionList CaseBranchNode::to_hlir(hlir::Context &context) const {
   return hlir::InstructionList();
 }
 
-// TODO(IT) fill in
 hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  hlir::InstructionList instructions = eval_expr->to_hlir(context);
+
+  Symbol parent_type = eval_expr->static_type.value();
+
+  int case_loop_idx = context.create_label_idx();
+  hlir::Position case_loop_position{case_loop_idx};
+
+  hlir::Value current_type =
+      context.create_temporary(context.symbols.type_id_type);
+
+  // Just a short-hand for acc of type bool
+  hlir::Value bool_acc = hlir::Value::acc(context.symbols.bool_type);
+
+  // Initial checks for case expression:
+  // check if void (case_void error)
+  instructions.push_back(std::make_unique<hlir::Binary>(
+      hlir::Op::EQUAL, bool_acc, hlir::Value::acc(parent_type),
+      hlir::Value::literal(context.symbols.void_value,
+                           context.symbols.object_type),
+      start_token));
+
+  instructions.push_back(
+      std::make_unique<hlir::Error>(hlir::BranchCondition::TRUE, bool_acc,
+                                    runtime::Error::CASE_VOID, start_token));
+
+  // get type of expression
+  instructions.push_back(std::make_unique<hlir::Unary>(
+      hlir::Op::TYPE_ID_OF, current_type, hlir::Value::acc(parent_type),
+      start_token));
+
+  // set up label for superclass loop
+  instructions.push_back(std::make_unique<hlir::Label>(
+      case_loop_idx, context.symbols.case_kw, start_token));
+
+  // check if type is tree_root_type (case_unmatched error)
+  instructions.push_back(std::make_unique<hlir::Binary>(
+      hlir::Op::EQUAL, bool_acc, current_type,
+      hlir::Value::literal(context.symbols.tree_root_type,
+                           context.symbols.type_id_type),
+      start_token));
+
+  instructions.push_back(std::make_unique<hlir::Error>(
+      hlir::BranchCondition::TRUE, bool_acc, runtime::Error::CASE_UNMATCHED,
+      start_token));
+
+  int exit_label_idx = context.create_label_idx();
+  hlir::Position exit_position = hlir::Position(exit_label_idx);
+
+  int base_branch_label_idx = exit_label_idx + 1;
+
+  for (const auto &branch : branches) {
+    hlir::Position branch_label_position =
+        hlir::Position(context.create_label_idx());
+
+    // Check if type matches,
+    instructions.push_back(std::make_unique<hlir::Binary>(
+        hlir::Op::EQUAL, bool_acc, current_type,
+        hlir::Value::literal(branch->declared_type,
+                             context.symbols.type_id_type),
+        branch->start_token));
+
+    // Jump to the branch if it does
+    instructions.push_back(std::make_unique<hlir::Branch>(
+        hlir::BranchCondition::TRUE,
+        hlir::Value::acc(context.symbols.bool_type), branch_label_position,
+        branch->start_token));
+  }
+
+  // If no checks matched, get superclass and start checks again
+  instructions.push_back(std::make_unique<hlir::Unary>(
+      hlir::Op::SUPERCLASS, current_type, current_type, start_token));
+
+  instructions.push_back(std::make_unique<hlir::Branch>(
+      hlir::BranchCondition::ALWAYS,
+      hlir::Value::literal(true, context.symbols.bool_type), case_loop_position,
+      start_token));
+
+  // Now add the labels and bodies for all of the branches
+  for (int i = 0; i < branches.size(); i++) {
+    const auto &case_branch = branches[i];
+
+    instructions.push_back(std::make_unique<hlir::Label>(
+        base_branch_label_idx + i, case_branch->declared_type,
+        case_branch->start_token));
+
+    instructions.splice(instructions.end(), case_branch->to_hlir(context));
+
+    instructions.push_back(std::make_unique<hlir::Branch>(
+        hlir::BranchCondition::ALWAYS,
+        hlir::Value::literal(true, context.symbols.bool_type), exit_position,
+        case_branch->start_token));
+  }
+
+  // finally, the exit label
+  instructions.push_back(std::make_unique<hlir::Label>(
+      exit_label_idx, context.symbols.esac_kw, start_token));
+
+  return instructions;
 }
