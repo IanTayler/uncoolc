@@ -420,11 +420,8 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
 
   // Initial checks for case expression:
   // check if void (case_void error)
-  instructions.push_back(std::make_unique<hlir::Binary>(
-      hlir::Op::EQUAL, bool_acc, hlir::Value::acc(parent_type),
-      hlir::Value::literal(context.symbols.void_value,
-                           context.symbols.object_type),
-      start_token));
+  instructions.push_back(std::make_unique<hlir::Unary>(
+      hlir::Op::IS_VOID, bool_acc, hlir::Value::acc(parent_type), start_token));
 
   instructions.push_back(
       std::make_unique<hlir::Error>(hlir::BranchCondition::TRUE, bool_acc,
