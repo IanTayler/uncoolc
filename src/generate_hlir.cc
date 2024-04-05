@@ -27,22 +27,22 @@ hlir::InstructionList default_initialize(Symbol object_id, Symbol type,
   if (type == symbols.int_type) {
     instructions.push_back(
         std::make_unique<hlir::Mov>(hlir::Value::var(object_id, type),
-                                    hlir::Value::literal(0, type), token));
+                                    hlir::Value::constant(0, type), token));
 
   } else if (type == symbols.bool_type) {
     instructions.push_back(
         std::make_unique<hlir::Mov>(hlir::Value::var(object_id, type),
-                                    hlir::Value::literal(false, type), token));
+                                    hlir::Value::constant(false, type), token));
 
   } else if (type == symbols.string_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::var(object_id, type),
-        hlir::Value::literal(symbols.string_empty, type), token));
+        hlir::Value::constant(symbols.string_empty, type), token));
 
   } else {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::var(object_id, type),
-        hlir::Value::literal(symbols.void_value, type), token));
+        hlir::Value::constant(symbols.void_value, type), token));
   }
 
   return instructions;
@@ -110,25 +110,25 @@ hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
   if (literal_type == context.symbols.int_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
-        hlir::Value::literal(int_eval(value, context.symbols), literal_type),
+        hlir::Value::constant(int_eval(value, context.symbols), literal_type),
         start_token));
 
   } else if (literal_type == context.symbols.bool_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
-        hlir::Value::literal(bool_eval(value, context.symbols), literal_type),
+        hlir::Value::constant(bool_eval(value, context.symbols), literal_type),
         start_token));
 
   } else if (literal_type == context.symbols.bool_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
-        hlir::Value::literal(string_eval(value, context.symbols), literal_type),
+        hlir::Value::constant(string_eval(value, context.symbols), literal_type),
         start_token));
 
   } else {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
-        hlir::Value::literal(value, literal_type), start_token));
+        hlir::Value::constant(value, literal_type), start_token));
   }
 
   return instructions;
@@ -321,7 +321,7 @@ hlir::InstructionList IfNode::to_hlir(hlir::Context &context) const {
   // Add a jump to the exit after the then, skipping the else section
   instructions.push_back(std::make_unique<hlir::Branch>(
       hlir::BranchCondition::ALWAYS,
-      hlir::Value::literal(true, context.symbols.bool_type), exit_position,
+      hlir::Value::constant(true, context.symbols.bool_type), exit_position,
       then_expr->start_token));
 
   // Now add the else label and body
@@ -364,7 +364,7 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   // condition evaluation
   instructions.push_back(std::make_unique<hlir::Branch>(
       hlir::BranchCondition::ALWAYS,
-      hlir::Value::literal(true, context.symbols.bool_type), condition_position,
+      hlir::Value::constant(true, context.symbols.bool_type), condition_position,
       body_expr->start_token));
 
   // This is the exit from the while loop
@@ -439,7 +439,7 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
   // check if type is tree_root_type (case_unmatched error)
   instructions.push_back(std::make_unique<hlir::Binary>(
       hlir::Op::EQUAL, bool_acc, current_type,
-      hlir::Value::literal(context.symbols.tree_root_type,
+      hlir::Value::constant(context.symbols.tree_root_type,
                            context.symbols.type_id_type),
       start_token));
 
@@ -459,7 +459,7 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
     // Check if type matches,
     instructions.push_back(std::make_unique<hlir::Binary>(
         hlir::Op::EQUAL, bool_acc, current_type,
-        hlir::Value::literal(branch->declared_type,
+        hlir::Value::constant(branch->declared_type,
                              context.symbols.type_id_type),
         branch->start_token));
 
@@ -476,7 +476,7 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
 
   instructions.push_back(std::make_unique<hlir::Branch>(
       hlir::BranchCondition::ALWAYS,
-      hlir::Value::literal(true, context.symbols.bool_type), case_loop_position,
+      hlir::Value::constant(true, context.symbols.bool_type), case_loop_position,
       start_token));
 
   // Now add the labels and bodies for all of the branches
@@ -491,7 +491,7 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
 
     instructions.push_back(std::make_unique<hlir::Branch>(
         hlir::BranchCondition::ALWAYS,
-        hlir::Value::literal(true, context.symbols.bool_type), exit_position,
+        hlir::Value::constant(true, context.symbols.bool_type), exit_position,
         case_branch->start_token));
   }
 

@@ -26,7 +26,7 @@ std::string to_string(ValueKind kind) {
   case ValueKind::ACC:
     return "acc";
   case ValueKind::CONSTANT:
-    return "literal";
+    return "constant";
   }
 }
 
@@ -94,15 +94,15 @@ Value Value::acc(Symbol static_type) {
   return Value(ValueKind::ACC, static_type);
 }
 
-Value Value::literal(int value, Symbol static_type) {
+Value Value::constant(int value, Symbol static_type) {
   return Value(ValueKind::CONSTANT, value, static_type);
 }
 
-Value Value::literal(bool value, Symbol static_type) {
+Value Value::constant(bool value, Symbol static_type) {
   return Value(ValueKind::CONSTANT, value, static_type);
 }
 
-Value Value::literal(Symbol value, Symbol static_type) {
+Value Value::constant(Symbol value, Symbol static_type) {
   return Value(ValueKind::CONSTANT, value, static_type);
 }
 

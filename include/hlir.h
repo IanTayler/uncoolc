@@ -51,9 +51,9 @@ public:
   static Value var(Symbol, Symbol);
   static Value temp(int, Symbol);
   static Value acc(Symbol);
-  static Value literal(int, Symbol);
-  static Value literal(bool, Symbol);
-  static Value literal(Symbol, Symbol);
+  static Value constant(int, Symbol);
+  static Value constant(bool, Symbol);
+  static Value constant(Symbol, Symbol);
 };
 
 std::string to_string(Value, const SymbolTable &);
