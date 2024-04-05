@@ -1,5 +1,6 @@
 #include "hlir.h"
 #include "error.h"
+#include "runtime.h"
 #include <format>
 
 namespace hlir {
@@ -154,6 +155,8 @@ std::string to_string(Op op) {
     return "label";
   case Op::MOV:
     return "mov";
+  case Op::ERROR:
+    return "error";
   case Op::TYPE_ID_OF:
     return "typeof";
   case Op::SUPERCLASS:
@@ -324,6 +327,21 @@ void Mov::print(Printer printer, const SymbolTable &symbols) const {
   printer.println(std::format("{} {}, {}", hlir::to_string(op),
                               hlir::to_string(dest, symbols),
                               hlir::to_string(src, symbols)));
+  printer.exit();
+}
+
+//
+// Error
+//
+
+Error::Error(BranchCondition ec, Value v, runtime::Error re, Token t)
+    : error(re), condition(ec), check(v), Instruction(Op::ERROR, t) {}
+
+void Error::print(Printer printer, const SymbolTable &symbols) const {
+  printer.enter();
+  printer.println(std::format(
+      "{}.{} {} {}", hlir::to_string(op), hlir::to_string(condition),
+      hlir::to_string(check, symbols), runtime::to_string(error)));
   printer.exit();
 }
 

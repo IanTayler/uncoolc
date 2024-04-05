@@ -2,6 +2,7 @@
 #define _HLIR_H
 
 #include "printer.h"
+#include "runtime.h"
 #include "symbol.h"
 #include "token.h"
 #include <list>
@@ -83,6 +84,7 @@ enum class Op {
   BRANCH,
   LABEL,
   MOV,
+  ERROR,
   TYPE_ID_OF,
   SUPERCLASS,
 };
@@ -215,6 +217,17 @@ private:
 
 public:
   Mov(Value, Value, Token t);
+
+  void print(Printer, const SymbolTable &) const override;
+};
+
+class Error : public Instruction {
+public:
+  BranchCondition condition;
+  Value check;
+  runtime::Error error;
+
+  Error(BranchCondition, Value, runtime::Error, Token t);
 
   void print(Printer, const SymbolTable &) const override;
 };
