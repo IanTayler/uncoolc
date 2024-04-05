@@ -400,9 +400,8 @@ hlir::InstructionList LetNode::to_hlir(hlir::Context &context) const {
   return instructions;
 }
 
-// TODO(IT) fill in
 hlir::InstructionList CaseBranchNode::to_hlir(hlir::Context &context) const {
-  return hlir::InstructionList();
+  return body_expr->to_hlir(context);
 }
 
 hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
