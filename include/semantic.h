@@ -7,24 +7,48 @@
 
 /***********************
  *                     *
+ *       VarInfo       *
+ *                     *
+ **********************/
+
+enum class VarLifetime {
+  Attribute,
+  Argument,
+  Local,
+  Undefined,
+};
+
+class VarInfo {
+public:
+  Symbol type;
+  VarLifetime lifetime;
+
+  VarInfo(Symbol, VarLifetime);
+  VarInfo();
+
+  bool is_undefined() const;
+};
+
+/***********************
+ *                     *
  *        Scope        *
  *                     *
  **********************/
 
 class Scopes {
 private:
-  std::forward_list<std::unordered_map<int, Symbol>> scopes;
+  std::forward_list<std::unordered_map<int, VarInfo>> scopes;
 
 public:
   Scopes();
   void enter();
   void exit();
 
-  void assign(Symbol name, Symbol type);
+  void assign(Symbol name, Symbol type, VarLifetime kind);
   /// Read the full scope to find the latest definition of a symbol
-  Symbol get(Symbol name) const;
+  VarInfo get(Symbol name) const;
   /// Check the definition of a symbol in the outermost scope
-  Symbol lookup(Symbol name) const;
+  VarInfo lookup(Symbol name) const;
 };
 
 /***********************

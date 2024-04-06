@@ -53,7 +53,8 @@ bool MethodNode::typecheck(TypeContext &context) {
   context.scopes.enter();
 
   for (const auto &param : parameters) {
-    context.scopes.assign(param->object_id, param->declared_type);
+    context.scopes.assign(param->object_id, param->declared_type,
+                          VarLifetime::Argument);
   }
 
   check = body->typecheck(context) && check;
@@ -88,7 +89,8 @@ bool ClassNode::typecheck(TypeContext &context) {
 
   for (const auto &attribute : attributes) {
     check = attribute->typecheck(context) && check;
-    context.scopes.assign(attribute->object_id, attribute->declared_type);
+    context.scopes.assign(attribute->object_id, attribute->declared_type,
+                          VarLifetime::Attribute);
   }
 
   for (const auto &method : methods) {
@@ -149,16 +151,16 @@ bool LiteralNode::typecheck(TypeContext &context) {
 }
 
 bool VariableNode::typecheck(TypeContext &context) {
-  Symbol variable_type = context.scopes.get(name);
+  VarInfo variable_info = context.scopes.get(name);
 
-  if (variable_type.is_empty()) {
+  if (variable_info.is_undefined()) {
     fatal(std::format("Undefined variable {}. Cannot set type",
                       context.symbols.get_string(name)),
           start_token);
     return false; // fool linter
   }
 
-  static_type = variable_type;
+  static_type = variable_info.type;
   return true;
 }
 
@@ -277,9 +279,9 @@ bool AssignNode::typecheck(TypeContext &context) {
 
   static_type = expression->static_type.value();
 
-  Symbol variable_type = context.scopes.get(variable);
+  VarInfo variable_info = context.scopes.get(variable);
 
-  if (variable_type.is_empty()) {
+  if (variable_info.is_undefined()) {
     error(std::format("Undefined variable {}",
                       context.symbols.get_string(variable)),
           start_token);
@@ -476,7 +478,8 @@ bool LetNode::typecheck(TypeContext &context) {
       }
     }
 
-    context.scopes.assign(declaration->object_id, declaration->declared_type);
+    context.scopes.assign(declaration->object_id, declaration->declared_type,
+                          VarLifetime::Local);
   }
 
   check = body_expr->typecheck(context) && check;
@@ -492,7 +495,7 @@ bool LetNode::typecheck(TypeContext &context) {
 
 bool CaseBranchNode::typecheck(TypeContext &context) {
   context.scopes.enter();
-  context.scopes.assign(object_id, declared_type);
+  context.scopes.assign(object_id, declared_type, VarLifetime::Local);
 
   bool check = body_expr->typecheck(context);
   context.scopes.exit();

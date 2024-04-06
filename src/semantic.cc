@@ -5,33 +5,47 @@
 
 /***********************
  *                     *
+ *       VarInfo       *
+ *                     *
+ **********************/
+
+VarInfo::VarInfo(Symbol t, VarLifetime l) : type(t), lifetime(l) {}
+
+VarInfo::VarInfo() : type(Symbol{}), lifetime{VarLifetime::Undefined} {}
+
+bool VarInfo::is_undefined() const {
+  return lifetime == VarLifetime::Undefined;
+}
+
+/***********************
+ *                     *
  *        Scope        *
  *                     *
  **********************/
 
 Scopes::Scopes() {}
 
-void Scopes::enter() { scopes.push_front(std::unordered_map<int, Symbol>()); }
+void Scopes::enter() { scopes.push_front(std::unordered_map<int, VarInfo>()); }
 void Scopes::exit() { scopes.pop_front(); }
 
-void Scopes::assign(Symbol name, Symbol type) {
-  scopes.front()[name.id] = type;
+void Scopes::assign(Symbol name, Symbol type, VarLifetime kind) {
+  scopes.front()[name.id] = VarInfo(type, kind);
 }
 
-Symbol Scopes::get(Symbol name) const {
+VarInfo Scopes::get(Symbol name) const {
   for (auto &scope : scopes) {
     if (scope.find(name.id) != scope.end()) {
       return scope.at(name.id);
     }
   }
-  return Symbol{};
+  return VarInfo{};
 }
 
-Symbol Scopes::lookup(Symbol name) const {
+VarInfo Scopes::lookup(Symbol name) const {
   try {
     return scopes.front().at(name.id);
   } catch (const std::out_of_range &) {
-    return Symbol{};
+    return VarInfo{};
   }
 }
 
@@ -133,7 +147,7 @@ void TypeContext::assign_attributes(Symbol class_name) {
                           symbols.get_string(attr)),
               Token{});
 
-      scopes.assign(attr, attr_ptr->declared_type);
+      scopes.assign(attr, attr_ptr->declared_type, VarLifetime::Attribute);
     }
 
     class_name = cls->superclass();
