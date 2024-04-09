@@ -11,11 +11,9 @@
 
 VarInfo::VarInfo(Symbol t, Lifetime l) : type(t), lifetime(l) {}
 
-VarInfo::VarInfo() : type(Symbol{}), lifetime{Lifetime::UNDEFINED} {}
+VarInfo VarInfo::undefined() { return VarInfo(Symbol{}, Lifetime::UNDEFINED); }
 
-bool VarInfo::is_undefined() const {
-  return lifetime == Lifetime::UNDEFINED;
-}
+bool VarInfo::is_undefined() const { return lifetime == Lifetime::UNDEFINED; }
 
 /***********************
  *                     *
@@ -29,7 +27,7 @@ void Scopes::enter() { scopes.push_front(std::unordered_map<int, VarInfo>()); }
 void Scopes::exit() { scopes.pop_front(); }
 
 void Scopes::assign(Symbol name, Symbol type, Lifetime kind) {
-  scopes.front()[name.id] = VarInfo(type, kind);
+  scopes.front().emplace(name.id, VarInfo(type, kind));
 }
 
 VarInfo Scopes::get(Symbol name) const {
@@ -38,14 +36,14 @@ VarInfo Scopes::get(Symbol name) const {
       return scope.at(name.id);
     }
   }
-  return VarInfo{};
+  return VarInfo::undefined();
 }
 
 VarInfo Scopes::lookup(Symbol name) const {
   try {
     return scopes.front().at(name.id);
   } catch (const std::out_of_range &) {
-    return VarInfo{};
+    return VarInfo::undefined();
   }
 }
 

@@ -18,7 +18,8 @@ public:
   Lifetime lifetime;
 
   VarInfo(Symbol, Lifetime);
-  VarInfo();
+
+  static VarInfo undefined();
 
   bool is_undefined() const;
 };

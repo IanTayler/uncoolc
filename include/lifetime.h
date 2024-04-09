@@ -6,6 +6,7 @@ enum class Lifetime {
   ARGUMENT,
   LOCAL,
   UNDEFINED,
+  UNKNOWN,
 };
 
 #endif // !_LIFETIME_H
