@@ -161,6 +161,8 @@ bool VariableNode::typecheck(TypeContext &context) {
   }
 
   static_type = variable_info.type;
+  lifetime = variable_info.lifetime;
+
   return true;
 }
 
@@ -287,6 +289,8 @@ bool AssignNode::typecheck(TypeContext &context) {
           start_token);
     check = false;
   }
+
+  lifetime = variable_info.lifetime;
 
   return check;
 }
