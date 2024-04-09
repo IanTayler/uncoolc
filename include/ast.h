@@ -2,6 +2,7 @@
 #define _AST_H
 
 #include "hlir.h"
+#include "lifetime.h"
 #include "printer.h"
 #include "symbol.h"
 #include "token.h"
@@ -186,9 +187,11 @@ public:
 class VariableNode : public ExpressionNode {
 private:
   Symbol name;
+  Lifetime lifetime;
 
 public:
-  VariableNode(Token t) : name(t.symbol()), ExpressionNode(t) {}
+  VariableNode(Token t)
+      : name(t.symbol()), lifetime(Lifetime::UNKNOWN), ExpressionNode(t) {}
 
   void print(Printer printer, const SymbolTable &symbols) override;
 
@@ -267,10 +270,11 @@ public:
 class AssignNode : public ExpressionNode {
 private:
   Symbol variable;
+  Lifetime lifetime;
   ExpressionPtr expression;
 
 public:
-  AssignNode(Token s) : ExpressionNode(s) {}
+  AssignNode(Token s) : lifetime(Lifetime::UNKNOWN), ExpressionNode(s) {}
 
   virtual int arity() override;
   virtual void add_child(std::unique_ptr<ExpressionNode> &new_child) override;
