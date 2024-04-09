@@ -2,6 +2,7 @@
 #define _SEMANTIC_H
 
 #include "ast.h"
+#include "lifetime.h"
 #include "symbol.h"
 #include <forward_list>
 
@@ -11,19 +12,12 @@
  *                     *
  **********************/
 
-enum class VarLifetime {
-  Attribute,
-  Argument,
-  Local,
-  Undefined,
-};
-
 class VarInfo {
 public:
   Symbol type;
-  VarLifetime lifetime;
+  Lifetime lifetime;
 
-  VarInfo(Symbol, VarLifetime);
+  VarInfo(Symbol, Lifetime);
   VarInfo();
 
   bool is_undefined() const;
@@ -44,7 +38,7 @@ public:
   void enter();
   void exit();
 
-  void assign(Symbol name, Symbol type, VarLifetime kind);
+  void assign(Symbol name, Symbol type, Lifetime kind);
   /// Read the full scope to find the latest definition of a symbol
   VarInfo get(Symbol name) const;
   /// Check the definition of a symbol in the outermost scope

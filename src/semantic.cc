@@ -9,12 +9,12 @@
  *                     *
  **********************/
 
-VarInfo::VarInfo(Symbol t, VarLifetime l) : type(t), lifetime(l) {}
+VarInfo::VarInfo(Symbol t, Lifetime l) : type(t), lifetime(l) {}
 
-VarInfo::VarInfo() : type(Symbol{}), lifetime{VarLifetime::Undefined} {}
+VarInfo::VarInfo() : type(Symbol{}), lifetime{Lifetime::UNDEFINED} {}
 
 bool VarInfo::is_undefined() const {
-  return lifetime == VarLifetime::Undefined;
+  return lifetime == Lifetime::UNDEFINED;
 }
 
 /***********************
@@ -28,7 +28,7 @@ Scopes::Scopes() {}
 void Scopes::enter() { scopes.push_front(std::unordered_map<int, VarInfo>()); }
 void Scopes::exit() { scopes.pop_front(); }
 
-void Scopes::assign(Symbol name, Symbol type, VarLifetime kind) {
+void Scopes::assign(Symbol name, Symbol type, Lifetime kind) {
   scopes.front()[name.id] = VarInfo(type, kind);
 }
 
@@ -147,7 +147,7 @@ void TypeContext::assign_attributes(Symbol class_name) {
                           symbols.get_string(attr)),
               Token{});
 
-      scopes.assign(attr, attr_ptr->declared_type, VarLifetime::Attribute);
+      scopes.assign(attr, attr_ptr->declared_type, Lifetime::ATTRIBUTE);
     }
 
     class_name = cls->superclass();

@@ -54,7 +54,7 @@ bool MethodNode::typecheck(TypeContext &context) {
 
   for (const auto &param : parameters) {
     context.scopes.assign(param->object_id, param->declared_type,
-                          VarLifetime::Argument);
+                          Lifetime::ARGUMENT);
   }
 
   check = body->typecheck(context) && check;
@@ -90,7 +90,7 @@ bool ClassNode::typecheck(TypeContext &context) {
   for (const auto &attribute : attributes) {
     check = attribute->typecheck(context) && check;
     context.scopes.assign(attribute->object_id, attribute->declared_type,
-                          VarLifetime::Attribute);
+                          Lifetime::ATTRIBUTE);
   }
 
   for (const auto &method : methods) {
@@ -479,7 +479,7 @@ bool LetNode::typecheck(TypeContext &context) {
     }
 
     context.scopes.assign(declaration->object_id, declaration->declared_type,
-                          VarLifetime::Local);
+                          Lifetime::LOCAL);
   }
 
   check = body_expr->typecheck(context) && check;
@@ -495,7 +495,7 @@ bool LetNode::typecheck(TypeContext &context) {
 
 bool CaseBranchNode::typecheck(TypeContext &context) {
   context.scopes.enter();
-  context.scopes.assign(object_id, declared_type, VarLifetime::Local);
+  context.scopes.assign(object_id, declared_type, Lifetime::LOCAL);
 
   bool check = body_expr->typecheck(context);
   context.scopes.exit();
