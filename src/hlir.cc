@@ -136,8 +136,6 @@ std::string to_string(Op op) {
     return "isvoid";
   case Op::NEW:
     return "new";
-  case Op::ADD_ARG:
-    return "add_arg";
   case Op::CALL:
     return "call";
   case Op::BRANCH:

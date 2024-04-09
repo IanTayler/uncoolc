@@ -76,7 +76,6 @@ enum class Op {
   NOT,
   IS_VOID,
   NEW,
-  ADD_ARG,
   CALL,
   BRANCH,
   LABEL,
