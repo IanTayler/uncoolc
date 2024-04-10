@@ -19,8 +19,10 @@ std::string to_string(ValueKind kind) {
   switch (kind) {
   case ValueKind::SELF:
     return "self";
-  case ValueKind::VAR:
-    return "var";
+  case ValueKind::LOCAL:
+    return "local";
+  case ValueKind::ATTRIBUTE:
+    return "attr";
   case ValueKind::TEMP:
     return "temp";
   case ValueKind::ACC:
@@ -37,8 +39,11 @@ std::string to_string(Value value, const SymbolTable &symbols) {
   case ValueKind::SELF:
     return "[self]";
 
-  case ValueKind::VAR:
-    return std::format("[var: {}]", symbols.get_string(value.symbol));
+  case ValueKind::LOCAL:
+    return std::format("[local: {}]", symbols.get_string(value.symbol));
+
+  case ValueKind::ATTRIBUTE:
+    return std::format("[attr: {}]", symbols.get_string(value.symbol));
 
   case ValueKind::TEMP:
     return std::format("[temp: {}]", value.num);
@@ -82,8 +87,12 @@ Value Value::self(Symbol static_type) {
   return Value(ValueKind::SELF, static_type);
 }
 
-Value Value::var(Symbol name, Symbol static_type) {
-  return Value(ValueKind::VAR, name, static_type);
+Value Value::attr(Symbol name, Symbol static_type) {
+  return Value(ValueKind::ATTRIBUTE, name, static_type);
+}
+
+Value Value::local(Symbol name, Symbol static_type) {
+  return Value(ValueKind::LOCAL, name, static_type);
 }
 
 Value Value::temp(int id, Symbol static_type) {

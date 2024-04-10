@@ -26,22 +26,22 @@ hlir::InstructionList default_initialize(Symbol object_id, Symbol type,
 
   if (type == symbols.int_type) {
     instructions.push_back(
-        std::make_unique<hlir::Mov>(hlir::Value::var(object_id, type),
+        std::make_unique<hlir::Mov>(hlir::Value::attr(object_id, type),
                                     hlir::Value::constant(0, type), token));
 
   } else if (type == symbols.bool_type) {
     instructions.push_back(
-        std::make_unique<hlir::Mov>(hlir::Value::var(object_id, type),
+        std::make_unique<hlir::Mov>(hlir::Value::attr(object_id, type),
                                     hlir::Value::constant(false, type), token));
 
   } else if (type == symbols.string_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(object_id, type),
+        hlir::Value::attr(object_id, type),
         hlir::Value::constant(symbols.string_empty, type), token));
 
   } else {
     instructions.push_back(std::make_unique<hlir::Mov>(
-        hlir::Value::var(object_id, type),
+        hlir::Value::attr(object_id, type),
         hlir::Value::constant(symbols.void_value, type), token));
   }
 
@@ -61,7 +61,7 @@ hlir::Class ClassNode::to_hlir_class(SymbolTable &symbols) const {
           attribute->initializer.value()->to_hlir(initializer_context));
 
       cls.initializer.push_back(std::make_unique<hlir::Mov>(
-          hlir::Value::var(attribute->object_id, attribute->declared_type),
+          hlir::Value::attr(attribute->object_id, attribute->declared_type),
           hlir::Value::acc(attribute->initializer.value()->static_type.value()),
           start_token));
 
@@ -137,9 +137,17 @@ hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
 
 hlir::InstructionList VariableNode::to_hlir(hlir::Context &context) const {
   auto instructions = hlir::InstructionList();
+
+  hlir::Value from = hlir::Value::attr(name, static_type.value());
+
+  if (lifetime == Lifetime::ATTRIBUTE)
+    from.kind = hlir::ValueKind::ATTRIBUTE;
+  else if (lifetime != Lifetime::LOCAL && lifetime != Lifetime::ARGUMENT)
+    fatal("INTERNAL: VariableNode has invalid lifetime. Expected ATTRIBUTE, "
+          "LOCAL or ARGUMENT.");
+
   instructions.push_back(std::make_unique<hlir::Mov>(
-      hlir::Value::acc(static_type.value()),
-      hlir::Value::var(name, static_type.value()), start_token));
+      hlir::Value::acc(static_type.value()), from, start_token));
 
   return instructions;
 }
@@ -239,8 +247,17 @@ hlir::InstructionList AssignNode::to_hlir(hlir::Context &context) const {
   auto instructions = expression->to_hlir(context);
   Symbol type = expression->static_type.value();
 
-  instructions.push_back(std::make_unique<hlir::Mov>(
-      hlir::Value::var(variable, type), hlir::Value::acc(type), start_token));
+  hlir::Value dest = hlir::Value::attr(variable, static_type.value());
+
+  if (lifetime == Lifetime::ATTRIBUTE)
+    dest.kind = hlir::ValueKind::ATTRIBUTE;
+  else if (lifetime != Lifetime::LOCAL)
+    fatal("INTERNAL: AssignNode has invalid lifetime. Expected ATTRIBUTE or "
+          "LOCAL.");
+
+  instructions.push_back(
+      std::make_unique<hlir::Mov>(dest, hlir::Value::acc(type), start_token));
+
   return instructions;
 }
 
@@ -269,8 +286,7 @@ hlir::InstructionList DispatchNode::to_hlir(hlir::Context &context) const {
   } else {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(context.symbols.self_type),
-        hlir::Value::var(context.symbols.self_var, context.symbols.self_type),
-        start_token));
+        hlir::Value::self(context.symbols.self_type), start_token));
 
     target_type = context.symbols.self_type;
   }
@@ -385,7 +401,8 @@ hlir::InstructionList LetNode::to_hlir(hlir::Context &context) const {
                           declaration->initializer.value()->to_hlir(context));
 
       instructions.push_back(std::make_unique<hlir::Mov>(
-          hlir::Value::var(declaration->object_id, declaration->declared_type),
+          hlir::Value::local(declaration->object_id,
+                             declaration->declared_type),
           hlir::Value::acc(declaration->declared_type),
           declaration->start_token));
 

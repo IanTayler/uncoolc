@@ -17,7 +17,8 @@ namespace hlir {
 
 enum class ValueKind {
   SELF,
-  VAR,
+  ATTRIBUTE,
+  LOCAL,
   TEMP,
   ACC,
   CONSTANT,
@@ -37,7 +38,7 @@ public:
 
   // Which of these fields is used depends on the kind and static_type
   // - SELF ignores these values
-  // - VAR uses symbol, for the variable name.
+  // - LOCAL, ATTR use symbol for the variable name.
   // - TEMP uses num as the temp id
   // - ACC ignores these values
   // - CONSTANT uses the field matching their type, with strings using Symbol
@@ -48,7 +49,8 @@ public:
   };
 
   static Value self(Symbol);
-  static Value var(Symbol, Symbol);
+  static Value attr(Symbol, Symbol);
+  static Value local(Symbol, Symbol);
   static Value temp(int, Symbol);
   static Value acc(Symbol);
   static Value constant(int, Symbol);
