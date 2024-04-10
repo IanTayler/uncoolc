@@ -159,3 +159,11 @@ VarInfo TypeContext::get_var(Symbol name) const {
 
   return scopes.get(name);
 }
+
+MethodNode *TypeContext::get_method(Symbol class_name,
+                                    Symbol method_name) const {
+  if (class_name == symbols.self_type)
+    return tree.get_method(current_class, method_name);
+
+  return tree.get_method(class_name, method_name);
+}

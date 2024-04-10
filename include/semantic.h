@@ -153,6 +153,7 @@ public:
   bool match(Symbol type_a, Symbol type_b) const;
 
   VarInfo get_var(Symbol name) const;
+  MethodNode *get_method(Symbol class_name, Symbol method_name) const;
 
   void assign_attributes(Symbol class_name);
 };

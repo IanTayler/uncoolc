@@ -142,9 +142,11 @@ hlir::InstructionList VariableNode::to_hlir(hlir::Context &context) const {
 
   if (lifetime == Lifetime::ATTRIBUTE)
     from.kind = hlir::ValueKind::ATTRIBUTE;
+  else if (lifetime == Lifetime::SELF)
+    from.kind = hlir::ValueKind::SELF;
   else if (lifetime != Lifetime::LOCAL && lifetime != Lifetime::ARGUMENT)
     fatal("INTERNAL: VariableNode has invalid lifetime. Expected ATTRIBUTE, "
-          "LOCAL or ARGUMENT.");
+          "LOCAL, ARGUMENT or SELF.");
 
   instructions.push_back(std::make_unique<hlir::Mov>(
       hlir::Value::acc(static_type.value()), from, start_token));
