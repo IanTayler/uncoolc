@@ -29,6 +29,8 @@ std::string to_string(ValueKind kind) {
     return "acc";
   case ValueKind::CONSTANT:
     return "constant";
+  case ValueKind::EMPTY:
+    return "empty";
   }
 }
 
@@ -62,6 +64,9 @@ std::string to_string(Value value, const SymbolTable &symbols) {
       return std::format("\"{}\"", value.num);
 
     return std::format("{}", symbols.get_string(value.symbol));
+
+  case ValueKind::EMPTY:
+    return "[empty]";
   }
 
   return "__unknown_value_kind__";
@@ -114,6 +119,14 @@ Value Value::constant(bool value, Symbol static_type) {
 Value Value::constant(Symbol value, Symbol static_type) {
   return Value(ValueKind::CONSTANT, value, static_type);
 }
+
+Value Value::empty() { return Value(ValueKind::EMPTY, Symbol{}); }
+
+//
+// Accessors
+//
+
+bool Value::is_empty() const { return kind == ValueKind::EMPTY; }
 
 /***********************
  *                     *

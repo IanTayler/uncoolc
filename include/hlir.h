@@ -22,6 +22,7 @@ enum class ValueKind {
   TEMP,
   ACC,
   CONSTANT,
+  EMPTY,
 };
 
 std::string to_string(ValueKind);
@@ -56,6 +57,9 @@ public:
   static Value constant(int, Symbol);
   static Value constant(bool, Symbol);
   static Value constant(Symbol, Symbol);
+  static Value empty();
+
+  bool is_empty() const;
 };
 
 std::string to_string(Value, const SymbolTable &);
