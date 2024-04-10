@@ -164,9 +164,9 @@ std::string to_string(const BranchCondition condition) {
   case BranchCondition::ALWAYS:
     return "always";
   case BranchCondition::TRUE:
-    return "True";
+    return "true";
   case BranchCondition::FALSE:
-    return "False";
+    return "false";
   }
 }
 
