@@ -303,6 +303,8 @@ inline Associativity Parser::op_associativity(Token t) const {
 inline int Parser::op_precedence(Token t) const {
   Symbol s = t.symbol();
 
+  if (t.type() == TokenType::DOT)
+    return 14;
   if (s == symbols.neg_op)
     return 12;
   if (s == symbols.isvoid_kw)
@@ -325,6 +327,7 @@ inline bool Parser::takes_left(Token t) const {
   switch (t.type()) {
   case TokenType::SIMPLE_OP:
   case TokenType::ASSIGN:
+  case TokenType::DOT:
     return true;
   default:
     return false;
