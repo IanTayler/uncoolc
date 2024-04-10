@@ -147,7 +147,7 @@ public:
 
   Scopes &scopes;
   Symbol current_class;
-  const ClassTree &tree;
+  const ClassTree &class_tree;
   SymbolTable &symbols;
 
   bool match(Symbol type_a, Symbol type_b) const;

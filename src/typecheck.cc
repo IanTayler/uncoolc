@@ -317,7 +317,7 @@ bool DispatchNode::typecheck(TypeContext &context) {
   Symbol parsed_target_type =
       target_type == symbols.self_type ? context.current_class : target_type;
 
-  MethodNode *method_ptr = context.tree.get_method(parsed_target_type, method);
+  MethodNode *method_ptr = context.class_tree.get_method(parsed_target_type, method);
 
   if (!method_ptr) {
     error(std::format("Call to undefined method {}.{}",
@@ -419,7 +419,7 @@ bool IfNode::typecheck(TypeContext &context) {
   Symbol type_else = else_expr->static_type.value();
 
   std::optional<ClassInfo> common_class =
-      context.tree.common_ancestor(type_then, type_else);
+      context.class_tree.common_ancestor(type_then, type_else);
 
   if (!common_class.has_value())
     fatal(std::format("INTERNAL: failed to get common class for {} and {}: "
@@ -543,7 +543,7 @@ bool CaseNode::typecheck(TypeContext &context) {
       common_type = branch->static_type.value();
 
     } else {
-      std::optional<ClassInfo> opt_common_type = context.tree.common_ancestor(
+      std::optional<ClassInfo> opt_common_type = context.class_tree.common_ancestor(
           branch->static_type.value(), common_type);
 
       if (!opt_common_type.has_value())
@@ -567,7 +567,7 @@ bool CaseNode::typecheck(TypeContext &context) {
  **********************/
 
 bool MethodNode::typecheck_inheritance(const TypeContext &context) const {
-  std::optional<ClassInfo> cls = context.tree.get(context.current_class);
+  std::optional<ClassInfo> cls = context.class_tree.get(context.current_class);
   if (!cls.has_value())
     fatal(
         std::format("INTERNAL: clould not find class marked as current_class {}"
@@ -580,7 +580,7 @@ bool MethodNode::typecheck_inheritance(const TypeContext &context) const {
   bool check = true;
 
   Symbol superclass_name = cls->superclass();
-  MethodNode *inherited_method = context.tree.get_method(superclass_name, name);
+  MethodNode *inherited_method = context.class_tree.get_method(superclass_name, name);
   if (inherited_method) {
     if (inherited_method->return_type != return_type) {
       error(std::format("Method {}.{} has return type {} but redefines an "
@@ -624,7 +624,7 @@ bool MethodNode::typecheck_inheritance(const TypeContext &context) const {
 }
 
 bool AttributeNode::typecheck_inheritance(const TypeContext &context) const {
-  std::optional<ClassInfo> cls = context.tree.get(context.current_class);
+  std::optional<ClassInfo> cls = context.class_tree.get(context.current_class);
   if (!cls.has_value())
     fatal(
         std::format("INTERNAL: clould not find class marked as current_class {}"
@@ -636,7 +636,7 @@ bool AttributeNode::typecheck_inheritance(const TypeContext &context) const {
 
   Symbol superclass_name = cls->superclass();
   AttributeNode *inherited_attribute =
-      context.tree.get_attribute(superclass_name, object_id);
+      context.class_tree.get_attribute(superclass_name, object_id);
 
   if (inherited_attribute &&
       inherited_attribute->declared_type != declared_type) {

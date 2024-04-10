@@ -114,7 +114,7 @@ std::vector<Symbol> ClassInfo::attributes() const {
 
 TypeContext::TypeContext(Scopes &scps, Symbol cc, const ClassTree &ct,
                          SymbolTable &st)
-    : scopes(scps), current_class(cc), tree(ct), symbols(st) {}
+    : scopes(scps), current_class(cc), class_tree(ct), symbols(st) {}
 
 bool TypeContext::match(Symbol type_a, Symbol type_b) const {
   if (type_a == symbols.self_type)
@@ -123,12 +123,12 @@ bool TypeContext::match(Symbol type_a, Symbol type_b) const {
   if (type_b == symbols.self_type)
     type_b = current_class;
 
-  return tree.is_subclass(type_a, type_b);
+  return class_tree.is_subclass(type_a, type_b);
 }
 
 void TypeContext::assign_attributes(Symbol class_name) {
   while (class_name != symbols.tree_root_type) {
-    std::optional<ClassInfo> cls = tree.get(class_name);
+    std::optional<ClassInfo> cls = class_tree.get(class_name);
     if (!cls.has_value())
       fatal(
           std::format(
@@ -163,7 +163,7 @@ VarInfo TypeContext::get_var(Symbol name) const {
 MethodNode *TypeContext::get_method(Symbol class_name,
                                     Symbol method_name) const {
   if (class_name == symbols.self_type)
-    return tree.get_method(current_class, method_name);
+    return class_tree.get_method(current_class, method_name);
 
-  return tree.get_method(class_name, method_name);
+  return class_tree.get_method(class_name, method_name);
 }
