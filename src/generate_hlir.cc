@@ -122,7 +122,8 @@ hlir::InstructionList LiteralNode::to_hlir(hlir::Context &context) const {
   } else if (literal_type == context.symbols.bool_type) {
     instructions.push_back(std::make_unique<hlir::Mov>(
         hlir::Value::acc(literal_type),
-        hlir::Value::constant(string_eval(value, context.symbols), literal_type),
+        hlir::Value::constant(string_eval(value, context.symbols),
+                              literal_type),
         start_token));
 
   } else {
@@ -364,8 +365,8 @@ hlir::InstructionList WhileNode::to_hlir(hlir::Context &context) const {
   // condition evaluation
   instructions.push_back(std::make_unique<hlir::Branch>(
       hlir::BranchCondition::ALWAYS,
-      hlir::Value::constant(true, context.symbols.bool_type), condition_position,
-      body_expr->start_token));
+      hlir::Value::constant(true, context.symbols.bool_type),
+      condition_position, body_expr->start_token));
 
   // This is the exit from the while loop
   instructions.push_back(std::make_unique<hlir::Label>(
@@ -440,7 +441,7 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
   instructions.push_back(std::make_unique<hlir::Binary>(
       hlir::Op::EQUAL, bool_acc, current_type,
       hlir::Value::constant(context.symbols.tree_root_type,
-                           context.symbols.type_id_type),
+                            context.symbols.type_id_type),
       start_token));
 
   instructions.push_back(std::make_unique<hlir::Error>(
@@ -460,7 +461,7 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
     instructions.push_back(std::make_unique<hlir::Binary>(
         hlir::Op::EQUAL, bool_acc, current_type,
         hlir::Value::constant(branch->declared_type,
-                             context.symbols.type_id_type),
+                              context.symbols.type_id_type),
         branch->start_token));
 
     // Jump to the branch if it does
@@ -476,8 +477,8 @@ hlir::InstructionList CaseNode::to_hlir(hlir::Context &context) const {
 
   instructions.push_back(std::make_unique<hlir::Branch>(
       hlir::BranchCondition::ALWAYS,
-      hlir::Value::constant(true, context.symbols.bool_type), case_loop_position,
-      start_token));
+      hlir::Value::constant(true, context.symbols.bool_type),
+      case_loop_position, start_token));
 
   // Now add the labels and bodies for all of the branches
   for (int i = 0; i < branches.size(); i++) {
