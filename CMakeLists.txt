@@ -20,7 +20,7 @@ add_executable(coolc
   src/classtree.cc
   src/printer.cc
   src/hlir.cc
-  src/generate_hlir.cc
+  src/hlir_from_ast.cc
   src/constant_eval.cc
   src/runtime.cc
 )
@@ -44,7 +44,7 @@ add_executable(tests
   src/classtree.cc
   src/printer.cc
   src/hlir.cc
-  src/generate_hlir.cc
+  src/hlir_from_ast.cc
   src/constant_eval.cc
   src/runtime.cc
 )
