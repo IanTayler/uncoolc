@@ -125,6 +125,7 @@ bool TypeContext::match(Symbol type_a, Symbol type_b) const {
 
   return tree.is_subclass(type_a, type_b);
 }
+
 void TypeContext::assign_attributes(Symbol class_name) {
   while (class_name != symbols.tree_root_type) {
     std::optional<ClassInfo> cls = tree.get(class_name);
@@ -150,4 +151,11 @@ void TypeContext::assign_attributes(Symbol class_name) {
 
     class_name = cls->superclass();
   }
+}
+
+VarInfo TypeContext::get_var(Symbol name) const {
+  if (name == symbols.self_var)
+    return VarInfo(symbols.self_type, Lifetime::SELF);
+
+  return scopes.get(name);
 }

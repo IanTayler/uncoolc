@@ -152,6 +152,8 @@ public:
 
   bool match(Symbol type_a, Symbol type_b) const;
 
+  VarInfo get_var(Symbol name) const;
+
   void assign_attributes(Symbol class_name);
 };
 

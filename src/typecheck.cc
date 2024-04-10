@@ -151,7 +151,7 @@ bool LiteralNode::typecheck(TypeContext &context) {
 }
 
 bool VariableNode::typecheck(TypeContext &context) {
-  VarInfo variable_info = context.scopes.get(name);
+  VarInfo variable_info = context.get_var(name);
 
   if (variable_info.is_undefined()) {
     fatal(std::format("Undefined variable {}. Cannot set type",
@@ -281,7 +281,7 @@ bool AssignNode::typecheck(TypeContext &context) {
 
   static_type = expression->static_type.value();
 
-  VarInfo variable_info = context.scopes.get(variable);
+  VarInfo variable_info = context.get_var(variable);
 
   if (variable_info.is_undefined()) {
     error(std::format("Undefined variable {}",
