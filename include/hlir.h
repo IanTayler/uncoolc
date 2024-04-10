@@ -172,12 +172,13 @@ public:
 
 class Call : public Instruction {
 private:
+  Value dest;
   Value target;
   Symbol method_name;
   std::vector<Value> args;
 
 public:
-  Call(Value, Symbol, Token t);
+  Call(Value, Value, Symbol, Token t);
 
   void print(Printer, const SymbolTable &) const override;
   void add_arg(const Value &);

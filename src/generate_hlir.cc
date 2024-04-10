@@ -275,7 +275,8 @@ hlir::InstructionList DispatchNode::to_hlir(hlir::Context &context) const {
     target_type = context.symbols.self_type;
   }
 
-  auto call = hlir::Call(hlir::Value::acc(target_type), method, start_token);
+  auto call = hlir::Call(hlir::Value::acc(static_type.value()),
+                         hlir::Value::acc(target_type), method, start_token);
 
   // Add all the arguments before the call
   for (const auto &temporary : argument_temporaries) {

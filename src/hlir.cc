@@ -249,17 +249,17 @@ void Binary::print(Printer printer, const SymbolTable &symbols) const {
 // Call
 //
 
-Call::Call(Value ta, Symbol n, Token to)
-    : target(ta), method_name(n), Instruction(Op::CALL, to) {}
+Call::Call(Value d, Value ta, Symbol n, Token to)
+    : dest(d), target(ta), method_name(n), Instruction(Op::CALL, to) {}
 
 void Call::print(Printer printer, const SymbolTable &symbols) const {
   printer.enter();
 
   // We will form this line out of several parts
   printer.beginln();
-  printer.print(std::format("{} {}, {}, (", hlir::to_string(op),
-                            hlir::to_string(target, symbols),
-                            symbols.get_string(method_name)));
+  printer.print(std::format(
+      "{} {}, {}, {}, (", hlir::to_string(op), hlir::to_string(dest, symbols),
+      hlir::to_string(target, symbols), symbols.get_string(method_name)));
 
   for (int i = 0; i < args.size(); i++) {
     const auto &arg = args[i];
