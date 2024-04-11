@@ -257,7 +257,7 @@ Value &Instruction::get_dest() {
   return DUMMY_EMPTY_VALUE;
 }
 
-int Instruction::num_sources() {
+int Instruction::num_args() {
   switch (op) {
   case Op::ADD:
   case Op::SUB:

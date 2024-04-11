@@ -142,7 +142,7 @@ public:
   bool has_dest();
   virtual Value &get_dest();
 
-  int num_sources();
+  int num_args();
   virtual Value &get_arg1();
   virtual Value &get_arg2();
 
