@@ -139,6 +139,13 @@ public:
 
   Instruction(Op o, Token t);
 
+  bool has_dest();
+  virtual Value &get_dest();
+
+  int num_sources();
+  virtual Value &get_arg1();
+  virtual Value &get_arg2();
+
   virtual void print(Printer, const SymbolTable &) const;
 };
 
@@ -149,6 +156,9 @@ private:
 
 public:
   Unary(Op o, Value, Value, Token t);
+
+  Value &get_dest() override;
+  Value &get_arg1() override;
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -161,6 +171,8 @@ private:
 public:
   New(Op o, Value, Symbol, Token t);
 
+  Value &get_dest() override;
+
   void print(Printer, const SymbolTable &) const override;
 };
 
@@ -172,6 +184,10 @@ private:
 
 public:
   Binary(Op o, Value, Value, Value, Token t);
+
+  Value &get_dest() override;
+  Value &get_arg1() override;
+  Value &get_arg2() override;
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -186,8 +202,12 @@ private:
 public:
   Call(Value, Value, Symbol, Token t);
 
-  void print(Printer, const SymbolTable &) const override;
+  Value &get_dest() override;
+  Value &get_arg1() override;
+
   void add_arg(const Value &);
+
+  void print(Printer, const SymbolTable &) const override;
 };
 
 class Branch : public Instruction {
@@ -198,6 +218,8 @@ private:
 
 public:
   Branch(BranchCondition, Value, Position, Token t);
+
+  Value &get_arg1() override;
 
   void print(Printer, const SymbolTable &) const override;
 };
@@ -221,6 +243,9 @@ private:
 public:
   Mov(Value, Value, Token t);
 
+  Value &get_dest() override;
+  Value &get_arg1() override;
+
   void print(Printer, const SymbolTable &) const override;
 };
 
@@ -231,6 +256,8 @@ public:
   runtime::Error error;
 
   Error(BranchCondition, Value, runtime::Error, Token t);
+
+  Value &get_arg1() override;
 
   void print(Printer, const SymbolTable &) const override;
 };

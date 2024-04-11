@@ -5,6 +5,8 @@
 
 namespace hlir {
 
+static Value DUMMY_EMPTY_VALUE = Value::empty();
+
 /***********************
  *                     *
  *        Value        *
@@ -222,6 +224,84 @@ void Instruction::print(Printer printer, const SymbolTable &symbols) const {
   printer.exit();
 }
 
+bool Instruction::has_dest() {
+  switch (op) {
+  case Op::ADD:
+  case Op::SUB:
+  case Op::MULT:
+  case Op::DIV:
+  case Op::EQUAL:
+  case Op::LESS_EQUAL:
+  case Op::LESS_THAN:
+  case Op::NEG:
+  case Op::NOT:
+  case Op::IS_VOID:
+  case Op::NEW:
+  case Op::CALL:
+  case Op::MOV:
+  case Op::TYPE_ID_OF:
+  case Op::SUPERCLASS:
+    return true;
+
+  case Op::BRANCH:
+  case Op::LABEL:
+  case Op::ERROR:
+    return false;
+  }
+}
+
+Value &Instruction::get_dest() {
+  fatal("INTERNAL: trying to get_dest in unsupported instruction");
+
+  // the following is just to fool the linter
+  return DUMMY_EMPTY_VALUE;
+}
+
+int Instruction::num_sources() {
+  switch (op) {
+  case Op::ADD:
+  case Op::SUB:
+  case Op::MULT:
+  case Op::DIV:
+  case Op::EQUAL:
+  case Op::LESS_EQUAL:
+  case Op::LESS_THAN:
+    return 2;
+
+  case Op::NEG:
+  case Op::NOT:
+  case Op::IS_VOID:
+  case Op::NEW:
+  case Op::MOV:
+  case Op::TYPE_ID_OF:
+  case Op::SUPERCLASS:
+  case Op::ERROR:
+  case Op::BRANCH:
+    return 1;
+
+  case Op::CALL:
+    // TODO(IT) consider how to deal with CALL arguments
+    return 1;
+
+  case Op::LABEL:
+    return 0;
+  }
+}
+
+Value &Instruction::get_arg1() {
+  fatal("INTERNAL: trying to get_arg1 in unsupported instruction");
+
+  // the following is just to fool the linter
+  return DUMMY_EMPTY_VALUE;
+}
+
+Value &Instruction::get_arg2() {
+  fatal("INTERNAL: trying to get_arg2 in unsupported instruction");
+
+  // the following is just to fool the linter
+  return DUMMY_EMPTY_VALUE;
+}
+
 //
 // Unary
 //
@@ -236,6 +316,10 @@ void Unary::print(Printer printer, const SymbolTable &symbols) const {
                               hlir::to_string(arg, symbols)));
   printer.exit();
 }
+
+Value &Unary::get_dest() { return dest; }
+
+Value &Unary::get_arg1() { return arg; }
 
 //
 // New
@@ -252,6 +336,8 @@ void New::print(Printer printer, const SymbolTable &symbols) const {
   printer.exit();
 }
 
+Value &New::get_dest() { return dest; }
+
 //
 // Binary
 //
@@ -266,6 +352,12 @@ void Binary::print(Printer printer, const SymbolTable &symbols) const {
       hlir::to_string(left, symbols), hlir::to_string(right, symbols)));
   printer.exit();
 }
+
+Value &Binary::get_dest() { return dest; }
+
+Value &Binary::get_arg1() { return left; }
+
+Value &Binary::get_arg2() { return right; }
 
 //
 // Call
@@ -300,6 +392,10 @@ void Call::print(Printer printer, const SymbolTable &symbols) const {
 
 void Call::add_arg(const Value &arg) { args.push_back(arg); }
 
+Value &Call::get_dest() { return dest; }
+
+Value &Call::get_arg1() { return target; }
+
 //
 // Branch
 //
@@ -315,6 +411,7 @@ void Branch::print(Printer printer, const SymbolTable &symbols) const {
   printer.exit();
 }
 
+Value &Branch::get_arg1() { return value; }
 //
 // Label
 //
@@ -341,6 +438,10 @@ void Mov::print(Printer printer, const SymbolTable &symbols) const {
   printer.exit();
 }
 
+Value &Mov::get_dest() { return dest; }
+
+Value &Mov::get_arg1() { return src; }
+
 //
 // Error
 //
@@ -355,6 +456,8 @@ void Error::print(Printer printer, const SymbolTable &symbols) const {
       hlir::to_string(check, symbols), runtime::to_string(error)));
   printer.exit();
 }
+
+Value &Error::get_arg1() { return check; }
 
 /***********************
  *                     *
