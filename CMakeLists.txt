@@ -23,6 +23,7 @@ add_executable(coolc
   src/hlir_from_ast.cc
   src/constant_eval.cc
   src/runtime.cc
+  src/hlir_optimizer.cc
 )
 target_include_directories(coolc
   PUBLIC
@@ -47,6 +48,7 @@ add_executable(tests
   src/hlir_from_ast.cc
   src/constant_eval.cc
   src/runtime.cc
+  src/hlir_optimizer.cc
 )
 target_include_directories(tests
   PUBLIC

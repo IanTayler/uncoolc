@@ -7,6 +7,8 @@
 #include "ast.h"
 #include "error.h"
 #include "hlir.h"
+#include "hlir_optimizer.h"
+#include "optimizer_config.h"
 #include "parser.h"
 #include "semantic.h"
 #include "symbol.h"
@@ -206,6 +208,41 @@ hlir::Universe run_hlir_generation(ModuleNode *module, SymbolTable &symbols,
 
 /**********************
  *                    *
+ *   HLIR Optimizers  *
+ *                    *
+ *********************/
+
+void run_hlir_optimizers(hlir::Universe &universe,
+                         const OptimizerConfig &optimizer_config,
+                         const SymbolTable &symbols, const CliOptions &options,
+                         int &steps) {
+  hlir::PassManager pass_manager{universe, optimizer_config};
+
+  while (!pass_manager.is_done()) {
+    const hlir::Pass &pass = pass_manager.run_pass();
+
+    std::ostream *output = nullptr;
+    std::fstream out_file;
+
+    if (options.debug_output) {
+      std::filesystem::create_directories(options.debug_dir);
+      out_file.open(options.debug_dir /
+                        std::format("{:03}_{}_hlir.log", steps, pass.name),
+                    std::ios::out);
+      output = &out_file;
+    }
+
+    if (output != nullptr) {
+      Printer printer{options.indent, output};
+      universe.print(printer, symbols);
+    }
+
+    steps++;
+  }
+}
+
+/**********************
+ *                    *
  *     Entrypoint     *
  *                    *
  *********************/
@@ -257,4 +294,7 @@ int main(int argc, char *argv[]) {
 
   hlir::Universe universe =
       run_hlir_generation(ast.get(), symbols, options, steps);
+
+  OptimizerConfig optimizer_config;
+  run_hlir_optimizers(universe, optimizer_config, symbols, options, steps);
 }
