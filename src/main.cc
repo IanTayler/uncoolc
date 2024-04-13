@@ -192,7 +192,7 @@ hlir::Universe run_hlir_generation(ModuleNode *module, SymbolTable &symbols,
 
   if (options.debug_output) {
     std::filesystem::create_directories(options.debug_dir);
-    out_file.open(options.debug_dir / std::format("{:03}_hlir.log", steps),
+    out_file.open(options.debug_dir / std::format("{:03}_from_ast.hlir", steps),
                   std::ios::out);
     output = &out_file;
   }
@@ -227,7 +227,7 @@ void run_hlir_optimizers(hlir::Universe &universe,
     if (options.debug_output) {
       std::filesystem::create_directories(options.debug_dir);
       out_file.open(options.debug_dir /
-                        std::format("{:03}_{}_hlir.log", steps, pass.name),
+                        std::format("{:03}_{}_opt.hlir", steps, pass.name),
                     std::ios::out);
       output = &out_file;
     }
